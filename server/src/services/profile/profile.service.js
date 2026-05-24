@@ -94,6 +94,8 @@ async ({
   skillName,
 }) => {
 
+  skillName = skillName.trim().toLowerCase();
+
   let skill =
     await prisma.skill.findUnique({
       where: {
@@ -111,6 +113,21 @@ async ({
       });
 
   }
+
+  const existingSkill =
+  await prisma.userSkill.findFirst({
+
+    where: {
+      userId,
+      skillId: skill.id,
+    },
+  });
+
+if (existingSkill) {
+  throw new Error(
+    "Skill already added"
+  );
+}
 
   const userSkill =
     await prisma.userSkill.create({
