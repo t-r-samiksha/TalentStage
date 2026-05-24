@@ -12,6 +12,9 @@ import milestoneRoutes
 from "./routes/milestone.routes.js";
 import notificationRoutes
 from "./routes/notification.routes.js";
+import {
+  errorMiddleware,
+} from "./middleware/error.middleware.js";
 
 dotenv.config();
 
@@ -26,6 +29,8 @@ app.use("/api/proposals", proposalRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/milestones",milestoneRoutes);
 app.use("/api/notifications",notificationRoutes);
+
+app.use(errorMiddleware);
 
 app.get("/", (req, res) => {
   res.send("TalentStage Backend Running 🚀");
