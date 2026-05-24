@@ -314,7 +314,7 @@ function App() {
       </nav>
 
       {/* SECTION 2: HERO SECTION */}
-      <section className="relative pt-32 pb-24 md:pt-44 md:pb-36 px-6 max-w-7xl mx-auto">
+      <section className="relative py-24 md:py-32 px-6 max-w-7xl mx-auto">
         
         {/* Metric Badges */}
         <div className="flex justify-center mb-6">
@@ -326,32 +326,29 @@ function App() {
 
         {/* Headline */}
         <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-6">
-            Assemble Your Elite AI & Web3 Dev Team{' '}
-            <span className="bg-gradient-to-r from-violet-400 via-indigo-300 to-purple-400 bg-clip-text text-transparent block mt-2">
-              In Fifteen Seconds.
-            </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.15] mb-6 bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            AI-Powered Freelancer Hiring Marketplace
           </h1>
           
           <p className="text-base sm:text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            FreelanceAI matches autonomous agentic specifications directly to vetted, top-tier engineering talent. Secured by automatic escrow-releasing smart contracts.
+            Hire verified freelancers smarter with AI matching and proposal analysis.
           </p>
 
           {/* Hero CTAs */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4.5 mb-16">
             <a 
               href="#freelancers" 
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6.5 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-700 font-semibold text-white hover:scale-105 active:scale-95 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/35 transition-all duration-200"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-700 font-semibold text-white hover:scale-105 active:scale-95 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/35 transition-all duration-200"
             >
-              <span>Hire Top Talent</span>
+              <span>Hire Talent</span>
               <ArrowRight className="w-4 h-4" />
             </a>
             
             <a 
-              href="#features" 
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6.5 py-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800 text-slate-300 hover:text-white font-semibold transition-all duration-200"
+              href="#freelancers" 
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-7 py-4 rounded-xl border border-slate-800 bg-transparent text-slate-300 hover:text-white hover:border-slate-50 hover:bg-slate-900/40 font-semibold hover:scale-105 active:scale-95 transition-all duration-200"
             >
-              <span>Learn How It Works</span>
+              <span>Become Freelancer</span>
             </a>
           </div>
         </div>
