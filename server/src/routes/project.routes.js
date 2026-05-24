@@ -17,12 +17,6 @@ from "../validators/project.validator.js";
 
 const router = express.Router();
 
-router.post(
-  "/",
-  authMiddleware,
-  createProjectController
-);
-
 router.get(
   "/",
   getAllProjectsController

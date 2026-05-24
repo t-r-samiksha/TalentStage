@@ -1,34 +1,25 @@
 import prisma from "../../config/db.js";
+import { createNotificationService } from "../notification/notification.service.js";
 
-export const hireFreelancerService =
-async ({
-  proposalId,
-  clientId,
-}) => {
-
+export const hireFreelancerService = async ({ proposalId, clientId }) => {
   // find proposal
-  const proposal =
-    await prisma.proposal.findUnique({
-      where: {
-        id: proposalId,
-      },
+  const proposal = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId,
+    },
 
-      include: {
-        project: true,
-      },
-    });
+    include: {
+      project: true,
+    },
+  });
 
   if (!proposal) {
     throw new Error("Proposal not found");
   }
 
   // verify ownership
-  if (
-    proposal.project.clientId !== clientId
-  ) {
-    throw new Error(
-      "Unauthorized action"
-    );
+  if (proposal.project.clientId !== clientId) {
+    throw new Error("Unauthorized action");
   }
 
   // update proposal status
@@ -54,17 +45,82 @@ async ({
   });
 
   // create contract
-  const contract =
-    await prisma.contract.create({
-      data: {
-        projectId: proposal.projectId,
+  const contract = await prisma.contract.create({
+    data: {
+      projectId: proposal.projectId,
 
-        clientId,
+      clientId,
 
-        freelancerId:
-          proposal.freelancerId,
+      freelancerId: proposal.freelancerId,
+    },
+  });
+
+  await createNotificationService({
+    userId: proposal.freelancerId,
+
+    title: "Proposal Accepted",
+
+    message: "Client hired you for the project.",
+  });
+
+  return contract;
+};
+
+export const getMyContractsService = async (userId) => {
+  const contracts = await prisma.contract.findMany({
+    where: {
+      OR: [
+        {
+          clientId: userId,
+        },
+        {
+          freelancerId: userId,
+        },
+      ],
+    },
+
+    include: {
+      project: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return contracts;
+};
+
+export const getContractByIdService = async (contractId) => {
+  const contract = await prisma.contract.findUnique({
+    where: {
+      id: contractId,
+    },
+
+    include: {
+      project: true,
+
+      client: {
+        select: {
+          id: true,
+          email: true,
+        },
       },
-    });
+
+      freelancer: {
+        select: {
+          id: true,
+          email: true,
+        },
+      },
+
+      milestones: true,
+    },
+  });
+
+  if (!contract) {
+    throw new Error("Contract not found");
+  }
 
   return contract;
 };

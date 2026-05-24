@@ -2,6 +2,8 @@ import express from "express";
 
 import {
   hireFreelancerController,
+  getMyContractsController,
+getContractByIdController,
 } from "../controllers/contract.controller.js";
 
 import { authMiddleware }
@@ -13,6 +15,18 @@ router.post(
   "/hire",
   authMiddleware,
   hireFreelancerController
+);
+
+router.get(
+  "/my",
+  authMiddleware,
+  getMyContractsController
+);
+
+router.get(
+  "/:id",
+  authMiddleware,
+  getContractByIdController
 );
 
 export default router;

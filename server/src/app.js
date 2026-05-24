@@ -8,6 +8,10 @@ import proposalRoutes
 from "./routes/proposal.routes.js";
 import contractRoutes
 from "./routes/contract.routes.js";
+import milestoneRoutes
+from "./routes/milestone.routes.js";
+import notificationRoutes
+from "./routes/notification.routes.js";
 
 dotenv.config();
 
@@ -20,6 +24,8 @@ app.use("/api/test", testRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/proposals", proposalRoutes);
 app.use("/api/contracts", contractRoutes);
+app.use("/api/milestones",milestoneRoutes);
+app.use("/api/notifications",notificationRoutes);
 
 app.get("/", (req, res) => {
   res.send("TalentStage Backend Running 🚀");
