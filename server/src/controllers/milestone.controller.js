@@ -5,6 +5,7 @@ import {
   approveMilestoneService,
   requestRevisionService,
 } from "../services/milestone/milestone.service.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const createMilestoneController =
 async (req, res) => {
@@ -16,17 +17,11 @@ async (req, res) => {
         req.body
       );
 
-    return res.status(201).json({
-      success: true,
-      milestone,
-    });
+    return successResponse(res, milestone, "Milestone created successfully", 201);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -42,17 +37,11 @@ async (req, res) => {
         req.params.contractId
       );
 
-    return res.status(200).json({
-      success: true,
-      milestones,
-    });
+    return successResponse(res, milestones, "Milestones fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -68,17 +57,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      milestone,
-    });
+    return successResponse(res, milestone, "Milestone submitted successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -94,17 +77,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      milestone,
-    });
+    return successResponse(res, milestone, "Milestone approved successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -120,17 +97,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      milestone,
-    });
+    return successResponse(res, milestone, "Revision requested successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 

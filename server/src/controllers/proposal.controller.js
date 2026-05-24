@@ -2,6 +2,7 @@ import {
   submitProposalService,
   getMyProposalsService,
 } from "../services/proposal/proposal.service.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const submitProposalController =
 async (req, res) => {
@@ -14,17 +15,11 @@ async (req, res) => {
         freelancerId: req.user.userId,
       });
 
-    return res.status(201).json({
-      success: true,
-      proposal,
-    });
+    return successResponse(res, proposal, "Proposal submitted successfully", 201);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -40,17 +35,11 @@ async (req, res) => {
         req.user.userId
       );
 
-    return res.status(200).json({
-      success: true,
-      proposals,
-    });
+    return successResponse(res, proposals, "Proposals fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 

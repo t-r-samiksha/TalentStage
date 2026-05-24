@@ -2,6 +2,7 @@ import {
   getMyNotificationsService,
   markNotificationReadService,
 } from "../services/notification/notification.service.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const getMyNotificationsController =
 async (req, res) => {
@@ -13,17 +14,11 @@ async (req, res) => {
         req.user.userId
       );
 
-    return res.status(200).json({
-      success: true,
-      notifications,
-    });
+    return successResponse(res, notifications, "Notifications fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -39,17 +34,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      notification,
-    });
+    return successResponse(res, notification, "Notification marked as read successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 

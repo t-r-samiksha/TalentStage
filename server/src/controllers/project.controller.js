@@ -3,6 +3,7 @@ import {
   getAllProjectsService,
   getProjectByIdService,
 } from "../services/project/project.service.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const createProjectController = async (
   req,
@@ -16,17 +17,11 @@ export const createProjectController = async (
       clientId: req.user.userId,
     });
 
-    return res.status(201).json({
-      success: true,
-      project,
-    });
+    return successResponse(res, project, "Project created successfully", 201);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -42,17 +37,11 @@ export const getAllProjectsController = async (
     const projects =
       await getAllProjectsService();
 
-    return res.status(200).json({
-      success: true,
-      projects,
-    });
+    return successResponse(res, projects, "Projects fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -68,17 +57,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      project,
-    });
+    return successResponse(res, project, "Project fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(404).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 404);
 
   }
 

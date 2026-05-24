@@ -1,3 +1,6 @@
+import { errorResponse }
+from "../utils/apiResponse.js";
+
 export const validate =
 (schema) =>
 (req, res, next) => {
@@ -10,10 +13,12 @@ export const validate =
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      errors: error.errors,
-    });
+    return errorResponse(
+      res,
+      error.errors?.[0]?.message ||
+        "Validation failed",
+      400
+    );
 
   }
 

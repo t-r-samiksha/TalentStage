@@ -1,6 +1,7 @@
 import { signupService, loginService } from "../services/auth/auth.service.js";
 
 import { generateToken } from "../utils/generateToken.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const signupController = async (req, res) => {
 
@@ -10,22 +11,23 @@ export const signupController = async (req, res) => {
 
     const token = generateToken(user);
 
-    return res.status(201).json({
-      success: true,
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
+    return successResponse(
+      res,
+      {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
       },
-    });
+      "Signup successful",
+      201
+    );
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -39,22 +41,23 @@ export const loginController = async (req, res) => {
 
     const token = generateToken(user);
 
-    return res.status(200).json({
-      success: true,
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
+    return successResponse(
+      res,
+      {
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        },
       },
-    });
+      "Login successful",
+      200
+    );
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 

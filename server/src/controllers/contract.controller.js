@@ -3,6 +3,7 @@ import {
   getMyContractsService,
 getContractByIdService,
 } from "../services/contract/contract.service.js";
+import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
 export const hireFreelancerController =
 async (req, res) => {
@@ -18,17 +19,11 @@ async (req, res) => {
           req.user.userId,
       });
 
-    return res.status(201).json({
-      success: true,
-      contract,
-    });
+    return successResponse(res, contract, "Freelancer hired successfully", 201);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -44,17 +39,11 @@ async (req, res) => {
         req.user.userId
       );
 
-    return res.status(200).json({
-      success: true,
-      contracts,
-    });
+    return successResponse(res, contracts, "Contracts fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 400);
 
   }
 
@@ -70,17 +59,11 @@ async (req, res) => {
         req.params.id
       );
 
-    return res.status(200).json({
-      success: true,
-      contract,
-    });
+    return successResponse(res, contract, "Contract fetched successfully", 200);
 
   } catch (error) {
 
-    return res.status(404).json({
-      success: false,
-      message: error.message,
-    });
+    return errorResponse(res, error.message, 404);
 
   }
 
