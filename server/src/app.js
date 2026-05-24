@@ -15,6 +15,8 @@ from "./routes/notification.routes.js";
 import {
   errorMiddleware,
 } from "./middleware/error.middleware.js";
+import profileRoutes
+from "./routes/profile.routes.js";
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.use("/api/proposals", proposalRoutes);
 app.use("/api/contracts", contractRoutes);
 app.use("/api/milestones",milestoneRoutes);
 app.use("/api/notifications",notificationRoutes);
+app.use("/api/profile",profileRoutes);
 
 app.use(errorMiddleware);
 
