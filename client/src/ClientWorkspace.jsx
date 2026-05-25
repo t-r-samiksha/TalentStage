@@ -257,16 +257,10 @@ function ClientWorkspace({ onNavigate }) {
 
             {/* Saved Freelancers */}
             <button
-              onClick={() => setActiveTab('freelancers')}
-              className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
-                ${activeTab === 'freelancers'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
-                }
-              `}
+              onClick={() => onNavigate('skill-match')}
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
             >
-              <Award className="w-4 h-4" />
+              <Award className="w-4 h-4 text-violet-400" />
               <span>Saved Freelancers</span>
               <span className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
             </button>

@@ -6,9 +6,10 @@ import FreelancerOnboarding from './FreelancerOnboarding';
 import FreelancerDashboard from './FreelancerDashboard';
 import ClientWorkspace from './ClientWorkspace';
 import ProjectFeedWorkspace from './ProjectFeedWorkspace';
+import SkillMatchWorkspace from './SkillMatchWorkspace';
 
 function App() {
-  const [view, setView] = useState('project-feed');
+  const [view, setView] = useState('skill-match');
 
   if (view === 'login') {
     return <LoginPage onNavigate={setView} />;
@@ -27,6 +28,9 @@ function App() {
   }
   if (view === 'project-feed') {
     return <ProjectFeedWorkspace onNavigate={setView} />;
+  }
+  if (view === 'skill-match') {
+    return <SkillMatchWorkspace onNavigate={setView} />;
   }
   return <LandingPage onNavigate={setView} />;
 }
