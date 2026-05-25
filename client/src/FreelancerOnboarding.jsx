@@ -220,7 +220,7 @@ function FreelancerOnboarding({ onNavigate }) {
       setIsLoading(false);
       setShowSuccessModal(true);
       setTimeout(() => {
-        onNavigate('landing');
+        onNavigate('dashboard');
       }, 2500);
     }, 2000);
   };
