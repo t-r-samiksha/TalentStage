@@ -136,6 +136,16 @@ function FreelancerDashboard({ onNavigate }) {
               )}
             </button>
 
+            {/* Browse Projects Link */}
+            <button
+              onClick={() => onNavigate('project-feed')}
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+            >
+              <Cpu className="w-4 h-4 text-violet-400" />
+              <span>Browse Projects</span>
+              <span className="ml-auto text-[8px] font-extrabold uppercase bg-violet-600/10 border border-violet-500/20 text-violet-400 px-1 rounded shadow-sm shadow-violet-500/10">Feed</span>
+            </button>
+
             {/* Portfolio Link */}
             <button
               onClick={() => setActiveTab('portfolio')}

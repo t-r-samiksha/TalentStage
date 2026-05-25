@@ -5,9 +5,10 @@ import SignupPage from './SignupPage';
 import FreelancerOnboarding from './FreelancerOnboarding';
 import FreelancerDashboard from './FreelancerDashboard';
 import ClientWorkspace from './ClientWorkspace';
+import ProjectFeedWorkspace from './ProjectFeedWorkspace';
 
 function App() {
-  const [view, setView] = useState('client-dashboard');
+  const [view, setView] = useState('project-feed');
 
   if (view === 'login') {
     return <LoginPage onNavigate={setView} />;
@@ -23,6 +24,9 @@ function App() {
   }
   if (view === 'client-dashboard') {
     return <ClientWorkspace onNavigate={setView} />;
+  }
+  if (view === 'project-feed') {
+    return <ProjectFeedWorkspace onNavigate={setView} />;
   }
   return <LandingPage onNavigate={setView} />;
 }
