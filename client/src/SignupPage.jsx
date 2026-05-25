@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
 import {
-  Cpu, ArrowLeft, Mail, Lock, User, Briefcase, Code2,
-  Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight, Check,
+  Cpu, ArrowLeft, Mail, Lock, User, Briefcase, Sparkles,
+  Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight,
+  Check, UserCheck,
 } from 'lucide-react';
 
 // ─── Realistic multi-colour Google icon ───────────────────────────────────────
@@ -23,22 +24,21 @@ const GithubIcon = (props) => (
   </svg>
 );
 
-// ─── Password strength logic ───────────────────────────────────────────────────
+// ─── Password strength hook ────────────────────────────────────────────────────
 function usePasswordStrength(password) {
   return useMemo(() => {
     if (!password) return { score: 0, label: '', color: '' };
     let score = 0;
-    if (password.length >= 8)               score++;
-    if (password.length >= 12)              score++;
-    if (/[A-Z]/.test(password))            score++;
-    if (/[0-9]/.test(password))            score++;
-    if (/[^A-Za-z0-9]/.test(password))    score++;
-
-    if (score <= 1) return { score, label: 'Weak',   color: 'bg-rose-500' };
-    if (score <= 2) return { score, label: 'Fair',   color: 'bg-amber-500' };
-    if (score <= 3) return { score, label: 'Good',   color: 'bg-yellow-400' };
-    if (score <= 4) return { score, label: 'Strong', color: 'bg-emerald-500' };
-    return            { score, label: 'Excellent', color: 'bg-emerald-400' };
+    if (password.length >= 8)            score++;
+    if (password.length >= 12)           score++;
+    if (/[A-Z]/.test(password))          score++;
+    if (/[0-9]/.test(password))          score++;
+    if (/[^A-Za-z0-9]/.test(password))  score++;
+    if (score <= 1) return { score, label: 'Weak',      color: 'bg-rose-500' };
+    if (score <= 2) return { score, label: 'Fair',      color: 'bg-amber-500' };
+    if (score <= 3) return { score, label: 'Good',      color: 'bg-yellow-400' };
+    if (score <= 4) return { score, label: 'Strong',    color: 'bg-emerald-500' };
+    return             { score, label: 'Excellent', color: 'bg-emerald-400' };
   }, [password]);
 }
 
@@ -83,66 +83,151 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
   );
 }
 
-// ─── Role card ────────────────────────────────────────────────────────────────
-function RoleCard({ selected, onClick, icon: Icon, title, subtitle, accentColor }) {
+// ─── Role definitions ─────────────────────────────────────────────────────────
+const ROLES = [
+  {
+    id: 'freelancer',
+    icon: UserCheck,
+    title: 'Freelancer',
+    description: 'Get matched with projects & earn with smart escrow protection',
+    accentFrom: 'from-violet-600/20',
+    accentTo: 'to-violet-800/10',
+    border: 'border-violet-500/70',
+    glow: 'shadow-violet-500/25',
+    iconColor: 'text-violet-400',
+    badgeBg: 'bg-violet-500',
+  },
+  {
+    id: 'client',
+    icon: Briefcase,
+    title: 'Client',
+    description: 'Post projects, hire top talent & deploy on-chain escrows seamlessly',
+    accentFrom: 'from-indigo-600/20',
+    accentTo: 'to-indigo-800/10',
+    border: 'border-indigo-500/70',
+    glow: 'shadow-indigo-500/25',
+    iconColor: 'text-indigo-400',
+    badgeBg: 'bg-indigo-500',
+  },
+  {
+    id: 'dual',
+    icon: Sparkles,
+    title: 'Dual Account',
+    description: 'Full access — hire talent and take on projects simultaneously',
+    accentFrom: 'from-fuchsia-600/20',
+    accentTo: 'to-indigo-700/10',
+    border: 'border-fuchsia-500/70',
+    glow: 'shadow-fuchsia-500/25',
+    iconColor: 'text-fuchsia-400',
+    badgeBg: 'bg-fuchsia-500',
+  },
+];
+
+// ─── Role card component ──────────────────────────────────────────────────────
+function RoleCard({ role, selected, onClick }) {
+  const { icon: Icon, title, description, accentFrom, accentTo, border, glow, iconColor, badgeBg } = role;
+
   return (
     <button
       type="button"
       onClick={onClick}
       className={`
-        relative flex flex-col items-center gap-1.5 py-4 px-3 rounded-xl border
-        cursor-pointer transition-all duration-250 overflow-hidden group
+        relative flex flex-col items-center text-center gap-2.5
+        py-5 px-3.5 rounded-2xl border cursor-pointer
+        overflow-hidden transition-all duration-300 group
         ${selected
-          ? `${accentColor.border} ${accentColor.bg} ${accentColor.text} shadow-lg ${accentColor.shadow}`
-          : 'border-slate-800 bg-slate-950/60 text-slate-500 hover:border-slate-700 hover:text-slate-300 hover:bg-slate-900/40'
+          ? `${border} bg-gradient-to-b ${accentFrom} ${accentTo} shadow-lg ${glow}`
+          : 'border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900/40'
         }
       `}
+      aria-pressed={selected}
     >
-      {/* Inner shine on selected */}
+      {/* Inner top sheen when active */}
       {selected && (
-        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.06] to-transparent pointer-events-none rounded-xl" />
+        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.07] to-transparent pointer-events-none rounded-2xl" />
       )}
-      {/* Active indicator dot */}
-      {selected && (
-        <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 rounded-full bg-current opacity-80" />
+
+      {/* Hover shimmer when inactive */}
+      {!selected && (
+        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl pointer-events-none" />
       )}
-      <Icon className="w-5 h-5" strokeWidth={selected ? 2.2 : 1.8} />
-      <span className="text-[11px] font-bold tracking-tight">{title}</span>
-      <span className="text-[9px] font-medium opacity-60 leading-tight text-center">{subtitle}</span>
+
+      {/* Checkmark badge — appears when selected */}
+      <span
+        className={`
+          absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center
+          transition-all duration-300
+          ${selected
+            ? `${badgeBg} scale-100 opacity-100 shadow-sm`
+            : 'bg-slate-800 scale-75 opacity-0'
+          }
+        `}
+      >
+        <Check className="w-2.5 h-2.5 text-white" strokeWidth={3.5} />
+      </span>
+
+      {/* Icon container */}
+      <div className={`
+        w-10 h-10 rounded-xl flex items-center justify-center
+        transition-all duration-300
+        ${selected
+          ? `${iconColor} bg-white/10 shadow-sm`
+          : 'text-slate-500 bg-slate-900/60 group-hover:text-slate-300'
+        }
+      `}>
+        <Icon className="w-5 h-5" strokeWidth={selected ? 2.2 : 1.8} />
+      </div>
+
+      {/* Title */}
+      <span className={`text-[12px] font-bold tracking-tight transition-colors duration-200 ${selected ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
+        {title}
+      </span>
+
+      {/* Micro description */}
+      <span className={`text-[9.5px] leading-relaxed font-medium transition-colors duration-200 ${selected ? 'text-slate-300 opacity-80' : 'text-slate-600 group-hover:text-slate-500'}`}>
+        {description}
+      </span>
     </button>
   );
 }
 
-// ─── Main component ────────────────────────────────────────────────────────────
+// ─── Main SignupPage component ────────────────────────────────────────────────
 function SignupPage({ onNavigate }) {
-  const [name, setName]                   = useState('');
-  const [email, setEmail]                 = useState('');
-  const [password, setPassword]           = useState('');
-  const [showPassword, setShowPassword]   = useState(false);
-  const [role, setRole]                   = useState('client'); // 'client' | 'developer'
-  const [agreed, setAgreed]              = useState(false);
-  const [isLoading, setIsLoading]         = useState(false);
-  const [oauthLoading, setOauthLoading]   = useState(''); // 'google' | 'github' | ''
-  const [error, setError]                 = useState('');
-  const [success, setSuccess]             = useState(false);
+  const [name, setName]                       = useState('');
+  const [email, setEmail]                     = useState('');
+  const [password, setPassword]               = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword]       = useState(false);
+  const [showConfirm, setShowConfirm]         = useState(false);
+  const [role, setRole]                       = useState('freelancer');
+  const [agreed, setAgreed]                   = useState(false);
+  const [isLoading, setIsLoading]             = useState(false);
+  const [oauthLoading, setOauthLoading]       = useState('');
+  const [error, setError]                     = useState('');
+  const [success, setSuccess]                 = useState(false);
 
   const strength = usePasswordStrength(password);
+  const selectedRole = ROLES.find((r) => r.id === role);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
-    if (!name.trim() || !email.trim() || !password.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Please fill in all fields to continue.');
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match. Please check and try again.');
       return;
     }
     if (!agreed) {
-      setError('Please accept the terms of service to create your account.');
+      setError('Please accept the Terms of Service to create your account.');
       return;
     }
 
@@ -150,7 +235,7 @@ function SignupPage({ onNavigate }) {
     setTimeout(() => {
       setIsLoading(false);
       setSuccess(true);
-    }, 1600);
+    }, 1700);
   };
 
   const handleOAuth = (provider) => {
@@ -162,33 +247,43 @@ function SignupPage({ onNavigate }) {
     }, 1400);
   };
 
-  // ── Success state ─────────────────────────────────────────────────────────
+  // ── Success / confirmation state ──────────────────────────────────────────
   if (success) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6 relative overflow-hidden">
+        {/* Ambient glow */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-600/5 blur-[140px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-600/6 blur-[150px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-indigo-600/8 blur-[100px]" />
         </div>
 
         <div className="relative z-10 w-full max-w-md text-center">
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-lg bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70 p-10">
-            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70 p-10">
+            {/* Accent line */}
+            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+            {/* Inner sheen */}
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
 
-            {/* Animated checkmark ring */}
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-600/20 to-indigo-600/20 border border-violet-500/30 flex items-center justify-center text-violet-400 mx-auto mb-5 shadow-lg shadow-violet-500/10">
-              <CheckCircle2 className="w-8 h-8" />
+            {/* Animated success icon */}
+            <div className="relative w-16 h-16 mx-auto mb-6">
+              <div className="absolute inset-0 rounded-2xl bg-emerald-500/15 animate-ping opacity-30" />
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600/25 to-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/15">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
             </div>
 
             <h2 className="text-2xl font-extrabold tracking-tight text-white mb-2">
-              You're in.
+              You're in. 🎉
             </h2>
-            <p className="text-sm text-slate-400 leading-relaxed mb-2 max-w-xs mx-auto">
-              Your account is live. You're registered as a{' '}
-              <span className="text-violet-400 font-semibold">
-                {role === 'client' ? 'Client' : 'Developer'}
+            <p className="text-sm text-slate-400 leading-relaxed mb-1 max-w-xs mx-auto">
+              Account created as a{' '}
+              <span className={`font-bold ${selectedRole?.iconColor ?? 'text-violet-400'}`}>
+                {selectedRole?.title ?? role}
               </span>.
             </p>
-            <p className="text-xs text-slate-600 mb-8">Welcome to the FreelanceAI smart-escrow network.</p>
+            <p className="text-xs text-slate-600 mb-8">
+              Welcome to the FreelanceAI smart-escrow network.
+            </p>
 
             <button
               onClick={() => onNavigate('landing')}
@@ -207,11 +302,11 @@ function SignupPage({ onNavigate }) {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 py-14 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
 
-      {/* ── Ambient radial glows ── */}
+      {/* ── Layered ambient radial glows ── */}
       <div className="pointer-events-none absolute inset-0 -z-0">
         <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-700/8 blur-[130px] animate-pulse-glow" />
         <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/7 blur-[110px] animate-pulse-glow-reverse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-violet-600/4 blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-fuchsia-700/4 blur-[80px]" />
       </div>
 
       {/* ── Back to home ── */}
@@ -225,8 +320,8 @@ function SignupPage({ onNavigate }) {
         </button>
       </div>
 
-      {/* ── Card ── */}
-      <div className="relative z-10 w-full max-w-[440px]">
+      {/* ── Card wrapper ── */}
+      <div className="relative z-10 w-full max-w-[460px]">
 
         {/* Brand lockup */}
         <div className="flex flex-col items-center mb-7">
@@ -243,18 +338,18 @@ function SignupPage({ onNavigate }) {
             </span>
           </button>
 
-          <h1 className="text-2xl font-extrabold tracking-tight text-white leading-tight">
+          <h2 className="text-2xl font-extrabold tracking-tight text-white leading-tight">
             Create your account
-          </h1>
+          </h2>
           <p className="text-sm text-slate-500 mt-1.5 text-center">
             Join the AI-powered freelance network in under 60 seconds.
           </p>
         </div>
 
-        {/* Glass card */}
-        <div className="relative rounded-2xl overflow-hidden backdrop-blur-lg bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70">
+        {/* ── Glass card ── */}
+        <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70">
 
-          {/* Violet top accent line */}
+          {/* Violet hairline top accent */}
           <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
           {/* Inner sheen */}
           <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
@@ -269,42 +364,27 @@ function SignupPage({ onNavigate }) {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
-              {/* ── Role selector ── */}
+              {/* ══ ROLE SELECTOR ════════════════════════════════════════════════ */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 mb-2.5 select-none">
-                  I want to
+                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-3 select-none">
+                  I am joining as
                 </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <RoleCard
-                    selected={role === 'client'}
-                    onClick={() => setRole('client')}
-                    icon={Briefcase}
-                    title="Hire Talent"
-                    subtitle="Post projects & deploy escrows"
-                    accentColor={{
-                      border: 'border-violet-500/70',
-                      bg: 'bg-violet-600/10',
-                      text: 'text-violet-300',
-                      shadow: 'shadow-violet-500/10',
-                    }}
-                  />
-                  <RoleCard
-                    selected={role === 'developer'}
-                    onClick={() => setRole('developer')}
-                    icon={Code2}
-                    title="Work as Dev"
-                    subtitle="Get matched & earn on-chain"
-                    accentColor={{
-                      border: 'border-indigo-500/70',
-                      bg: 'bg-indigo-600/10',
-                      text: 'text-indigo-300',
-                      shadow: 'shadow-indigo-500/10',
-                    }}
-                  />
+                <div className="grid grid-cols-3 gap-2.5">
+                  {ROLES.map((r) => (
+                    <RoleCard
+                      key={r.id}
+                      role={r}
+                      selected={role === r.id}
+                      onClick={() => setRole(r.id)}
+                    />
+                  ))}
                 </div>
               </div>
+
+              {/* Soft separator */}
+              <div className="h-px bg-slate-800/60" />
 
               {/* ── Full Name ── */}
               <AuthInput
@@ -318,10 +398,10 @@ function SignupPage({ onNavigate }) {
                 autoComplete="name"
               />
 
-              {/* ── Work Email ── */}
+              {/* ── Email ── */}
               <AuthInput
                 id="signup-email"
-                label="Work Email"
+                label="Email Address"
                 type="email"
                 placeholder="you@company.com"
                 value={email}
@@ -353,7 +433,6 @@ function SignupPage({ onNavigate }) {
                   )}
                 </div>
 
-                {/* Input */}
                 <div className="relative group">
                   <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
                     <Lock className="w-4 h-4" />
@@ -389,7 +468,7 @@ function SignupPage({ onNavigate }) {
 
                 {/* Strength bar */}
                 {password && (
-                  <div className="flex gap-1 mt-1">
+                  <div className="flex gap-1 mt-0.5">
                     {[1, 2, 3, 4, 5].map((seg) => (
                       <div
                         key={seg}
@@ -402,8 +481,77 @@ function SignupPage({ onNavigate }) {
                 )}
               </div>
 
+              {/* ── Confirm Password ── */}
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="signup-confirm-password"
+                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+                >
+                  Confirm Password
+                </label>
+                <div className="relative group">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+                    <Lock className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="signup-confirm-password"
+                    type={showConfirm ? 'text' : 'password'}
+                    placeholder="Re-enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    required
+                    className={`
+                      w-full pl-10 pr-10 py-3 rounded-xl
+                      bg-slate-950 border
+                      text-sm text-white placeholder:text-slate-700
+                      focus:outline-none focus:ring-1
+                      hover:border-slate-700
+                      transition-all duration-200
+                      ${confirmPassword && password !== confirmPassword
+                        ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/40'
+                        : confirmPassword && password === confirmPassword
+                          ? 'border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-500/40'
+                          : 'border-slate-800 focus:border-indigo-500 focus:ring-indigo-500/60'
+                      }
+                    `}
+                  />
+                  <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center">
+                    {/* Show match indicator if typed, else eye toggle */}
+                    {confirmPassword ? (
+                      password === confirmPassword ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm((v) => !v)}
+                          className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                          aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      )
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirm((v) => !v)}
+                        className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                        aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    )}
+                  </span>
+                </div>
+                {confirmPassword && password !== confirmPassword && (
+                  <p className="text-[10px] text-rose-400 font-medium mt-0.5">
+                    Passwords don't match.
+                  </p>
+                )}
+              </div>
+
               {/* ── Terms checkbox ── */}
-              <div className="flex items-start gap-2.5 pt-1">
+              <div className="flex items-start gap-2.5 pt-0.5">
                 <button
                   type="button"
                   onClick={() => setAgreed((v) => !v)}
@@ -448,11 +596,11 @@ function SignupPage({ onNavigate }) {
                 disabled={isLoading}
                 className="
                   w-full py-3.5 mt-1 rounded-xl
-                  bg-gradient-to-r from-violet-600 via-indigo-600 to-violet-700
+                  bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600
                   hover:brightness-110 active:scale-[0.98]
                   disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed
                   text-white text-sm font-bold tracking-tight
-                  shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30
+                  shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30
                   flex items-center justify-center gap-2.5
                   transition-all duration-200 cursor-pointer
                 "
@@ -464,7 +612,7 @@ function SignupPage({ onNavigate }) {
                   </>
                 ) : (
                   <>
-                    <span>Create Free Account</span>
+                    <span>Create Account</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
