@@ -131,6 +131,7 @@ function LandingPage({ onNavigate }) {
   
   // Scrolled state for Navbar shadow/blur transition
   const [scrolled, setScrolled] = useState(false);
+  const [previewChartTab, setPreviewChartTab] = useState('weekly');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -392,117 +393,190 @@ function LandingPage({ onNavigate }) {
               <span className="w-3 h-3 rounded-full bg-rose-500/80" />
               <span className="w-3 h-3 rounded-full bg-amber-500/80" />
               <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-              <span className="text-xs font-semibold text-slate-500 ml-2 select-none">WORKSPACE // AGENTIC_MATCHMAKER</span>
+              <span className="text-xs font-semibold text-slate-500 ml-2 select-none">WORKSPACE // LIVE_MATCH_ANALYTICS</span>
             </div>
             <div className="flex items-center gap-2 text-xs font-medium text-slate-400 bg-slate-950/60 border border-slate-800/80 rounded-md px-2.5 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Matching Core v1.42</span>
+              <span>Engine Status: Online</span>
             </div>
           </div>
 
           {/* Dashboard Columns */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-4">
             
-            {/* Left Sidebar Mockup */}
-            <div className="lg:col-span-3 flex flex-col gap-1.5">
-              <div className="text-slate-500 text-[10px] font-bold px-2 py-1 uppercase tracking-widest">Navigation</div>
-              {[
-                { label: "AI Matcher Hub", icon: Cpu, active: true },
-                { label: "Active Milestones", icon: Briefcase, count: 2 },
-                { label: "Smart Escrows", icon: ShieldCheck, status: "Secure" },
-                { label: "Commit Logs", icon: Terminal }
-              ].map((item, index) => (
-                <div 
-                  key={index} 
-                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold cursor-default transition-all duration-200 ${
-                    item.active 
-                      ? 'bg-violet-600/15 border border-violet-500/30 text-violet-300' 
-                      : 'hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </div>
-                  {item.count && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 text-[9px] font-bold">{item.count}</span>
-                  )}
-                  {item.status && (
-                    <span className="px-1.5 py-0.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-[8px] font-bold uppercase tracking-wider">{item.status}</span>
-                  )}
+            {/* Left Column: Analytics Summary */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+              
+              {/* Match Confidence Badge Card */}
+              <div className="glass-panel p-5 rounded-xl border border-slate-850 bg-slate-950/45 relative overflow-hidden group hover:border-slate-700/80 transition-all duration-300">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-violet-600/5 rounded-full blur-xl pointer-events-none" />
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Match Index</span>
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
                 </div>
-              ))}
-            </div>
-
-            {/* Middle Main Mockup Card */}
-            <div className="lg:col-span-5 bg-slate-950/65 border border-slate-900/60 rounded-xl p-4.5 flex flex-col justify-between min-h-[220px]">
-              <div>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">PROJECT PROFILE</h4>
-                    <h3 className="text-sm font-bold text-white mt-1">Autonomous Neural Agents Pipeline</h3>
-                  </div>
-                  <div className="px-2 py-1 rounded bg-indigo-950/40 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold">
-                    Active Spec
-                  </div>
+                <div className="mt-3 flex items-baseline gap-2">
+                  <span className="text-3xl font-extrabold text-white tracking-tight">94%</span>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                    Match Confidence
+                  </span>
                 </div>
+                <p className="text-[11px] text-slate-400 mt-2.5 leading-relaxed">
+                  AI parsing verified 94% compatibility with recent PR commits and stack specifications.
+                </p>
+              </div>
 
-                {/* Match metrics progress */}
-                <div className="mt-5 space-y-3">
-                  <div>
-                    <div className="flex justify-between text-xs font-medium text-slate-400 mb-1">
-                      <span>Semantic Spec Analysis</span>
-                      <span className="text-violet-400 font-bold">98% Complete</span>
-                    </div>
-                    <div className="h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                      <div className="h-full w-[98%] bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs font-medium text-slate-400 mb-1">
-                      <span>Milestone Smart-Escrow</span>
-                      <span className="text-emerald-400 font-bold">Deposited</span>
-                    </div>
-                    <div className="h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                      <div className="h-full w-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full" />
-                    </div>
-                  </div>
+              {/* Recent Earnings Visual Tracker Card */}
+              <div className="glass-panel p-5 rounded-xl border border-slate-850 bg-slate-950/45 relative overflow-hidden group hover:border-slate-700/80 transition-all duration-300">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-600/5 rounded-full blur-xl pointer-events-none" />
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Milestone Escrows</span>
+                  <span className="text-[9px] font-bold text-emerald-400 bg-emerald-950/40 border border-emerald-500/25 px-2 py-0.5 rounded">
+                    +15.2%
+                  </span>
+                </div>
+                <div className="mt-3">
+                  <span className="text-2xl font-extrabold text-white tracking-tight">₹45,000</span>
+                  <span className="text-xs font-medium text-slate-400 ml-1.5 select-none">Recent Earnings</span>
+                </div>
+                {/* Visual progress bar */}
+                <div className="h-1.5 bg-slate-900 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full w-[75%] bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full" />
+                </div>
+                <div className="flex justify-between items-center mt-2.5 text-[9px] text-slate-500">
+                  <span>Milestone 2 Verified</span>
+                  <span>Goal: ₹60,000</span>
                 </div>
               </div>
 
-              {/* Status Alert Badge */}
-              <div className="mt-4 p-3 rounded-lg bg-slate-900/80 border border-slate-800/80 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-violet-950/60 border border-violet-500/30 flex items-center justify-center text-violet-400">
-                  <Cpu className="w-4.5 h-4.5" />
+            </div>
+
+            {/* Middle Column: Interactive CSS Bar Chart */}
+            <div className="lg:col-span-5 glass-panel p-5 rounded-xl border border-slate-850 bg-slate-950/45 flex flex-col justify-between min-h-[260px] relative">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-indigo-600/5 rounded-full blur-2xl pointer-events-none" />
+              
+              <div className="flex items-center justify-between border-b border-slate-900/60 pb-3">
+                <div>
+                  <h4 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">AI Match Density</h4>
+                  <h3 className="text-xs font-bold text-white mt-0.5">Distribution Index</h3>
                 </div>
-                <div className="flex-1">
-                  <div className="text-xs font-bold text-slate-200">Match Completed</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">Top Matched Agent: Dr. Evelyn Vance</div>
+                
+                {/* Selector Tabs */}
+                <div className="flex bg-slate-900 border border-slate-800 p-0.5 rounded-lg">
+                  <button 
+                    onClick={() => setPreviewChartTab('weekly')}
+                    className={`px-2.5 py-1 text-[9px] font-bold rounded-md transition-all cursor-pointer ${
+                      previewChartTab === 'weekly' 
+                        ? 'bg-violet-600 text-white shadow-md' 
+                        : 'text-slate-500 hover:text-slate-350'
+                    }`}
+                  >
+                    Weekly
+                  </button>
+                  <button 
+                    onClick={() => setPreviewChartTab('monthly')}
+                    className={`px-2.5 py-1 text-[9px] font-bold rounded-md transition-all cursor-pointer ${
+                      previewChartTab === 'monthly' 
+                        ? 'bg-violet-600 text-white shadow-md' 
+                        : 'text-slate-500 hover:text-slate-355'
+                    }`}
+                  >
+                    Monthly
+                  </button>
                 </div>
-                <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> 99% Fit
-                </span>
+              </div>
+
+              {/* Bar Chart Canvas */}
+              <div className="h-[150px] flex items-end justify-between px-2 pt-6 pb-2 relative border-b border-slate-900/40 mt-4">
+                
+                {/* Background grid lines */}
+                <div className="absolute left-0 right-0 top-[25%] border-b border-slate-900/25 pointer-events-none" />
+                <div className="absolute left-0 right-0 top-[50%] border-b border-slate-900/25 pointer-events-none" />
+                <div className="absolute left-0 right-0 top-[75%] border-b border-slate-900/25 pointer-events-none" />
+
+                {previewChartTab === 'weekly' ? (
+                  // Weekly Data: Mon to Sun
+                  [
+                    { label: "Mon", val: 64 },
+                    { label: "Tue", val: 78 },
+                    { label: "Wed", val: 82 },
+                    { label: "Thu", val: 90 },
+                    { label: "Fri", val: 94, highlight: true },
+                    { label: "Sat", val: 80 },
+                    { label: "Sun", val: 85 }
+                  ].map((bar, idx) => (
+                    <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group/bar relative px-1 sm:px-2">
+                      {/* Tooltip on Hover */}
+                      <div className="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[9px] font-bold text-white transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+                        {bar.val}% Fit
+                      </div>
+                      
+                      {/* CSS Shape Bar */}
+                      <div 
+                        style={{ height: `${bar.val}%` }} 
+                        className={`w-4 sm:w-5.5 rounded-t-md relative transition-all duration-500 ease-out cursor-default ${
+                          bar.highlight 
+                            ? 'bg-gradient-to-t from-violet-600 via-indigo-500 to-cyan-400 shadow-lg shadow-violet-500/15 group-hover/bar:brightness-110' 
+                            : 'bg-gradient-to-t from-slate-900 to-slate-700 border border-slate-800 group-hover/bar:bg-slate-850 group-hover/bar:border-slate-650'
+                        }`}
+                      />
+                      
+                      {/* X-axis Label */}
+                      <span className="text-[9px] font-semibold text-slate-500 mt-2">{bar.label}</span>
+                    </div>
+                  ))
+                ) : (
+                  // Monthly Data: Week 1 to Week 4
+                  [
+                    { label: "W1", val: 72 },
+                    { label: "W2", val: 85 },
+                    { label: "W3", val: 94, highlight: true },
+                    { label: "W4", val: 89 }
+                  ].map((bar, idx) => (
+                    <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end group/bar relative px-3 sm:px-5">
+                      {/* Tooltip on Hover */}
+                      <div className="opacity-0 group-hover/bar:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[9px] font-bold text-white transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg z-10">
+                        {bar.val}% Fit
+                      </div>
+
+                      {/* CSS Shape Bar */}
+                      <div 
+                        style={{ height: `${bar.val}%` }} 
+                        className={`w-7 sm:w-9.5 rounded-t-md relative transition-all duration-500 ease-out cursor-default ${
+                          bar.highlight 
+                            ? 'bg-gradient-to-t from-violet-600 via-indigo-500 to-cyan-400 shadow-lg shadow-violet-500/15 group-hover/bar:brightness-110' 
+                            : 'bg-gradient-to-t from-slate-900 to-slate-700 border border-slate-800 group-hover/bar:bg-slate-850 group-hover/bar:border-slate-650'
+                        }`}
+                      />
+
+                      {/* X-axis Label */}
+                      <span className="text-[9px] font-semibold text-slate-500 mt-2">{bar.label}</span>
+                    </div>
+                  ))
+                )}
+
               </div>
             </div>
 
-            {/* Right Command Terminal stream */}
-            <div className="lg:col-span-4 bg-black/55 border border-slate-900/60 rounded-xl p-4 font-mono text-[11px] leading-[1.4] text-slate-400 flex flex-col justify-between min-h-[220px]">
+            {/* Right Column: Console terminal stream */}
+            <div className="lg:col-span-3 bg-black/55 border border-slate-900/60 rounded-xl p-4 font-mono text-[11px] leading-[1.4] text-slate-400 flex flex-col justify-between min-h-[260px]">
               <div className="space-y-1.5">
                 <div className="text-slate-500 border-b border-slate-900 pb-1 flex justify-between font-sans text-[9px] uppercase tracking-wider font-bold">
                   <span>console_feed</span>
                   <span>status: streaming</span>
                 </div>
-                <div className="text-slate-500 mt-2">$ match --spec-id nlp_agent_092</div>
-                <div className="text-slate-300 flex items-center gap-1.5">
-                  <span className="text-violet-400 animate-pulse">●</span> Parsing requirements...
+                <div className="text-slate-500 mt-2">$ match --live --analytics</div>
+                <div className="text-slate-350 flex items-center gap-1.5">
+                  <span className="text-violet-400 animate-pulse">●</span> Scanning repositories...
                 </div>
-                <div className="text-indigo-400">Found 3 candidates matching &quot;PyTorch, Agentic LLM&quot;</div>
-                <div className="text-slate-300">Deploying smart escrow contract...</div>
-                <div className="text-emerald-400">Escrow deployed: 0x71C84...a49d (5.0 ETH)</div>
-                <div className="text-slate-500">$ listen github_webhook --active</div>
-                <div className="text-slate-400">Commit 4f7c1d: Unit tests passed (100% green)</div>
-                <div className="text-emerald-300 font-semibold">✓ Funds released to EV_dev</div>
+                <div className="text-indigo-400">Match score updated: 94% fit</div>
+                <div className="text-slate-350">Smart Escrow funded: ₹45,000</div>
+                <div className="text-emerald-400">Escrow deployed: 0x71C84...a49d</div>
+                <div className="text-slate-500">$ verify commit --hash 4f7c1d</div>
+                <div className="text-slate-400">Unit tests passed (100% green)</div>
+                <div className="text-emerald-350 font-semibold">✓ Milestone released to team</div>
               </div>
               <div className="flex items-center justify-between border-t border-slate-900 pt-2 mt-2 text-slate-500 text-[9px]">
                 <span>Logs active</span>
