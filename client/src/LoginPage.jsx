@@ -1,234 +1,376 @@
 import { useState } from 'react';
-import { Cpu, ArrowLeft, Mail, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Cpu, ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 
+// ─── Realistic multi-colour Google icon ───────────────────────────────────────
+const GoogleIcon = (props) => (
+  <svg viewBox="0 0 48 48" width="18" height="18" {...props}>
+    <path fill="#EA4335" d="M24 9.5c3.14 0 5.95 1.08 8.17 2.85l6.09-6.09C34.46 2.99 29.56 1 24 1 14.82 1 7.02 6.48 3.48 14.27l7.1 5.51C12.27 13.52 17.67 9.5 24 9.5z" />
+    <path fill="#4285F4" d="M46.5 24.5c0-1.62-.15-3.18-.42-4.68H24v8.86h12.65c-.55 2.95-2.2 5.45-4.68 7.13l7.17 5.57C43.07 37.27 46.5 31.36 46.5 24.5z" />
+    <path fill="#FBBC05" d="M10.58 28.22A14.57 14.57 0 0 1 9.5 24c0-1.47.22-2.9.62-4.22l-7.1-5.51A23.45 23.45 0 0 0 .5 24c0 3.77.87 7.34 2.52 10.52l7.56-6.3z" />
+    <path fill="#34A853" d="M24 47c5.56 0 10.23-1.84 13.64-5l-7.17-5.57c-1.85 1.25-4.22 1.99-6.47 1.99-6.33 0-11.7-4.02-13.42-9.65l-7.56 6.3C7.02 41.52 14.82 47 24 47z" />
+    <path fill="none" d="M0 0h48v48H0z" />
+  </svg>
+);
+
+// ─── GitHub icon ──────────────────────────────────────────────────────────────
 const GithubIcon = (props) => (
-  <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
+  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
     <path d="M9 18c-4.51 2-5-2-7-2" />
   </svg>
 );
 
-const GoogleIcon = (props) => (
-  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" {...props}>
-    <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.41 0-6.19-2.78-6.19-6.19s2.78-6.19 6.19-6.19c1.472 0 2.82.52 3.882 1.39l3.14-3.14C18.99 1.957 15.798 1 12.24 1 6.033 1 12.24 1 6.033 1 12.24s5.033 11.24 11.24 11.24c5.898 0 10.871-4.212 11.536-9.84H12.24z" />
-  </svg>
-);
+// ─── Reusable premium input field ─────────────────────────────────────────────
+function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, rightSlot, autoComplete }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label
+        htmlFor={id}
+        className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+      >
+        {label}
+      </label>
+      <div className="relative group">
+        {/* Left icon */}
+        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+          <Icon className="w-4 h-4" />
+        </span>
 
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          autoComplete={autoComplete}
+          required
+          className="
+            w-full pl-10 pr-10 py-3 rounded-xl
+            bg-slate-950 border border-slate-800
+            text-sm text-white placeholder:text-slate-700
+            focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+            hover:border-slate-700
+            transition-all duration-200
+          "
+        />
+
+        {/* Right slot (e.g. eye toggle) */}
+        {rightSlot && (
+          <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center">
+            {rightSlot}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main component ────────────────────────────────────────────────────────────
 function LoginPage({ onNavigate }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading]   = useState(false);
+  const [oauthLoading, setOauthLoading] = useState(''); // 'google' | 'github' | ''
+  const [error, setError]           = useState('');
+  const [success, setSuccess]       = useState(false);
 
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    
-    if (!email || !password) {
-      setError('Please fill in all fields.');
+
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in both email and password to continue.');
       return;
     }
 
     setIsLoading(true);
-    // Simulate API sign in
+    // Simulated API authentication
     setTimeout(() => {
       setIsLoading(false);
       setSuccess(true);
-    }, 1500);
+    }, 1600);
   };
 
-  return (
-    <div className="min-h-screen text-slate-100 bg-slate-950 font-sans relative flex flex-col justify-center items-center px-6 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
-      
-      {/* Background Decorative Ambient Gradients */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute bottom-[200px] right-1/4 w-[500px] h-[500px] rounded-full bg-indigo-600/8 blur-[150px] pointer-events-none animate-pulse-glow-reverse" />
+  const handleOAuth = (provider) => {
+    setError('');
+    setOauthLoading(provider);
+    setTimeout(() => {
+      setOauthLoading('');
+      setSuccess(true);
+    }, 1400);
+  };
 
-      {/* Back button */}
-      <div className="absolute top-8 left-6 md:left-12">
-        <button 
+  // ── Success state ─────────────────────────────────────────────────────────
+  if (success) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6 relative overflow-hidden">
+        {/* Ambient glows */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-emerald-600/5 blur-[140px]" />
+        </div>
+
+        <div className="relative z-10 w-full max-w-md text-center">
+          <div className="glass-panel rounded-2xl p-10 border border-slate-800/80 shadow-2xl shadow-black">
+            {/* Glow accent line */}
+            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+
+            <div className="w-14 h-14 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-5 shadow-lg shadow-emerald-500/10">
+              <CheckCircle2 className="w-7 h-7" />
+            </div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-white mb-2">
+              Welcome back.
+            </h2>
+            <p className="text-sm text-slate-400 leading-relaxed mb-8 max-w-xs mx-auto">
+              You've authenticated successfully. Your workspace is ready.
+            </p>
+            <button
+              onClick={() => onNavigate('landing')}
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Enter Workspace</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Main login view ───────────────────────────────────────────────────────
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
+
+      {/* ── Layered ambient radial glows ── */}
+      <div className="pointer-events-none absolute inset-0 -z-0">
+        {/* Primary top-left violet bloom */}
+        <div className="absolute -top-20 -left-10 w-[560px] h-[560px] rounded-full bg-violet-700/8 blur-[130px] animate-pulse-glow" />
+        {/* Secondary bottom-right indigo bloom */}
+        <div className="absolute bottom-[-80px] right-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/7 blur-[110px] animate-pulse-glow-reverse" />
+        {/* Central soft undercard glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[300px] rounded-full bg-violet-600/4 blur-[80px]" />
+      </div>
+
+      {/* ── Back to home ── */}
+      <div className="absolute top-7 left-6 md:left-10 z-20">
+        <button
           onClick={() => onNavigate('landing')}
-          className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors cursor-pointer group"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors duration-200 group cursor-pointer"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
           <span>Back to home</span>
         </button>
       </div>
 
-      {/* Auth Card Container */}
-      <div className="w-full max-w-md z-10">
-        
-        {/* Brand Header */}
-        <div className="flex flex-col items-center mb-8">
-          <a href="#" onClick={(e) => { e.preventDefault(); onNavigate('landing'); }} className="flex items-center gap-2.5 group mb-3">
-            <div className="relative w-9 h-9 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
-              <Cpu className="w-5 h-5 text-white animate-pulse" />
+      {/* ── Card ── */}
+      <div className="relative z-10 w-full max-w-[420px]">
+
+        {/* Brand lockup above card */}
+        <div className="flex flex-col items-center mb-7">
+          <button
+            onClick={() => onNavigate('landing')}
+            className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer"
+            aria-label="FreelanceAI — home"
+          >
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-200">
+              <Cpu className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
+            <span className="text-[1.15rem] font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
               Freelance<span className="text-violet-400 font-extrabold">AI</span>
             </span>
-          </a>
-          <p className="text-xs text-slate-400 tracking-wider uppercase font-semibold">Security Portal</p>
+          </button>
+
+          <h2 className="text-2xl font-extrabold tracking-tight text-white leading-tight">Welcome back</h2>
+          <p className="text-sm text-slate-500 mt-1.5 text-center">
+            Sign in to access your workspace and active escrows.
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="glass-panel p-8 rounded-2xl relative overflow-hidden bg-gradient-to-b from-slate-900/60 to-slate-950/60 shadow-2xl shadow-black/80">
-          
-          <div className="absolute -top-[1px] left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-violet-500 to-transparent blur-[1px]" />
-          
-          {success ? (
-            <div className="text-center py-6 animate-fade-in">
-              <div className="w-12 h-12 rounded-full bg-emerald-950/40 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-4">
-                <CheckCircle2 className="w-6 h-6" />
+        {/* Glass card */}
+        <div className="relative rounded-2xl overflow-hidden backdrop-blur-lg bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70">
+
+          {/* Violet hairline accent on top edge */}
+          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          {/* Soft inner top sheen */}
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
+
+          <div className="relative p-7 sm:p-8">
+
+            {/* Error banner */}
+            {error && (
+              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/25 text-xs text-rose-300 leading-relaxed">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <span>{error}</span>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Welcome Back!</h3>
-              <p className="text-xs text-slate-400 mb-6">You have successfully authenticated with the FreelanceAI Secure Core.</p>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+              {/* Email */}
+              <AuthInput
+                id="login-email"
+                label="Work Email"
+                type="email"
+                placeholder="you@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                icon={Mail}
+                autoComplete="email"
+              />
+
+              {/* Password */}
+              <AuthInput
+                id="login-password"
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                icon={Lock}
+                autoComplete="current-password"
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword
+                      ? <EyeOff className="w-4 h-4" />
+                      : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+              />
+
+              {/* Forgot password */}
+              <div className="flex justify-end -mt-1">
+                <button
+                  type="button"
+                  onClick={(e) => e.preventDefault()}
+                  className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors duration-200 cursor-pointer"
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              {/* Primary CTA */}
               <button
-                onClick={() => onNavigate('landing')}
-                className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-lg text-sm font-semibold text-white shadow-lg shadow-violet-500/20 hover:brightness-110 active:scale-98 transition-all cursor-pointer"
+                type="submit"
+                disabled={isLoading}
+                className="
+                  w-full py-3.5 mt-1 rounded-xl
+                  bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600
+                  hover:brightness-110 active:scale-[0.98]
+                  disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed
+                  text-white text-sm font-bold tracking-tight
+                  shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30
+                  flex items-center justify-center gap-2.5
+                  transition-all duration-200 cursor-pointer
+                "
               >
-                Go to Workspace Dashboard
+                {isLoading ? (
+                  <>
+                    <span className="w-4 h-4 rounded-full border-2 border-white/25 border-t-white animate-spin" />
+                    <span>Authenticating…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="relative my-6 flex items-center gap-3">
+              <div className="flex-1 h-px bg-slate-800" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600 shrink-0">
+                or continue with
+              </span>
+              <div className="flex-1 h-px bg-slate-800" />
+            </div>
+
+            {/* OAuth buttons */}
+            <div className="grid grid-cols-2 gap-3">
+
+              {/* Google — full-colour, premium dark outline */}
+              <button
+                type="button"
+                onClick={() => handleOAuth('google')}
+                disabled={!!oauthLoading}
+                className="
+                  relative flex items-center justify-center gap-2.5
+                  py-2.5 px-4 rounded-xl
+                  bg-white/[0.04] border border-slate-800
+                  hover:bg-white/[0.08] hover:border-slate-700
+                  active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
+                  text-slate-300 hover:text-white
+                  text-xs font-semibold tracking-tight
+                  transition-all duration-200 cursor-pointer
+                  group overflow-hidden
+                "
+                aria-label="Sign in with Google"
+              >
+                {/* Subtle hover sheen */}
+                <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
+                {oauthLoading === 'google' ? (
+                  <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                ) : (
+                  <GoogleIcon />
+                )}
+                <span>Google</span>
+              </button>
+
+              {/* GitHub */}
+              <button
+                type="button"
+                onClick={() => handleOAuth('github')}
+                disabled={!!oauthLoading}
+                className="
+                  relative flex items-center justify-center gap-2.5
+                  py-2.5 px-4 rounded-xl
+                  bg-white/[0.04] border border-slate-800
+                  hover:bg-white/[0.08] hover:border-slate-700
+                  active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
+                  text-slate-300 hover:text-white
+                  text-xs font-semibold tracking-tight
+                  transition-all duration-200 cursor-pointer
+                  group overflow-hidden
+                "
+                aria-label="Sign in with GitHub"
+              >
+                <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
+                {oauthLoading === 'github' ? (
+                  <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                ) : (
+                  <GithubIcon />
+                )}
+                <span>GitHub</span>
               </button>
             </div>
-          ) : (
-            <>
-              <h2 className="text-xl font-extrabold text-white mb-1">Sign In</h2>
-              <p className="text-xs text-slate-400 mb-6">Enter details to access your smart workspace escrows.</p>
 
-              {error && (
-                <div className="mb-4 p-3 rounded-lg bg-rose-950/30 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-300">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                
-                {/* Email Field */}
-                <div>
-                  <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-1.5" htmlFor="email">
-                    Work Email
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
-                      <Mail className="w-4.5 h-4.5" />
-                    </span>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      placeholder="you@company.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-950/80 border border-slate-800 text-sm placeholder:text-slate-650 text-white focus:outline-none focus:border-violet-500/80 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Field */}
-                <div>
-                  <div className="flex justify-between items-center mb-1.5">
-                    <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider" htmlFor="password">
-                      Password
-                    </label>
-                    <a href="#" onClick={(e) => e.preventDefault()} className="text-[10px] text-violet-400 hover:text-violet-300 font-semibold transition-colors">
-                      Forgot password?
-                    </a>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
-                      <Lock className="w-4.5 h-4.5" />
-                    </span>
-                    <input
-                      id="password"
-                      type="password"
-                      required
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-950/80 border border-slate-800 text-sm placeholder:text-slate-650 text-white focus:outline-none focus:border-violet-500/80 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3 bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 text-white text-sm font-semibold active:scale-95 disabled:scale-100 disabled:opacity-50 cursor-pointer transition-all duration-200 shadow-md shadow-violet-500/10 flex items-center justify-center gap-2 rounded-lg"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="w-4 h-4 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                      <span>Authenticating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Secure Log In</span>
-                    </>
-                  )}
-                </button>
-
-              </form>
-
-              {/* Divider */}
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-900"></div>
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                  <span className="bg-slate-950 px-2 rounded-md">or connect via</span>
-                </div>
-              </div>
-
-              {/* OAuth buttons */}
-              <div className="grid grid-cols-2 gap-3.5">
-                <button 
-                  onClick={() => {
-                    setIsLoading(true);
-                    setTimeout(() => {
-                      setIsLoading(false);
-                      setSuccess(true);
-                    }, 1200);
-                  }}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-850 hover:border-slate-700 hover:bg-slate-900/40 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer active:scale-98 transition-all"
-                >
-                  <GithubIcon />
-                  <span>GitHub</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsLoading(true);
-                    setTimeout(() => {
-                      setIsLoading(false);
-                      setSuccess(true);
-                    }, 1200);
-                  }}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-lg border border-slate-850 hover:border-slate-700 hover:bg-slate-900/40 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer active:scale-98 transition-all"
-                >
-                  <GoogleIcon />
-                  <span>Google</span>
-                </button>
-              </div>
-
-              {/* Sign up toggle */}
-              <p className="text-center text-xs text-slate-500 mt-6 select-none">
-                Don't have an account?{' '}
-                <button 
-                  onClick={() => onNavigate('signup')} 
-                  className="text-violet-400 hover:text-violet-300 font-bold underline transition-colors cursor-pointer"
-                >
-                  Create one here
-                </button>
-              </p>
-            </>
-          )}
-
+            {/* Sign-up nudge */}
+            <p className="text-center text-[12px] text-slate-600 mt-6 leading-relaxed">
+              Don't have an account?{' '}
+              <button
+                type="button"
+                onClick={() => onNavigate('signup')}
+                className="font-bold text-violet-400 hover:text-violet-300 transition-colors duration-200 cursor-pointer"
+              >
+                Create one free
+              </button>
+            </p>
+          </div>
         </div>
 
+        {/* Trust micro-copy below card */}
+        <p className="mt-5 text-center text-[10px] font-medium text-slate-700 tracking-wide">
+          Protected by end-to-end encryption &middot; SOC 2 Type II compliant
+        </p>
       </div>
-
     </div>
   );
 }
