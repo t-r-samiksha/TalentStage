@@ -528,7 +528,7 @@ function LandingPage({ onNavigate }) {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
             
             {/* Feature 1: AI Match Engine */}
             <div className="bg-slate-900/20 backdrop-blur-md border border-slate-800 rounded-2xl p-6 relative overflow-hidden group hover:bg-slate-900/50 hover:border-slate-700/80 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300 shadow-xl shadow-black/20">
