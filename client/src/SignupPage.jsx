@@ -286,10 +286,10 @@ function SignupPage({ onNavigate }) {
             </p>
 
             <button
-              onClick={() => onNavigate('landing')}
+              onClick={() => onNavigate((role === 'freelancer' || role === 'dual') ? 'onboarding' : 'landing')}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Go to Dashboard</span>
+              <span>{(role === 'freelancer' || role === 'dual') ? 'Setup Professional Profile' : 'Go to Dashboard'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
