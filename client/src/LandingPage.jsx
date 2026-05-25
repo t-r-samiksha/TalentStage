@@ -768,114 +768,120 @@ function LandingPage({ onNavigate }) {
         </div>
       </section>
 
-      {/* SECTION 5: DARK GRADIENT FOOTER & NEWSLETTER */}
-      <footer className="border-t border-slate-900 bg-slate-950 relative overflow-hidden z-10">
-        
-        {/* Newsletter Section */}
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-12">
-          
-          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-2xl relative overflow-hidden bg-gradient-to-b from-slate-900/60 to-slate-950/60 mb-20 text-center">
-            
-            <div className="absolute -top-10 -right-10 w-44 h-44 bg-violet-600/5 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none" />
+      {/* SECTION 5: MINIMAL 3-COLUMN FOOTER */}
+      <footer className="relative border-t border-slate-900/60 bg-slate-950 overflow-hidden z-10">
 
-            <h3 className="text-2xl font-bold text-white mb-2">Join the Private Roster Release</h3>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-md mx-auto mb-6.5">
-              Subscribe to get immediate email updates when verified AI researchers and protocol developers check into the system.
-            </p>
+        {/* Ambient radial glow — soft backlighting from below */}
+        <div className="pointer-events-none absolute inset-0 -z-0">
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[320px] rounded-full bg-violet-700/5 blur-[120px]" />
+          <div className="absolute -bottom-10 left-[15%] w-[420px] h-[220px] rounded-full bg-indigo-600/6 blur-[100px]" />
+          <div className="absolute -bottom-10 right-[15%] w-[380px] h-[200px] rounded-full bg-violet-500/4 blur-[90px]" />
+        </div>
 
-            <form onSubmit={handleSubscribe} className="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                required
-                placeholder="Enter your work email"
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg bg-slate-950/80 border border-slate-800 text-sm placeholder:text-slate-600 text-white focus:outline-none focus:border-violet-500/80 transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-5 py-3 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 text-white text-sm font-semibold active:scale-95 cursor-pointer transition-all duration-200 shadow-md shadow-violet-500/10"
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-14 sm:py-16">
+
+          {/* 3-Column Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-6 items-start">
+
+            {/* ── Column 1: Brand & Copyright ── */}
+            <div className="flex flex-col gap-4">
+              {/* Logo */}
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="inline-flex items-center gap-2.5 group w-fit"
+                aria-label="FreelanceAI — Back to top"
               >
-                Subscribe
-              </button>
-            </form>
-
-            {newsletterSubscribed && (
-              <p className="text-xs font-semibold text-emerald-400 mt-3.5 flex items-center justify-center gap-1.5 animate-fade-in">
-                <CheckCircle2 className="w-4 h-4" /> Thank you for subscribing! Check your inbox shortly.
-              </p>
-            )}
-          </div>
-
-          {/* Footer Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-16 text-left">
-            
-            {/* Logo Column */}
-            <div className="col-span-2 lg:col-span-2 space-y-4">
-              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center">
-                  <Cpu className="w-4.5 h-4.5 text-white" />
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-md shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
+                  <Cpu className="w-4 h-4 text-white" />
                 </div>
-                <span className="text-lg font-bold tracking-tight text-white">
+                <span className="text-base font-bold tracking-tight text-white">
                   Freelance<span className="text-violet-400 font-extrabold">AI</span>
                 </span>
               </a>
-              <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
-                A high-performance automated talent portal pairing machine-parsed requirements to verified specialists. Standardizing freelance development cycles via automated Smart Escrow code builds.
+
+              {/* Tagline */}
+              <p className="text-[11px] leading-[1.65] text-slate-500 max-w-[220px]">
+                Automated talent matchmaking powered by AI, verified code audits, and on-chain escrow releases.
               </p>
-              <div className="flex items-center gap-4 pt-2">
-                <a href="#" className="text-slate-500 hover:text-white transition-colors"><TwitterIcon className="w-4.5 h-4.5" /></a>
-                <a href="#" className="text-slate-500 hover:text-white transition-colors"><GithubIcon className="w-4.5 h-4.5" /></a>
-                <a href="#" className="text-slate-500 hover:text-white transition-colors"><LinkedinIcon className="w-4.5 h-4.5" /></a>
+
+              {/* Copyright */}
+              <p className="text-[10px] font-medium text-slate-600 tracking-tight mt-1">
+                &copy; {new Date().getFullYear()} FreelanceAI Technologies Inc.
+                <br />All rights reserved.
+              </p>
+            </div>
+
+            {/* ── Column 2: Hover-active Nav Links ── */}
+            <div className="flex flex-col items-start sm:items-center gap-1.5">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-600 mb-3">Navigate</p>
+
+              {[
+                { label: 'About', href: '#' },
+                { label: 'Contact', href: '#' },
+                { label: 'GitHub', href: 'https://github.com', external: true },
+              ].map(({ label, href, external }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
+                  onClick={!external ? (e) => e.preventDefault() : undefined}
+                  className="relative inline-flex items-center gap-1.5 text-sm font-medium text-slate-400 hover:text-white transition-colors duration-200 group py-0.5"
+                >
+                  {label === 'GitHub' && (
+                    <GithubIcon className="w-3.5 h-3.5 text-slate-500 group-hover:text-white transition-colors duration-200" />
+                  )}
+                  <span>{label}</span>
+                  {/* Sliding underline on hover */}
+                  <span className="absolute -bottom-px left-0 h-px w-0 bg-gradient-to-r from-violet-400 to-indigo-400 group-hover:w-full transition-all duration-300 ease-out rounded-full" />
+                </a>
+              ))}
+            </div>
+
+            {/* ── Column 3: System Status & Legal ── */}
+            <div className="flex flex-col items-start sm:items-end gap-3">
+              {/* Live system status badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/20 bg-emerald-950/20 backdrop-blur-sm">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className="text-[10px] font-semibold text-emerald-400 tracking-wide">All Systems Operational</span>
+              </div>
+
+              {/* Legal links */}
+              <div className="flex items-center gap-4 flex-wrap justify-start sm:justify-end mt-1">
+                {['Terms of Service', 'Privacy Policy', 'Security'].map((item) => (
+                  <a
+                    key={item}
+                    href="#"
+                    onClick={(e) => e.preventDefault()}
+                    className="text-[10px] font-medium text-slate-600 hover:text-slate-300 transition-colors duration-200"
+                  >
+                    {item}
+                  </a>
+                ))}
+              </div>
+
+              {/* Social icons */}
+              <div className="flex items-center gap-3 mt-1">
+                <a href="#" onClick={(e) => e.preventDefault()} aria-label="Twitter" className="text-slate-600 hover:text-white transition-colors duration-200">
+                  <TwitterIcon className="w-4 h-4" />
+                </a>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="text-slate-600 hover:text-white transition-colors duration-200">
+                  <GithubIcon className="w-4 h-4" />
+                </a>
+                <a href="#" onClick={(e) => e.preventDefault()} aria-label="LinkedIn" className="text-slate-600 hover:text-white transition-colors duration-200">
+                  <LinkedinIcon className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
-            {/* Column 2 */}
-            <div className="space-y-3.5">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Product</h4>
-              <ul className="space-y-2 text-xs text-slate-500">
-                <li><a href="#features" className="hover:text-slate-200 transition-colors">Neural Matcher</a></li>
-                <li><a href="#features" className="hover:text-slate-200 transition-colors">Smart Escrows</a></li>
-                <li><a href="#features" className="hover:text-slate-200 transition-colors">Portfolios Auditing</a></li>
-                <li><a href="#features" className="hover:text-slate-200 transition-colors">Release Timeline</a></li>
-              </ul>
-            </div>
-
-            {/* Column 3 */}
-            <div className="space-y-3.5">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Platform</h4>
-              <ul className="space-y-2 text-xs text-slate-500">
-                <li><a href="#freelancers" className="hover:text-slate-200 transition-colors">Browse Talent</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">Security Sandbox</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">Developer Portal</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">System Metrics</a></li>
-              </ul>
-            </div>
-
-            {/* Column 4 */}
-            <div className="space-y-3.5">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Company</h4>
-              <ul className="space-y-2 text-xs text-slate-500">
-                <li><a href="#" className="hover:text-slate-200 transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">Press Kit</a></li>
-                <li><a href="#" className="hover:text-slate-200 transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-
           </div>
 
-          {/* Bottom copyright bar */}
-          <div className="border-t border-slate-900 pt-8 flex flex-col sm:flex-row items-center justify-between text-slate-600 text-xs">
-            <span>&copy; {new Date().getFullYear()} FreelanceAI Technologies Inc. All rights reserved.</span>
-            <div className="flex gap-6 mt-4 sm:mt-0">
-              <a href="#" className="hover:text-slate-400 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-slate-400 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-slate-400 transition-colors">Security</a>
-            </div>
-          </div>
-
+          {/* Hairline divider at very bottom */}
+          <div className="mt-12 h-px w-full bg-gradient-to-r from-transparent via-slate-800/70 to-transparent" />
         </div>
       </footer>
 
