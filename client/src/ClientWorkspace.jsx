@@ -6,6 +6,7 @@ import {
   Calendar, Trash2, Check, ArrowRight, ShieldCheck, HelpCircle,
   TrendingUp, AlertCircle
 } from 'lucide-react';
+import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 
 function ClientWorkspace({ onNavigate }) {
   // Navigation state between view 1 ('dashboard') and view 2 ('post-project')
@@ -958,6 +959,16 @@ function ClientWorkspace({ onNavigate }) {
             </div>
 
           </div>
+        )}
+
+        {/* Client Messaging Hub */}
+        {activeTab === 'messages' && (
+          <WorkspaceMessagesAndContracts activeSection="messages" onNavigate={onNavigate} />
+        )}
+
+        {/* Client Escrow & Payments Ledger */}
+        {activeTab === 'payments' && (
+          <WorkspaceMessagesAndContracts activeSection="contracts" onNavigate={onNavigate} />
         )}
 
       </main>

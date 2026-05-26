@@ -5,6 +5,7 @@ import {
   ShieldCheck, Send, MessageSquare, User, Calendar, Plus,
   ChevronRight, ArrowUpRight, Award, HelpCircle
 } from 'lucide-react';
+import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 
 function FreelancerDashboard({ onNavigate }) {
   // Active state for sidebar navigation simulation
@@ -286,7 +287,10 @@ function FreelancerDashboard({ onNavigate }) {
       {/* ───────────────────────────────────────────────────────────────── */}
       <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8">
         
-        {/* Workspace Top Header */}
+        {/* ── CONDITIONAL TABS RENDER ── */}
+        {(activeTab === 'dashboard' || activeTab === 'portfolio' || activeTab === 'proposals' || activeTab === 'profile') && <>
+          
+            {/* Workspace Top Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6 select-none">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
@@ -742,7 +746,17 @@ function FreelancerDashboard({ onNavigate }) {
             </div>
           </div>
 
-        </section>
+          </section></>}
+
+        {/* Workspace Messages Hub (Page 14) */}
+        {activeTab === 'messages' && (
+          <WorkspaceMessagesAndContracts activeSection="messages" onNavigate={onNavigate} />
+        )}
+
+        {/* Escrow Contract Ledger (Page 15) */}
+        {(activeTab === 'earnings' || activeTab === 'projects') && (
+          <WorkspaceMessagesAndContracts activeSection="contracts" onNavigate={onNavigate} />
+        )}
 
       </main>
 
@@ -751,3 +765,4 @@ function FreelancerDashboard({ onNavigate }) {
 }
 
 export default FreelancerDashboard;
+
