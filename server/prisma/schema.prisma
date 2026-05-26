@@ -64,6 +64,10 @@ model User {
   sentInvitations Invitation[] @relation("ClientInvitations")
 
   receivedInvitations Invitation[] @relation("FreelancerInvitations")
+
+  followers ClientFollower[] @relation("ClientFollowers")
+
+  following ClientFollower[] @relation("FreelancerFollowing")
 }
 
 model Profile {
@@ -165,11 +169,11 @@ model Milestone {
   amount     Int
   status     MilestoneStatus @default(PENDING)
 
-  submissionText    String?
+  submissionText String?
 
   submissionFileUrl String?
 
-  submittedAt       DateTime?
+  submittedAt DateTime?
 
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
@@ -236,4 +240,20 @@ model Invitation {
   freelancer User @relation("FreelancerInvitations", fields: [freelancerId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, freelancerId])
+}
+
+model ClientFollower {
+  id String @id @default(uuid())
+
+  clientId String
+
+  freelancerId String
+
+  createdAt DateTime @default(now())
+
+  client User @relation("ClientFollowers", fields: [clientId], references: [id], onDelete: Cascade)
+
+  freelancer User @relation("FreelancerFollowing", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, freelancerId])
 }
