@@ -11,9 +11,11 @@ const socketUserMap = new Map();
 export const initSocket = (server) => {
 
   io = new Server(server, {
+
     cors: {
       origin: "*",
     },
+
   });
 
   io.on("connection", (socket) => {
@@ -23,7 +25,7 @@ export const initSocket = (server) => {
       socket.id
     );
 
-    // USER JOIN
+    // USER JOIN / ONLINE
     socket.on(
       "join",
       (userId) => {
@@ -34,16 +36,25 @@ export const initSocket = (server) => {
           userId
         );
 
+        // attach user to socket
+        socket.userId = userId;
+
         // join personal room
         socket.join(userId);
 
         // add online user
         onlineUsers.add(userId);
 
-        // emit updated presence
+        // emit full presence update
         io.emit(
           "presence:update",
           Array.from(onlineUsers)
+        );
+
+        // emit individual online event
+        io.emit(
+          "user:online",
+          userId
         );
 
         console.log(
@@ -116,11 +127,11 @@ export const initSocket = (server) => {
           socket.id
         );
 
-        // get actual user
+        // get user
         const userId =
           socketUserMap.get(socket.id);
 
-        // remove user
+        // remove from tracking
         if (userId) {
 
           onlineUsers.delete(userId);
@@ -129,10 +140,16 @@ export const initSocket = (server) => {
             socket.id
           );
 
-          // update presence
+          // emit updated presence
           io.emit(
             "presence:update",
             Array.from(onlineUsers)
+          );
+
+          // emit offline event
+          io.emit(
+            "user:offline",
+            userId
           );
 
         }

@@ -70,6 +70,8 @@ model User {
   following ClientFollower[] @relation("FreelancerFollowing")
 
   ledgerAccount LedgerAccount?
+
+  skillTests SkillTest[]
 }
 
 model Profile {
@@ -97,6 +99,8 @@ model Skill {
   name String @unique
 
   userSkills UserSkill[]
+
+  skillTests SkillTest[]
 }
 
 model UserSkill {
@@ -311,4 +315,52 @@ model LedgerEntry {
   ledgerAccount LedgerAccount @relation(fields: [ledgerAccountId], references: [id], onDelete: Cascade)
 
   transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+}
+
+enum SkillTestDifficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model SkillTest {
+  id String @id @default(uuid())
+
+  userId String
+
+  skillId String
+
+  currentDifficulty SkillTestDifficulty @default(EASY)
+
+  score Int @default(0)
+
+  completed Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  questions SkillQuestion[]
+}
+
+model SkillQuestion {
+  id String @id @default(uuid())
+
+  skillTestId String
+
+  question String
+
+  answer String
+
+  userAnswer String?
+
+  difficulty SkillTestDifficulty
+
+  isCorrect Boolean?
+
+  createdAt DateTime @default(now())
+
+  skillTest SkillTest @relation(fields: [skillTestId], references: [id], onDelete: Cascade)
 }
