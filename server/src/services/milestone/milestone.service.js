@@ -1,5 +1,6 @@
 import prisma from "../../config/db.js";
 import { getIO } from "../../socket/socket.js";
+import { releaseMilestonePaymentService } from "../ledger/ledger.service.js";
 
 export const createMilestoneService = async ({ contractId, title, amount }) => {
   const milestone = await prisma.milestone.create({
@@ -68,6 +69,24 @@ export const approveMilestoneService = async (milestoneId) => {
     data: {
       status: "APPROVED",
     },
+  });
+
+  const contract = await prisma.contract.findUnique({
+    where: {
+      id: milestone.contractId,
+    },
+  });
+
+  if (!contract) {
+    throw new Error("Contract not found");
+  }
+
+  await releaseMilestonePaymentService({
+    contractId: contract.id,
+
+    freelancerId: contract.freelancerId,
+
+    amount: milestone.amount,
   });
 
   try {

@@ -14,6 +14,7 @@ import messageRoutes from "./routes/message.routes.js";
 import invitationRoutes from "./routes/invitation.routes.js";
 import dashboardRoutes from "./routes/dashboard.routes.js";
 import followRoutes from "./routes/follow.routes.js";
+import ledgerRoutes from "./routes/ledger.routes.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api", followRoutes);
+app.use("/api/ledger", ledgerRoutes);
 
 app.use(errorMiddleware);
 

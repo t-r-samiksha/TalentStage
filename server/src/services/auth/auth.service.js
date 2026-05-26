@@ -1,12 +1,8 @@
 import bcrypt from "bcryptjs";
 import prisma from "../../config/db.js";
+import { createLedgerAccountService } from "../ledger/ledger.service.js";
 
-export const signupService = async ({
-  email,
-  password,
-  role,
-}) => {
-
+export const signupService = async ({ email, password, role }) => {
   // check existing user
   const existingUser = await prisma.user.findUnique({
     where: {
@@ -30,14 +26,12 @@ export const signupService = async ({
     },
   });
 
+  await createLedgerAccountService(user.id);
+
   return user;
 };
 
-export const loginService = async ({
-  email,
-  password,
-}) => {
-
+export const loginService = async ({ email, password }) => {
   // find user
   const user = await prisma.user.findUnique({
     where: {
@@ -50,10 +44,7 @@ export const loginService = async ({
   }
 
   // compare password
-  const isPasswordValid = await bcrypt.compare(
-    password,
-    user.password
-  );
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw new Error("Invalid credentials");

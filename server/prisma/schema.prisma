@@ -68,6 +68,8 @@ model User {
   followers ClientFollower[] @relation("ClientFollowers")
 
   following ClientFollower[] @relation("FreelancerFollowing")
+
+  ledgerAccount LedgerAccount?
 }
 
 model Profile {
@@ -160,6 +162,8 @@ model Contract {
   milestones Milestone[]
 
   messages Message[]
+
+  transactions Transaction[]
 }
 
 model Milestone {
@@ -256,4 +260,55 @@ model ClientFollower {
   freelancer User @relation("FreelancerFollowing", fields: [freelancerId], references: [id], onDelete: Cascade)
 
   @@unique([clientId, freelancerId])
+}
+
+enum TransactionType {
+  ESCROW_DEPOSIT
+  MILESTONE_RELEASE
+  PLATFORM_COMMISSION
+}
+
+model LedgerAccount {
+  id String @id @default(uuid())
+
+  userId String @unique
+
+  balance Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  entries LedgerEntry[]
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  contractId String
+
+  amount Int
+
+  type TransactionType
+
+  createdAt DateTime @default(now())
+
+  contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  LedgerEntry LedgerEntry[]
+}
+
+model LedgerEntry {
+  id String @id @default(uuid())
+
+  ledgerAccountId String
+
+  transactionId String
+
+  amount Int
+
+  createdAt DateTime @default(now())
+
+  ledgerAccount LedgerAccount @relation(fields: [ledgerAccountId], references: [id], onDelete: Cascade)
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 }
