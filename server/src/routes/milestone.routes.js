@@ -11,6 +11,9 @@ import {
 import { authMiddleware }
 from "../middleware/auth.middleware.js";
 
+import upload
+from "../middleware/upload.middleware.js";
+
 const router = express.Router();
 
 router.post(
@@ -28,6 +31,7 @@ router.get(
 router.patch(
   "/:id/submit",
   authMiddleware,
+  upload.single("file"),
   submitMilestoneController
 );
 

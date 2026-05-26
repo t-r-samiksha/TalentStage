@@ -16,7 +16,7 @@ import {
   sendMessageSchema,
 } from "../validators/message.validator.js";
 
-import { upload }
+import upload
 from "../middleware/upload.middleware.js";
 
 const router = express.Router();

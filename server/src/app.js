@@ -12,6 +12,7 @@ import { errorMiddleware } from "./middleware/error.middleware.js";
 import profileRoutes from "./routes/profile.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import invitationRoutes from "./routes/invitation.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use(errorMiddleware);
 

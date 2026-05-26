@@ -165,6 +165,12 @@ model Milestone {
   amount     Int
   status     MilestoneStatus @default(PENDING)
 
+  submissionText    String?
+
+  submissionFileUrl String?
+
+  submittedAt       DateTime?
+
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 }
 

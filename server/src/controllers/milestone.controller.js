@@ -52,16 +52,38 @@ async (req, res) => {
 
   try {
 
-    const milestone =
-      await submitMilestoneService(
-        req.params.id
-      );
+    const file = req.file;
 
-    return successResponse(res, milestone, "Milestone submitted successfully", 200);
+    const milestone =
+      await submitMilestoneService({
+
+        milestoneId:
+          req.params.id,
+
+        submissionText:
+          req.body.submissionText,
+
+        submissionFileUrl:
+          file
+            ? file.path
+            : null,
+
+      });
+
+    return successResponse(
+      res,
+      milestone,
+      "Milestone submitted successfully",
+      200
+    );
 
   } catch (error) {
 
-    return errorResponse(res, error.message, 400);
+    return errorResponse(
+      res,
+      error.message,
+      400
+    );
 
   }
 
