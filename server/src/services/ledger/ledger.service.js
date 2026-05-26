@@ -62,58 +62,88 @@ export const escrowDepositService = async ({ contractId, userId, amount }) => {
 };
 
 // RELEASE MILESTONE PAYMENT
-export const releaseMilestonePaymentService = async ({
+export const releaseMilestonePaymentService =
+async ({
   contractId,
   freelancerId,
   amount,
 }) => {
+
   // platform commission
-  const commission = Math.floor(amount * 0.1);
+  const commission =
+    Math.floor(amount * 0.1);
 
-  const freelancerAmount = amount - commission;
+  const freelancerAmount =
+    amount - commission;
 
-  // create transaction
-  const transaction = await prisma.transaction.create({
-    data: {
-      contractId,
+  const result =
+    await prisma.$transaction(
 
-      amount: freelancerAmount,
+      async (tx) => {
 
-      type: "MILESTONE_RELEASE",
-    },
-  });
+        // create transaction
+        const transaction =
+          await tx.transaction.create({
 
-  // update freelancer balance
-  const account = await prisma.ledgerAccount.update({
-    where: {
-      userId: freelancerId,
-    },
+            data: {
 
-    data: {
-      balance: {
-        increment: freelancerAmount,
-      },
-    },
-  });
+              contractId,
 
-  // ledger entry
-  await prisma.ledgerEntry.create({
-    data: {
-      ledgerAccountId: account.id,
+              amount:
+                freelancerAmount,
 
-      transactionId: transaction.id,
+              type:
+                "MILESTONE_RELEASE",
+            },
+          });
 
-      amount: freelancerAmount,
-    },
-  });
+        // update freelancer balance
+        const account =
+          await tx.ledgerAccount.update({
 
-  return {
-    transaction,
+            where: {
+              userId:
+                freelancerId,
+            },
 
-    commission,
+            data: {
 
-    freelancerAmount,
-  };
+              balance: {
+                increment:
+                  freelancerAmount,
+              },
+            },
+          });
+
+        // ledger entry
+        await tx.ledgerEntry.create({
+
+          data: {
+
+            ledgerAccountId:
+              account.id,
+
+            transactionId:
+              transaction.id,
+
+            amount:
+              freelancerAmount,
+          },
+        });
+
+        return {
+
+          transaction,
+
+          commission,
+
+          freelancerAmount,
+        };
+
+      }
+    );
+
+  return result;
 };
 
 export const getWalletService = async (userId) => {

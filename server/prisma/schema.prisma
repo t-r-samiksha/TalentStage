@@ -147,6 +147,8 @@ model Proposal {
   freelancer User    @relation(fields: [freelancerId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, freelancerId])
+  @@index([projectId])
+  @@index([freelancerId])
 }
 
 model Contract {
@@ -168,6 +170,9 @@ model Contract {
   messages Message[]
 
   transactions Transaction[]
+
+  @@index([clientId])
+  @@index([freelancerId])
 }
 
 model Milestone {
@@ -184,6 +189,8 @@ model Milestone {
   submittedAt DateTime?
 
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
 }
 
 model Notification {
@@ -200,6 +207,8 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Message {
@@ -220,6 +229,9 @@ model Message {
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 
   sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+  @@index([senderId])
 }
 
 enum InvitationStatus {
@@ -299,6 +311,8 @@ model Transaction {
 
   contract    Contract      @relation(fields: [contractId], references: [id], onDelete: Cascade)
   LedgerEntry LedgerEntry[]
+
+  @@index([contractId])
 }
 
 model LedgerEntry {

@@ -16,13 +16,29 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import followRoutes from "./routes/follow.routes.js";
 import ledgerRoutes from "./routes/ledger.routes.js";
 import skillTestRoutes from "./routes/skilltest.routes.js";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 dotenv.config();
 
 const app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+
+  max: 200,
+
+  message: "Too many requests",
+});
+
 app.use(cors());
+
+app.use(helmet());
+
+app.use(limiter);
+
 app.use(express.json());
+
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoutes);
 app.use("/api/projects", projectRoutes);
