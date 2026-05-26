@@ -8,33 +8,29 @@ import ClientWorkspace from './ClientWorkspace';
 import ProjectFeedWorkspace from './ProjectFeedWorkspace';
 import SkillMatchWorkspace from './SkillMatchWorkspace';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
+import GlobalDemoController from './GlobalDemoController';
 
 function App() {
   const [view, setView] = useState('skill-match');
 
+  let activeComponent = null;
+
   if (view === 'login') {
-    return <LoginPage onNavigate={setView} />;
-  }
-  if (view === 'signup') {
-    return <SignupPage onNavigate={setView} />;
-  }
-  if (view === 'onboarding') {
-    return <FreelancerOnboarding onNavigate={setView} />;
-  }
-  if (view === 'dashboard') {
-    return <FreelancerDashboard onNavigate={setView} />;
-  }
-  if (view === 'client-dashboard') {
-    return <ClientWorkspace onNavigate={setView} />;
-  }
-  if (view === 'project-feed') {
-    return <ProjectFeedWorkspace onNavigate={setView} />;
-  }
-  if (view === 'skill-match') {
-    return <SkillMatchWorkspace onNavigate={setView} />;
-  }
-  if (view === 'workspace') {
-    return (
+    activeComponent = <LoginPage onNavigate={setView} />;
+  } else if (view === 'signup') {
+    activeComponent = <SignupPage onNavigate={setView} />;
+  } else if (view === 'onboarding') {
+    activeComponent = <FreelancerOnboarding onNavigate={setView} />;
+  } else if (view === 'dashboard') {
+    activeComponent = <FreelancerDashboard onNavigate={setView} />;
+  } else if (view === 'client-dashboard') {
+    activeComponent = <ClientWorkspace onNavigate={setView} />;
+  } else if (view === 'project-feed') {
+    activeComponent = <ProjectFeedWorkspace onNavigate={setView} />;
+  } else if (view === 'skill-match') {
+    activeComponent = <SkillMatchWorkspace onNavigate={setView} />;
+  } else if (view === 'workspace') {
+    activeComponent = (
       <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col">
         {/* Glowing background highlights */}
         <div className="pointer-events-none absolute inset-0 z-0">
@@ -60,8 +56,16 @@ function App() {
         </div>
       </div>
     );
+  } else {
+    activeComponent = <LandingPage onNavigate={setView} />;
   }
-  return <LandingPage onNavigate={setView} />;
+
+  return (
+    <>
+      {activeComponent}
+      <GlobalDemoController setView={setView} currentView={view} />
+    </>
+  );
 }
 
 export default App;
