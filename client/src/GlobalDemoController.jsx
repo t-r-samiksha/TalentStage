@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   X, Layers, Sparkles, ShieldCheck, BarChart2, Cpu,
   Home, LogIn, UserPlus, FileText, List, Eye, PlusCircle,
   CheckSquare, RefreshCw, Send, MessageSquare, DollarSign,
   User, ArrowRight, Zap, CheckCircle2, Terminal
 } from 'lucide-react';
+import { authStorage } from './api';
 
 const PILLARS = [
   {
@@ -188,11 +190,57 @@ const PILLAR_ACCENT = {
   emerald: { dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10' },
 };
 
-export default function GlobalDemoController({ setView, currentView }) {
+export default function GlobalDemoController() {
+  const location = useLocation();
+  const reactNavigator = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const navigate = (view) => {
-    setView?.(view);
+  const getPath = (item) => {
+    switch (item.label) {
+      case 'Landing Page': return '/';
+      case 'Login Portal': return '/login';
+      case 'Sign Up': return '/signup';
+      case 'Onboarding Wizard': return '/onboarding';
+      case 'Freelancer Dashboard': return '/dashboard';
+      case 'Client Workspace': return '/client-dashboard';
+      case 'Project Feed': return '/project-feed';
+      case 'AI Skill Match': return '/skill-match';
+      case 'Post Project (AI Form)': return '/client-dashboard/post-project';
+      case 'Submit Proposal': return '/project-feed';
+      case 'Portfolio AI Diff': return '/dashboard/portfolio';
+      case 'Skill Verification': return '/skill-match';
+      case 'Vector Match Results': return '/skill-match';
+      case 'Messages Hub': return '/workspace';
+      case 'Escrow Ledger': return '/workspace';
+      case 'Financial Earnings': return '/dashboard/earnings';
+      case 'Public Profile': return '/dashboard/profile';
+      default: return '/';
+    }
+  };
+
+  const navigate = (item) => {
+    const view = item.view;
+    const path = getPath(item);
+    // Synchronize mock roles to match the targeted views during live demo presentations
+    if (authStorage.isAuthenticated()) {
+      const user = authStorage.getUser() || {};
+      if (['client-dashboard'].includes(view) && user.role !== 'CLIENT') {
+        console.log('[Demo Controller] Aligning mock user role to CLIENT for dashboard view...');
+        authStorage.setUser({
+          ...user,
+          role: 'CLIENT',
+          profile: { ...user.profile, fullName: user.profile?.fullName || 'Client User' }
+        });
+      } else if (['dashboard', 'onboarding', 'skill-match'].includes(view) && user.role !== 'FREELANCER') {
+        console.log('[Demo Controller] Aligning mock user role to FREELANCER for developer view...');
+        authStorage.setUser({
+          ...user,
+          role: 'FREELANCER',
+          profile: { ...user.profile, fullName: user.profile?.fullName || 'Freelancer Dev' }
+        });
+      }
+    }
+    reactNavigator(path);
     setIsOpen(false);
   };
 
@@ -290,18 +338,18 @@ export default function GlobalDemoController({ setView, currentView }) {
                   {/* Items grid */}
                   <div className="grid grid-cols-2 gap-2">
                     {pillar.items.map((item) => {
-                      const ItemIcon = item.icon;
-                      const isActive = currentView === item.view;
-                      return (
-                        <button
-                          key={item.label}
-                          onClick={() => navigate(item.view)}
-                          className={`group relative flex items-start gap-3 p-3.5 rounded-xl border text-left cursor-pointer
-                            transition-all duration-200 ease-out
-                            ${isActive
-                              ? `${accent.bg} ${accent.border} ring-1 ${accent.border.replace('border-', 'ring-')}`
-                              : 'bg-slate-900/50 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
-                            }`}
+                       const ItemIcon = item.icon;
+                       const isActive = location.pathname === getPath(item);
+                       return (
+                         <button
+                           key={item.label}
+                           onClick={() => navigate(item)}
+                           className={`group relative flex items-start gap-3 p-3.5 rounded-xl border text-left cursor-pointer
+                             transition-all duration-200 ease-out
+                             ${isActive
+                               ? `${accent.bg} ${accent.border} ring-1 ${accent.border.replace('border-', 'ring-')}`
+                               : 'bg-slate-900/50 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
+                             }`}
                         >
                           {/* Icon */}
                           <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Cpu, CheckCircle2, Award,
   Play, ArrowLeft, Timer, Check,
@@ -6,7 +7,8 @@ import {
 } from 'lucide-react';
 import { skillTestService } from './api';
 
-export default function SkillMatchWorkspace({ onNavigate }) {
+export default function SkillMatchWorkspace() {
+  const navigate = useNavigate();
   const [view, setView] = useState('verification');
   
   // ─── Verification State (Page 12) ───
@@ -195,7 +197,7 @@ export default function SkillMatchWorkspace({ onNavigate }) {
         <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => onNavigate('dashboard')}
+              onClick={() => navigate('/dashboard')}
               className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-950 transition-colors cursor-pointer group select-none mr-2"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
@@ -219,7 +221,7 @@ export default function SkillMatchWorkspace({ onNavigate }) {
               Skill Verification
             </button>
             <button
-              onClick={() => onNavigate('project-feed')}
+              onClick={() => navigate('/project-feed')}
               className={`px-3.5 py-2 rounded-xl transition-all cursor-pointer select-none hover:text-slate-800`}
             >
               AI Matches View

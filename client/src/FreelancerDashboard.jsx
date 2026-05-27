@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   Clock, LogOut, LayoutDashboard, FolderGit2,
@@ -8,9 +9,30 @@ import {
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import { authService, dashboardService, projectService, aiService } from './api';
 
-function FreelancerDashboard({ onNavigate }) {
-  // Navigation tabs state
-  const [activeTab, setActiveTab] = useState('dashboard');
+function FreelancerDashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const activeTab = useMemo(() => {
+    const path = location.pathname;
+    if (path.endsWith('/portfolio')) return 'portfolio';
+    if (path.endsWith('/proposals')) return 'proposals';
+    if (path.endsWith('/contracts')) return 'projects';
+    if (path.endsWith('/earnings')) return 'earnings';
+    if (path.endsWith('/messages')) return 'messages';
+    if (path.endsWith('/profile')) return 'profile';
+    return 'dashboard';
+  }, [location.pathname]);
+
+  const setActiveTab = (tab) => {
+    if (tab === 'dashboard') {
+      navigate('/dashboard');
+    } else if (tab === 'projects') {
+      navigate('/dashboard/contracts');
+    } else {
+      navigate(`/dashboard/${tab}`);
+    }
+  };
   
   // Real database-backed states
   const [profile, setProfile] = useState(null);
@@ -305,7 +327,7 @@ function FreelancerDashboard({ onNavigate }) {
         <div className="space-y-7">
           
           {/* Logo brand lockup */}
-          <div className="flex items-center gap-2.5 px-2.5 cursor-pointer group" onClick={() => onNavigate('landing')}>
+          <div className="flex items-center gap-2.5 px-2.5 cursor-pointer group" onClick={() => navigate('/')}>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4 h-4 text-white" />
             </div>
@@ -337,7 +359,7 @@ function FreelancerDashboard({ onNavigate }) {
 
             {/* Browse Projects Link */}
             <button
-              onClick={() => onNavigate('project-feed')}
+              onClick={() => navigate('/project-feed')}
               className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all relative group cursor-pointer"
             >
               <Cpu className="w-4 h-4 text-violet-400" />
@@ -362,7 +384,7 @@ function FreelancerDashboard({ onNavigate }) {
 
             {/* Skill Verification */}
             <button
-              onClick={() => onNavigate('skill-match')}
+              onClick={() => navigate('/skill-match')}
               className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all relative group cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4 text-violet-400" />
@@ -884,7 +906,7 @@ function FreelancerDashboard({ onNavigate }) {
                 Decentralized nodes active
               </span>
               <span 
-                onClick={() => onNavigate('skill-match')}
+                onClick={() => navigate('/skill-match')}
                 className="text-indigo-600 hover:underline cursor-pointer flex items-center gap-0.5"
               >
                 Start Attestation Test
@@ -1006,7 +1028,7 @@ function FreelancerDashboard({ onNavigate }) {
                   <p className="text-sm text-slate-500 mt-0.5 leading-normal font-medium">Smart-matching algorithms generated proposals.</p>
                 </div>
                 <button 
-                  onClick={() => onNavigate('project-feed')}
+                  onClick={() => navigate('/project-feed')}
                   className="p-1.5 rounded-lg bg-slate-950 border border-slate-850 text-slate-400 hover:text-white hover:border-slate-700 transition-colors text-[9px] font-bold cursor-pointer flex items-center gap-1"
                 >
                   <span>New Proposal</span>
@@ -1085,12 +1107,12 @@ function FreelancerDashboard({ onNavigate }) {
 
         {/* Workspace Messages Hub (Page 14) */}
         {activeTab === 'messages' && (
-          <WorkspaceMessagesAndContracts activeSection="messages" onNavigate={onNavigate} />
+          <WorkspaceMessagesAndContracts activeSection="messages" />
         )}
 
         {/* Escrow Contract Ledger (Page 15) */}
         {(activeTab === 'earnings' || activeTab === 'projects') && (
-          <WorkspaceMessagesAndContracts activeSection="contracts" onNavigate={onNavigate} />
+          <WorkspaceMessagesAndContracts activeSection="contracts" />
         )}
 
         {/* Dedicated proposals list tab view */}
@@ -1108,7 +1130,7 @@ function FreelancerDashboard({ onNavigate }) {
               </div>
 
               <button 
-                onClick={() => onNavigate('project-feed')}
+                onClick={() => navigate('/project-feed')}
                 className="py-2 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-violet-500/10 cursor-pointer flex items-center gap-1.5 transition-all select-none"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -1139,7 +1161,7 @@ function FreelancerDashboard({ onNavigate }) {
                 <p className="text-sm font-bold text-slate-400">No Proposals Found</p>
                 <p className="text-xs text-slate-500">You haven't submitted any proposals yet. Check the project feed to find matches!</p>
                 <button
-                  onClick={() => onNavigate('project-feed')}
+                  onClick={() => navigate('/project-feed')}
                   className="py-2 px-4 rounded-xl bg-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-indigo-500/10 transition-all cursor-pointer"
                 >
                   Browse Projects Feed

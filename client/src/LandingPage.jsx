@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Cpu, Sparkles, ShieldCheck, ArrowRight, Star,
   CheckCircle2, X, Menu, Zap, Users,
@@ -88,7 +89,8 @@ const ACCENT = {
   amber: { bg: 'bg-slate-900/30', border: 'border-slate-800/80', text: 'text-slate-450', icon: 'bg-slate-900/30' },
 };
 
-export default function LandingPage({ onNavigate }) {
+export default function LandingPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -149,7 +151,7 @@ export default function LandingPage({ onNavigate }) {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo */}
-          <button onClick={() => onNavigate('landing')} className="flex items-center gap-2.5 group cursor-pointer bg-transparent border-none">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group cursor-pointer bg-transparent border-none">
             <div className="w-9 h-9 rounded-xl bg-[#e50914] flex items-center justify-center shadow-lg shadow-red-500/10 group-hover:scale-105 transition-all duration-300">
               <Cpu className="w-5 h-5 text-white" />
             </div>
@@ -170,11 +172,11 @@ export default function LandingPage({ onNavigate }) {
 
           {/* CTAs */}
           <div className="hidden md:flex items-center gap-4">
-            <button onClick={() => onNavigate('login')} className="text-sm font-semibold text-slate-400 hover:text-slate-100 transition-colors cursor-pointer bg-transparent border-none">
+            <button onClick={() => navigate('/login')} className="text-sm font-semibold text-slate-400 hover:text-slate-100 transition-colors cursor-pointer bg-transparent border-none">
               Sign In
             </button>
             <button
-              onClick={() => onNavigate('signup')}
+              onClick={() => navigate('/signup')}
               className="px-5 py-2.5 rounded-xl bg-[#e50914] hover:bg-[#b80710] text-white text-sm font-bold shadow-lg shadow-red-950/20 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border-none"
             >
               Sign Up Free
@@ -194,8 +196,8 @@ export default function LandingPage({ onNavigate }) {
               <a key={label} href={href} onClick={() => setMobileMenuOpen(false)} className="block text-base font-semibold text-slate-300 hover:text-white">{label}</a>
             ))}
             <div className="pt-2 space-y-3 border-t border-[#222227]">
-              <button onClick={() => { setMobileMenuOpen(false); onNavigate('login'); }} className="w-full py-2.5 text-sm font-semibold text-slate-400 cursor-pointer bg-transparent border-none">Sign In</button>
-              <button onClick={() => { setMobileMenuOpen(false); onNavigate('signup'); }} className="w-full py-3 bg-[#e50914] rounded-xl text-sm font-bold text-white cursor-pointer border-none">Get Started Free</button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate('/login'); }} className="w-full py-2.5 text-sm font-semibold text-slate-400 cursor-pointer bg-transparent border-none">Sign In</button>
+              <button onClick={() => { setMobileMenuOpen(false); navigate('/signup'); }} className="w-full py-3 bg-[#e50914] rounded-xl text-sm font-bold text-white cursor-pointer border-none">Get Started Free</button>
             </div>
           </div>
         )}
@@ -225,14 +227,14 @@ export default function LandingPage({ onNavigate }) {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
           <button
-            onClick={() => onNavigate('signup')}
+            onClick={() => navigate('/signup')}
             className="flex items-center gap-2.5 px-8 py-4 rounded-xl bg-[#e50914] hover:bg-[#b80710] text-white text-base font-bold shadow-xl shadow-red-950/20 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border-none"
           >
             Start Hiring Now
             <ArrowRight className="w-5 h-5" />
           </button>
           <button
-            onClick={() => onNavigate('onboarding')}
+            onClick={() => navigate('/onboarding')}
             className="flex items-center gap-2.5 px-8 py-4 rounded-xl border border-[#222227] bg-[#121216]/50 backdrop-blur-md text-slate-300 hover:text-white hover:bg-slate-900 hover:border-slate-800 text-base font-semibold shadow-sm hover:scale-105 transition-all duration-300 cursor-pointer"
           >
             Become a Freelancer
@@ -606,7 +608,7 @@ export default function LandingPage({ onNavigate }) {
           {/* CTA below grid */}
           <div className="text-center mt-12">
             <button
-              onClick={() => onNavigate('skill-match')}
+              onClick={() => navigate('/skill-match')}
               className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl bg-[#e50914] hover:bg-[#b80710] text-white font-bold shadow-xl shadow-red-955/20 hover:scale-105 transition-all cursor-pointer border-none"
             >
               <Sparkles className="w-5 h-5 animate-spin-slow" />
@@ -636,14 +638,14 @@ export default function LandingPage({ onNavigate }) {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
             <button
-              onClick={() => onNavigate('signup')}
+              onClick={() => navigate('/signup')}
               className="flex items-center justify-center gap-2.5 px-8 py-4 rounded-xl bg-[#e50914] hover:bg-[#b80710] text-white font-bold text-base shadow-xl shadow-red-955/20 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border-none"
             >
               Get Started for Free
               <ArrowRight className="w-5 h-5" />
             </button>
             <button
-              onClick={() => onNavigate('login')}
+              onClick={() => navigate('/login')}
               className="flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-slate-850 bg-slate-950 text-slate-350 hover:text-white hover:bg-slate-900 hover:border-slate-800 font-bold shadow-sm hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               Sign In to Your Account

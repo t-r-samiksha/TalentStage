@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Cpu, ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { authService, authStorage } from './api';
 
@@ -67,7 +68,8 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
 }
 
 // ─── Main component ────────────────────────────────────────────────────────────
-function LoginPage({ onNavigate }) {
+function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -133,9 +135,9 @@ function LoginPage({ onNavigate }) {
               onClick={() => {
                 const user = authStorage.getUser();
                 if (user?.role === 'CLIENT') {
-                  onNavigate('client-dashboard');
+                  navigate('/client-dashboard');
                 } else {
-                  onNavigate('dashboard');
+                  navigate('/dashboard');
                 }
               }}
               className="w-full py-3.5 rounded-xl bg-[#e50914] hover:bg-[#b80710] active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-red-950/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none"
@@ -166,7 +168,7 @@ function LoginPage({ onNavigate }) {
       {/* ── Back to home ── */}
       <div className="absolute top-7 left-6 md:left-10 z-20">
         <button
-          onClick={() => onNavigate('landing')}
+          onClick={() => navigate('/')}
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors duration-200 group cursor-pointer bg-transparent border-none"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
@@ -180,7 +182,7 @@ function LoginPage({ onNavigate }) {
         {/* Brand lockup above card */}
         <div className="flex flex-col items-center mb-7 select-none">
           <button
-            onClick={() => onNavigate('landing')}
+            onClick={() => navigate('/')}
             className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer bg-transparent border-none"
             aria-label="TalentStage — home"
           >
@@ -367,7 +369,7 @@ function LoginPage({ onNavigate }) {
               Don\'t have an account?{' '}
               <button
                 type="button"
-                onClick={() => onNavigate('signup')}
+                onClick={() => navigate('/signup')}
                 className="font-bold text-red-400 hover:text-red-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
               >
                 Create one free

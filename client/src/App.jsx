@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
@@ -11,32 +12,107 @@ import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import GlobalDemoController from './GlobalDemoController';
 import { authStorage } from './api';
 
-function App() {
-  const [view, setView] = useState('landing');
+/**
+ * Route Guard for Authenticated Private Routes
+ */
+function ProtectedRoute({ children }) {
+  const location = useLocation();
+  
+  if (!authStorage.isAuthenticated()) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return children;
+}
+
+/**
+ * Route Guard for Role Separation (CLIENT vs FREELANCER)
+ */
+function RoleGuard({ allowedRole, children }) {
+  if (!authStorage.isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const user = authStorage.getUser();
+  const role = user?.role;
+
+  if (role !== allowedRole) {
+    console.warn(`[Route Guard] Blocked access for role: ${role}. Expected: ${allowedRole}`);
+    return role === 'CLIENT' 
+      ? <Navigate to="/client-dashboard" replace /> 
+      : <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
+/**
+ * Route Guard to redirect authenticated users away from landing/auth pages
+ */
+function PublicOnlyRoute({ children }) {
+  if (authStorage.isAuthenticated()) {
+    const user = authStorage.getUser();
+    return user?.role === 'CLIENT' 
+      ? <Navigate to="/client-dashboard" replace /> 
+      : <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+}
+
+/**
+ * Isolated wrapper layout for messages/contracts full view
+ */
+function WorkspaceMessagesAndContractsWrapper() {
+  const navigate = useNavigate();
+  const user = authStorage.getUser();
+  
+  const handleBack = () => {
+    if (user?.role === 'CLIENT') {
+      navigate('/client-dashboard');
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col text-slate-100">
+      {/* Glowing background highlights */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-950/20 blur-[120px] animate-pulse-glow" />
+        <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-violet-950/15 blur-[100px] animate-pulse-glow-reverse" />
+      </div>
+      
+      <div className="relative z-10 flex-1 flex flex-col justify-start animate-fadeIn">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={handleBack}
+            className="text-xs font-bold text-slate-500 hover:text-indigo-400 cursor-pointer transition-colors flex items-center gap-1.5"
+          >
+            &larr; Back to Dashboard
+          </button>
+        </div>
+        <WorkspaceMessagesAndContracts />
+      </div>
+    </div>
+  );
+}
+
+function AppRoutes() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // 1. Auto-login and route check on startup
-    if (authStorage.isAuthenticated()) {
-      const user = authStorage.getUser();
-      setTimeout(() => {
-        if (user?.role === 'CLIENT') {
-          setView('client-dashboard');
-        } else {
-          setView('dashboard');
-        }
-      }, 0);
-    } else {
-      setTimeout(() => setView('landing'), 0);
-    }
-
-    // 2. Global event listener to capture session expirations (e.g. 401 response interceptors)
+    // 1. Global event listener for session expirations (like 401s)
     const handleUnauthorized = () => {
-      setView('login');
+      authStorage.clearAuth();
+      navigate('/login', { replace: true });
     };
 
-    // 3. Global event listener for manual logout
+    // 2. Global event listener for manual logout
     const handleLogout = () => {
-      setView('landing');
+      authStorage.clearAuth();
+      navigate('/', { replace: true });
     };
 
     window.addEventListener('talentstage-unauthorized', handleUnauthorized);
@@ -46,52 +122,82 @@ function App() {
       window.removeEventListener('talentstage-unauthorized', handleUnauthorized);
       window.removeEventListener('talentstage-logout', handleLogout);
     };
-  }, []);
+  }, [navigate]);
 
-  const getActiveComponent = () => {
-    if (view === 'login') return <LoginPage onNavigate={setView} />;
-    if (view === 'signup') return <SignupPage onNavigate={setView} />;
-    if (view === 'onboarding') return <FreelancerOnboarding onNavigate={setView} />;
-    if (view === 'dashboard') return <FreelancerDashboard onNavigate={setView} />;
-    if (view === 'client-dashboard') return <ClientWorkspace onNavigate={setView} />;
-    if (view === 'project-feed') return <ProjectFeedWorkspace onNavigate={setView} />;
-    if (view === 'skill-match') return <SkillMatchWorkspace onNavigate={setView} />;
-    if (view === 'workspace') return (
-      <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col">
-        {/* Glowing background highlights */}
-        <div className="pointer-events-none absolute inset-0 z-0">
-          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-950/20 blur-[120px] animate-pulse-glow" />
-          <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-violet-950/15 blur-[100px] animate-pulse-glow-reverse" />
-        </div>
-        <div className="relative z-10 flex-1 flex flex-col justify-start animate-fadeIn">
-          <div className="flex justify-between items-center mb-6">
-            <button
-              onClick={() => setView('dashboard')}
-              className="text-xs font-bold text-slate-500 hover:text-indigo-650 cursor-pointer transition-colors flex items-center gap-1.5"
-            >
-              &larr; Back to Freelancer Dashboard
-            </button>
-            <button
-              onClick={() => setView('client-dashboard')}
-              className="text-xs font-bold text-slate-500 hover:text-indigo-650 cursor-pointer transition-colors flex items-center gap-1.5"
-            >
-              Back to Client Workspace &rarr;
-            </button>
-          </div>
-          <WorkspaceMessagesAndContracts onNavigate={setView} />
-        </div>
-      </div>
-    );
-    return <LandingPage onNavigate={setView} />;
-  };
-
-  const isDashboardView = ['dashboard', 'client-dashboard', 'project-feed', 'skill-match', 'workspace', 'onboarding'].includes(view);
+  const isDashboardView = [
+    '/dashboard', 
+    '/client-dashboard', 
+    '/project-feed', 
+    '/skill-match', 
+    '/workspace', 
+    '/onboarding'
+  ].some(path => location.pathname.startsWith(path));
 
   return (
-    <div className={isDashboardView ? 'dashboard-theme text-slate-100 bg-slate-950 min-h-screen' : 'bg-slate-955 text-slate-100 min-h-screen'}>
-      {getActiveComponent()}
-      <GlobalDemoController setView={setView} currentView={view} />
+    <div className={isDashboardView ? 'dashboard-theme text-slate-100 bg-slate-955 min-h-screen' : 'bg-slate-955 text-slate-100 min-h-screen'}>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<PublicOnlyRoute><LandingPage /></PublicOnlyRoute>} />
+        <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+        <Route path="/signup" element={<PublicOnlyRoute><SignupPage /></PublicOnlyRoute>} />
+
+        {/* Private Freelancer Routes */}
+        <Route path="/onboarding" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRole="FREELANCER">
+              <FreelancerOnboarding />
+            </RoleGuard>
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/*" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRole="FREELANCER">
+              <FreelancerDashboard />
+            </RoleGuard>
+          </ProtectedRoute>
+        } />
+
+        {/* Private Client Routes */}
+        <Route path="/client-dashboard/*" element={
+          <ProtectedRoute>
+            <RoleGuard allowedRole="CLIENT">
+              <ClientWorkspace />
+            </RoleGuard>
+          </ProtectedRoute>
+        } />
+
+        {/* Shared Private Routes */}
+        <Route path="/project-feed" element={
+          <ProtectedRoute>
+            <ProjectFeedWorkspace />
+          </ProtectedRoute>
+        } />
+        <Route path="/skill-match" element={
+          <ProtectedRoute>
+            <SkillMatchWorkspace />
+          </ProtectedRoute>
+        } />
+        <Route path="/workspace" element={
+          <ProtectedRoute>
+            <WorkspaceMessagesAndContractsWrapper />
+          </ProtectedRoute>
+        } />
+
+        {/* Fallback Catch-all Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Unified Demo Navigator FAB */}
+      <GlobalDemoController />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

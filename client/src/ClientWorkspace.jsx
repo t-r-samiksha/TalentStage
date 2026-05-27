@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   LogOut, LayoutDashboard, Plus,
@@ -8,9 +9,27 @@ import {
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import { authService, dashboardService, projectService } from './api';
 
-function ClientWorkspace({ onNavigate }) {
-  // Navigation state between view 1 ('dashboard') and view 2 ('post-project')
-  const [activeTab, setActiveTab] = useState('dashboard');
+function ClientWorkspace() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const activeTab = useMemo(() => {
+    const path = location.pathname;
+    if (path.endsWith('/post-project')) return 'post-project';
+    if (path.endsWith('/listings')) return 'listings';
+    if (path.endsWith('/saved-freelancers')) return 'saved-freelancers';
+    if (path.endsWith('/messages')) return 'messages';
+    if (path.endsWith('/payments')) return 'payments';
+    return 'dashboard';
+  }, [location.pathname]);
+
+  const setActiveTab = (tab) => {
+    if (tab === 'dashboard') {
+      navigate('/client-dashboard');
+    } else {
+      navigate(`/client-dashboard/${tab}`);
+    }
+  };
   
   // Simulated submission loader & success state
   const [isPosting, setIsPosting] = useState(false);
@@ -286,7 +305,7 @@ function ClientWorkspace({ onNavigate }) {
         <div className="space-y-7">
           
           {/* Logo brand lockup */}
-          <div className="flex items-center gap-2.5 px-2.5 cursor-pointer group" onClick={() => onNavigate('landing')}>
+          <div className="flex items-center gap-2.5 px-2.5 cursor-pointer group" onClick={() => navigate('/')}>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-650 to-violet-650 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4 h-4 text-white" />
             </div>
@@ -318,7 +337,7 @@ function ClientWorkspace({ onNavigate }) {
 
             {/* Browse Projects Link */}
             <button
-              onClick={() => onNavigate('project-feed')}
+              onClick={() => navigate('/project-feed')}
               className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
             >
               <Cpu className="w-4 h-4 text-indigo-400" />
@@ -358,12 +377,20 @@ function ClientWorkspace({ onNavigate }) {
 
             {/* Saved Freelancers */}
             <button
-              onClick={() => onNavigate('skill-match')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+              onClick={() => setActiveTab('saved-freelancers')}
+              className={`
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
+                ${activeTab === 'saved-freelancers'
+                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                }
+              `}
             >
               <Award className="w-4 h-4 text-violet-400" />
               <span>Saved Freelancers</span>
-              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-400 text-[10px] font-extrabold tracking-wide">
+                4
+              </span>
             </button>
 
             {/* Messages */}
@@ -440,14 +467,22 @@ function ClientWorkspace({ onNavigate }) {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6 select-none">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              {activeTab === 'dashboard' ? `Welcome back, ${profile?.profile?.fullName || 'Client'}` : 'Post New Contract'}
+              {activeTab === 'dashboard' ? `Welcome back, ${profile?.profile?.fullName || 'Client'}` : 
+               activeTab === 'post-project' ? 'Post New Contract' :
+               activeTab === 'listings' ? 'Active Project Listings' :
+               activeTab === 'saved-freelancers' ? 'Saved & Verified Candidates' :
+               activeTab === 'messages' ? 'Candidate Messages Hub' :
+               activeTab === 'payments' ? 'Milestone & Escrow Ledger' : 'Client Workspace'}
               <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
             </h1>
             <p className="text-sm text-slate-400 mt-1 leading-normal font-medium">
-              {activeTab === 'dashboard'
-                ? `Review bid proposals, secure contract escrows, and verify deliverables for ${dashboardData?.totalProjects || 0} project listings.`
-                : 'Configure project parameters. Our AI diagnostics will evaluate budget optimization in real-time.'
-              }
+              {activeTab === 'dashboard' ? `Review bid proposals, secure contract escrows, and verify deliverables for ${dashboardData?.totalProjects || 0} project listings.` :
+               activeTab === 'post-project' ? 'Configure project parameters. Our AI diagnostics will evaluate budget optimization in real-time.' :
+               activeTab === 'listings' ? 'Monitor review queues, bid proposal distributions, and hiring progress.' :
+               activeTab === 'saved-freelancers' ? 'Verified talent profiles matched to your escrow vault criteria.' :
+               activeTab === 'messages' ? 'Real-time encrypted communications with your contractors.' :
+               activeTab === 'payments' ? 'Smart contract-backed milestone payments. Full audit trail.' :
+               'Manage your active contracts and expert freelancers.'}
             </p>
           </div>
 
@@ -461,176 +496,277 @@ function ClientWorkspace({ onNavigate }) {
         {/* ───────────────────────────────────────────────────────────────── */}
         {/* ── VIEW 1: CLIENT DASHBOARD VIEW (Page 6) ──────────────────────── */}
         {/* ───────────────────────────────────────────────────────────────── */}
+        {/* ── Top Stats Cards (Rendered ONLY on Dashboard) ── */}
         {activeTab === 'dashboard' && (
-          <div className="space-y-8">
+          <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 select-none animate-fade-in">
             
-            {/* Top Stats Cards (4-Column Grid) */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
-              
-              {/* Card 1: Active Projects */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
-                      {dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length || 0} Active
-                    </h3>
-                  </div>
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm relative">
-                    <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                    <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-500" />
-                    <Briefcase className="w-5 h-5" />
-                  </div>
+            {/* Card 1: Active Projects */}
+            <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
+                  <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                    {dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length || 0} Active
+                  </h3>
                 </div>
-                <div className="mt-3 flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-slate-500 font-medium">Escrow contracts active</span>
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm relative">
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-500" />
+                  <Briefcase className="w-5 h-5" />
                 </div>
               </div>
+              <div className="mt-3 flex items-center gap-1.5">
+                <span className="text-[9.5px] text-slate-500 font-medium">Escrow contracts active</span>
+              </div>
+            </div>
 
-              {/* Card 2: Total Budget */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Budget</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹{totalBudget.toLocaleString('en-IN')}</h3>
-                  </div>
-                  <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
-                    <DollarSign className="w-5 h-5" />
-                  </div>
+            {/* Card 2: Total Budget */}
+            <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Budget</span>
+                  <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹{totalBudget.toLocaleString('en-IN')}</h3>
                 </div>
-                <div className="mt-3 flex items-center">
-                  <span className="text-[9.5px] text-indigo-400/90 font-extrabold uppercase tracking-wider select-none">
-                    Allocated to Listings
-                  </span>
+                <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
+                  <DollarSign className="w-5 h-5" />
                 </div>
               </div>
+              <div className="mt-3 flex items-center">
+                <span className="text-[9.5px] text-indigo-400/90 font-extrabold uppercase tracking-wider select-none">
+                  Allocated to Listings
+                </span>
+              </div>
+            </div>
 
-              {/* Card 3: AI Matches */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Matches</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">{totalProposalsCount} Proposals</h3>
-                  </div>
-                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
+            {/* Card 3: AI Matches */}
+            <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Matches</span>
+                  <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">{totalProposalsCount} Proposals</h3>
                 </div>
-                <div className="mt-3 flex items-center">
-                  <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-[8.5px] font-bold text-violet-300 uppercase tracking-wider shadow-sm">
-                    Active proposals count
-                  </span>
+                <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
+                  <Sparkles className="w-5 h-5" />
                 </div>
               </div>
+              <div className="mt-3 flex items-center">
+                <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-[8.5px] font-bold text-violet-300 uppercase tracking-wider shadow-sm">
+                  Active proposals count
+                </span>
+              </div>
+            </div>
 
-              {/* Card 4: Pending Payments */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Pending Payments</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
-                      {pendingMilestonesCount} Milestone{pendingMilestonesCount !== 1 ? 's' : ''}
-                    </h3>
-                  </div>
-                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm">
-                    <AlertCircle className="w-5 h-5" />
-                  </div>
+            {/* Card 4: Pending Payments */}
+            <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Pending Payments</span>
+                  <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                    {pendingMilestonesCount} Milestone{pendingMilestonesCount !== 1 ? 's' : ''}
+                  </h3>
                 </div>
-                <div className="mt-3 flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-sm text-amber-450 font-bold">Awaiting Attestation Approval</span>
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm">
+                  <AlertCircle className="w-5 h-5" />
                 </div>
               </div>
-
-            </section>
-
-            {/* Project List Area */}
-            <section className="space-y-5">
-              <div className="flex justify-between items-center select-none">
-                <h3 className="text-lg font-bold text-white">
-                  Active Project Listings ({clientProjects.length})
-                </h3>
-                <button
-                  onClick={() => setActiveTab('post-project')}
-                  className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:brightness-110 active:scale-[0.98] text-slate-900 text-sm font-semibold tracking-wide shadow-md flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Post New Project</span>
-                </button>
+              <div className="mt-3 flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="text-sm text-amber-455 font-bold">Awaiting Attestation Approval</span>
               </div>
+            </div>
 
-              {/* Grid of Listings */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {!clientProjects.length ? (
-                  <div className="col-span-full py-12 text-center rounded-2xl border border-dashed border-slate-800/80 bg-slate-900/10 backdrop-blur-xl">
-                    <Briefcase className="w-8 h-8 text-slate-600 mx-auto mb-3" />
-                    <p className="text-xs text-slate-400">No projects posted yet. Click "Post New Project" to get started!</p>
-                  </div>
-                ) : (
-                  clientProjects.map((project) => (
-                    <div
-                      key={project.id}
-                      className="
-                        relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl shadow-lg
-                        hover:translate-y-[-4px] hover:border-indigo-500/40 hover:shadow-[0_4px_25px_-5px_rgba(99,102,241,0.15)]
-                        transition-all duration-300 group cursor-pointer
-                      "
-                    >
-                      {/* Header line & status */}
-                      <div className="flex justify-between items-start mb-3 select-none">
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
-                          {project.status}
-                        </span>
-                        <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {project.deadline}
-                        </span>
-                      </div>
+          </section>
+        )}
 
-                      {/* Title & Budget */}
-                      <div className="space-y-2 mb-4">
-                        <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
-                          {project.title}
-                        </h4>
-                        <div className="text-indigo-400 font-extrabold text-sm tracking-tight flex items-center gap-1 select-none">
-                          <DollarSign className="w-3.5 h-3.5" />
-                          <span>{project.budget}</span>
-                        </div>
-                      </div>
+        {/* ── Project List Area (Rendered on Dashboard OR Listings Tab) ── */}
+        {(activeTab === 'dashboard' || activeTab === 'listings') && (
+          <section className="space-y-5 animate-fade-in">
+            <div className="flex justify-between items-center select-none">
+              <h3 className="text-lg font-bold text-white">
+                Active Project Listings ({clientProjects.length})
+              </h3>
+              <button
+                onClick={() => setActiveTab('post-project')}
+                className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:brightness-110 active:scale-[0.98] text-slate-900 text-sm font-semibold tracking-wide shadow-md flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Post New Project</span>
+              </button>
+            </div>
 
-                      {/* Skill Tags */}
-                      <div className="flex flex-wrap gap-1.5 mb-5 select-none">
-                        {project.skills.map((skill) => (
-                          <span 
-                            key={skill} 
-                            className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Action & Proposal count footer */}
-                      <div className="pt-4 border-t border-slate-900 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-1.5 select-none">
-                          <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-sm">
-                            {project.proposals}
-                          </span>
-                          <span className="text-[10px] font-semibold text-slate-500">Proposals received</span>
-                        </div>
-                        
-                        <button className="py-1.5 px-3 rounded-lg border border-slate-800 text-[10.5px] font-bold text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-950 transition-all flex items-center gap-1 cursor-pointer">
-                          <span>Details</span>
-                          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                        </button>
-                      </div>
-
+            {/* Grid of Listings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {!clientProjects.length ? (
+                <div className="col-span-full py-12 text-center rounded-2xl border border-dashed border-slate-800/80 bg-slate-900/10 backdrop-blur-xl">
+                  <Briefcase className="w-8 h-8 text-slate-600 mx-auto mb-3" />
+                  <p className="text-xs text-slate-400">No projects posted yet. Click "Post New Project" to get started!</p>
+                </div>
+              ) : (
+                clientProjects.map((project) => (
+                  <div
+                    key={project.id}
+                    className="
+                      relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl shadow-lg
+                      hover:translate-y-[-4px] hover:border-indigo-500/40 hover:shadow-[0_4px_25px_-5px_rgba(99,102,241,0.15)]
+                      transition-all duration-300 group cursor-pointer
+                    "
+                  >
+                    {/* Header line & status */}
+                    <div className="flex justify-between items-start mb-3 select-none">
+                      <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
+                        {project.status}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {project.deadline}
+                      </span>
                     </div>
-                  ))
-                )}
-              </div>
-            </section>
 
+                    {/* Title & Budget */}
+                    <div className="space-y-2 mb-4">
+                      <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
+                        {project.title}
+                      </h4>
+                      <div className="text-indigo-400 font-extrabold text-sm tracking-tight flex items-center gap-1 select-none">
+                        <DollarSign className="w-3.5 h-3.5" />
+                        <span>{project.budget}</span>
+                      </div>
+                    </div>
+
+                    {/* Skill Tags */}
+                    <div className="flex flex-wrap gap-1.5 mb-5 select-none">
+                      {project.skills.map((skill) => (
+                        <span 
+                          key={skill} 
+                          className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Action & Proposal count footer */}
+                    <div className="pt-4 border-t border-slate-900 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-1.5 select-none">
+                        <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-sm">
+                          {project.proposals}
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-500">Proposals received</span>
+                      </div>
+                      
+                      <button className="py-1.5 px-3 rounded-lg border border-slate-800 text-[10.5px] font-bold text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-950 transition-all flex items-center gap-1 cursor-pointer">
+                        <span>Details</span>
+                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </button>
+                    </div>
+
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* ── Saved Candidates Showcase View (Rendered on Saved Freelancers Tab) ── */}
+        {activeTab === 'saved-freelancers' && (
+          <div className="space-y-8 animate-fade-in select-none">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                {
+                  name: 'Siddharth Mehta',
+                  role: 'Solidity Protocol Architect',
+                  skills: ['Solidity', 'Hardhat', 'ERC-4337', 'EVM Security'],
+                  matchScore: 98,
+                  attestations: '4 Attested Badges',
+                  earned: '₹14,50,000',
+                  rate: '₹4,500/hr',
+                  bio: 'Architected five production-grade ERC-4337 bundler infrastructures. Specializes in gas-optimized paymaster designs and entry-point security audits.',
+                  avatar: 'SM'
+                },
+                {
+                  name: 'Pooja Ramachandran',
+                  role: 'Senior React Architecture Lead',
+                  skills: ['React', 'TypeScript', 'Next.js', 'Storybook'],
+                  matchScore: 95,
+                  attestations: '3 Attested Badges',
+                  earned: '₹9,80,000',
+                  rate: '₹3,500/hr',
+                  bio: 'Expert in dynamic CSS structures, custom React hooks, concurrent state rendering, and robust atomic component libraries.',
+                  avatar: 'PR'
+                },
+                {
+                  name: 'Marcus Vance',
+                  role: 'AI Orchestration & LLM Engineer',
+                  skills: ['Python', 'LangChain', 'FastAPI', 'Docker'],
+                  matchScore: 92,
+                  attestations: '2 Attested Badges',
+                  earned: '₹12,40,000',
+                  rate: '₹4,000/hr',
+                  bio: 'Engineered LLM agents with structured parsing. Integrated adaptive question generation pipelines using stateful memory designs.',
+                  avatar: 'MV'
+                },
+                {
+                  name: 'Amit Deshmukh',
+                  role: 'Full-Stack Developer',
+                  skills: ['Node.js', 'Express', 'PostgreSQL', 'Prisma'],
+                  matchScore: 89,
+                  attestations: '2 Attested Badges',
+                  earned: '₹7,20,000',
+                  rate: '₹2,800/hr',
+                  bio: 'Designed secure double-entry ledgers and custom Express middleware with robust automated unit-test frameworks.',
+                  avatar: 'AD'
+                }
+              ].map((f, idx) => (
+                <div 
+                  key={idx} 
+                  className="rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-6 shadow-lg relative overflow-hidden flex flex-col justify-between hover:border-slate-700/80 transition-all duration-300 group"
+                >
+                  <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-650/20 border border-indigo-500/30 flex items-center justify-center text-sm font-black text-indigo-400">
+                          {f.avatar}
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-extrabold text-white leading-snug group-hover:text-indigo-400 transition-colors">{f.name}</h3>
+                          <p className="text-[10.5px] font-semibold text-slate-500">{f.role}</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/10 border-emerald-500/20 whitespace-nowrap">
+                        {f.matchScore}% Match
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-450 leading-relaxed">{f.bio}</p>
+
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {f.skills.map((s, sIdx) => (
+                        <span 
+                          key={sIdx}
+                          className="px-2 py-0.5 rounded bg-slate-850 border border-slate-800 text-[9px] font-bold text-slate-400"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-6 pt-4 border-t border-slate-900/60 flex items-center justify-between text-[10px] font-bold">
+                    <div className="flex gap-3 text-slate-500">
+                      <span>Rate: <span className="text-white">{f.rate}</span></span>
+                      <span>·</span>
+                      <span>Earned: <span className="text-white">{f.earned}</span></span>
+                    </div>
+                    <span className="text-indigo-400 font-extrabold flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      {f.attestations}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -1074,12 +1210,12 @@ function ClientWorkspace({ onNavigate }) {
 
         {/* Client Messaging Hub */}
         {activeTab === 'messages' && (
-          <WorkspaceMessagesAndContracts activeSection="messages" onNavigate={onNavigate} />
+          <WorkspaceMessagesAndContracts activeSection="messages" />
         )}
 
         {/* Client Escrow & Payments Ledger */}
         {activeTab === 'payments' && (
-          <WorkspaceMessagesAndContracts activeSection="contracts" onNavigate={onNavigate} />
+          <WorkspaceMessagesAndContracts activeSection="contracts" />
         )}
 
       </main>

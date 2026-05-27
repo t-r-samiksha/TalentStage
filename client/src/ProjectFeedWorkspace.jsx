@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Cpu, ArrowLeft, Search, Filter, Sparkles, CheckCircle2, Star,
   Clock, DollarSign, Calendar, ChevronDown, Code2,
   Check, ShieldCheck, ExternalLink,
   Zap, Send, AlertCircle
 } from 'lucide-react';
-import { projectService, dashboardService, aiService } from './api';
+import { projectService, dashboardService, aiService, authStorage } from './api';
 
 // ─── Time Ago Helper ────────────────────────────────────────────────────────
 function timeAgo(dateString) {
@@ -275,7 +276,8 @@ function MatchBadge({ match }) {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────
-export default function ProjectFeedWorkspace({ onNavigate }) {
+export default function ProjectFeedWorkspace() {
+  const navigate = useNavigate();
   const [view, setView] = useState('feed'); // 'feed' | 'details'
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -757,7 +759,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               </button>
             )}
             <button
-              onClick={() => onNavigate('landing')}
+              onClick={() => navigate('/')}
               className="flex items-center gap-2 group cursor-pointer select-none"
             >
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
@@ -776,18 +778,38 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
             >
               Project Feed
             </button>
-            <button
-              onClick={() => onNavigate('client-dashboard')}
-              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
-            >
-              Client Dashboard
-            </button>
-            <button
-              onClick={() => onNavigate('dashboard')}
-              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
-            >
-              My Dashboard
-            </button>
+            {authStorage.isAuthenticated() ? (
+              authStorage.getUser()?.role === 'CLIENT' ? (
+                <button
+                  onClick={() => navigate('/client-dashboard')}
+                  className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
+                >
+                  Client Workspace
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
+                >
+                  My Dashboard
+                </button>
+              )
+            ) : (
+              <>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="px-3 py-1.5 rounded-lg text-white transition-all cursor-pointer select-none bg-indigo-600 hover:bg-indigo-700"
+                >
+                  Sign Up Free
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
