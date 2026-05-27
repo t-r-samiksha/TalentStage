@@ -4,11 +4,10 @@ import rateLimit from 'express-rate-limit';
 import portfolioRoutes from './routes/portfolioRoutes';
 import proposalRoutes from './routes/proposalRoutes';
 import matchRoutes from './routes/matchRoutes';
-import skillRoutes from './routes/skillRoutes';
 
 const router = Router();
 
-// Rate limiting: max 30 requests per minute per IP
+// Rate limiting: max 30 requests per minute per IP for AI endpoints
 const aiRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 30,
@@ -17,13 +16,12 @@ const aiRateLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply rate limiting to all /ai routes
-router.use('/ai', aiRateLimiter);
+// Apply rate limiting to all mounted AI routes
+router.use(aiRateLimiter);
 
-// Mount all routes. The internal files define their exact paths (e.g. /ai/review-portfolio, /skills/result)
+// Mount public AI routes
 router.use('/', portfolioRoutes);
 router.use('/', proposalRoutes);
 router.use('/', matchRoutes);
-router.use('/', skillRoutes);
 
 export default router;

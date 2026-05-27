@@ -70,17 +70,32 @@ export const getMyContractsService = async (userId) => {
   const contracts = await prisma.contract.findMany({
     where: {
       OR: [
-        {
-          clientId: userId,
-        },
-        {
-          freelancerId: userId,
-        },
+        { clientId: userId },
+        { freelancerId: userId },
       ],
     },
 
     include: {
       project: true,
+      client: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: { fullName: true, avatarUrl: true },
+          },
+        },
+      },
+      freelancer: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: { fullName: true, avatarUrl: true },
+          },
+        },
+      },
+      milestones: true,
     },
 
     orderBy: {
