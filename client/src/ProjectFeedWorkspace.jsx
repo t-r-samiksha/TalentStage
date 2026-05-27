@@ -510,7 +510,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         </div>
 
                         {/* Description — 2-line clamp */}
-                        <p className="text-sm text-slate-305 leading-relaxed line-clamp-2">
+                        <p className="text-sm text-slate-300 leading-relaxed line-clamp-2">
                           {project.description}
                         </p>
 

@@ -378,7 +378,7 @@ export default function LandingPage({ onNavigate }) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 select-none">
                   {[
                     { label: 'API Requests', val: '4.8M', change: '+12.5%', color: 'text-red-400' },
-                    { label: 'Model Accuracy', val: '98.2%', change: 'active', color: 'text-slate-305' },
+                    { label: 'Model Accuracy', val: '98.2%', change: 'active', color: 'text-slate-300' },
                     { label: 'Active Projects', val: '7', change: 'nominal', color: 'text-slate-300' },
                     { label: 'Server Status', val: 'Online', change: '15ms latency', color: 'text-emerald-400' },
                   ].map((s, idx) => (

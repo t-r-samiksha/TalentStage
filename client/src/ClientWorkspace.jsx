@@ -381,7 +381,7 @@ function ClientWorkspace({ onNavigate }) {
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-1.5">
-                  <span className="text-sm text-slate-305 font-medium">All escrows fully funded</span>
+                  <span className="text-sm text-slate-300 font-medium">All escrows fully funded</span>
                 </div>
               </div>
 
