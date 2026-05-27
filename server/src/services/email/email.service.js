@@ -1,39 +1,19 @@
-import nodemailer from 'nodemailer';
 import { logger } from '../../utils/logger.js';
 
-let transporter = null;
-
 /**
- * Returns a cached Nodemailer SMTP transporter.
- * Dynamically reads credentials at call-time to prevent ESM environment variable loading hoisting issues.
- */
-const getTransporter = () => {
-  if (transporter) return transporter;
-
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-
-  if (!emailUser || !emailPass) {
-    throw new Error("SMTP email credentials (EMAIL_USER and EMAIL_PASS) are not configured in environment variables.");
-  }
-
-  transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: emailUser,
-      pass: emailPass,
-    },
-  });
-
-  return transporter;
-};
-
-/**
- * Dispatches a premium HTML 6-digit OTP email using Gmail SMTP
+ * Dispatches a premium HTML 6-digit OTP email using the Brevo HTTPS REST API
  * @param {string} email - Recipient email address
  * @param {string} otp - 6-digit verification code
  */
 export const sendOtpEmail = async (email, otp) => {
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  const senderEmail = process.env.BREVO_SENDER_EMAIL;
+  const senderName = process.env.BREVO_SENDER_NAME || "TalentStage";
+
+  if (!brevoApiKey || !senderEmail) {
+    throw new Error("Brevo credentials (BREVO_API_KEY and BREVO_SENDER_EMAIL) are not configured in environment variables.");
+  }
+
   const htmlContent = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
       <h2 style="color: #e50914; margin-bottom: 24px;">Verify your TalentStage Account</h2>
@@ -49,20 +29,40 @@ export const sendOtpEmail = async (email, otp) => {
   `;
 
   try {
-    logger.info(`Attempting to send OTP email to ${email} via Gmail SMTP...`);
-    
-    const smtpTransporter = getTransporter();
-    const mailOptions = {
-      from: `"TalentStage Support" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: `${otp} is your TalentStage verification code`,
-      html: htmlContent,
-    };
+    logger.info(`Attempting to send OTP email to ${email} via Brevo HTTP API...`);
 
-    const info = await smtpTransporter.sendMail(mailOptions);
-    logger.info(`OTP email sent to ${email} successfully via Gmail SMTP (Message ID: ${info.messageId}).`);
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "accept": "application/json",
+        "api-key": brevoApiKey,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        sender: {
+          name: senderName,
+          email: senderEmail
+        },
+        to: [
+          {
+            email: email
+          }
+        ],
+        subject: `${otp} is your TalentStage verification code`,
+        htmlContent: htmlContent
+      })
+    });
+
+    const responseData = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      const errorMessage = responseData.message || `HTTP ${response.status} Error`;
+      throw new Error(errorMessage);
+    }
+
+    logger.info(`OTP email sent to ${email} successfully via Brevo API (Message ID: ${responseData.messageId}).`);
   } catch (error) {
-    logger.error(`Failed to send OTP email to ${email} via Gmail SMTP: ${error.message}`);
+    logger.error(`Failed to send OTP email to ${email} via Brevo API: ${error.message}`);
     throw new Error(`Email delivery failed: ${error.message}`);
   }
 };
