@@ -1,122 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from 'react';
+import LandingPage from './LandingPage';
+import LoginPage from './LoginPage';
+import SignupPage from './SignupPage';
+import FreelancerOnboarding from './FreelancerOnboarding';
+import FreelancerDashboard from './FreelancerDashboard';
+import ClientWorkspace from './ClientWorkspace';
+import ProjectFeedWorkspace from './ProjectFeedWorkspace';
+import SkillMatchWorkspace from './SkillMatchWorkspace';
+import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
+import GlobalDemoController from './GlobalDemoController';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [view, setView] = useState('skill-match');
+
+  let activeComponent = null;
+
+  if (view === 'login') {
+    activeComponent = <LoginPage onNavigate={setView} />;
+  } else if (view === 'signup') {
+    activeComponent = <SignupPage onNavigate={setView} />;
+  } else if (view === 'onboarding') {
+    activeComponent = <FreelancerOnboarding onNavigate={setView} />;
+  } else if (view === 'dashboard') {
+    activeComponent = <FreelancerDashboard onNavigate={setView} />;
+  } else if (view === 'client-dashboard') {
+    activeComponent = <ClientWorkspace onNavigate={setView} />;
+  } else if (view === 'project-feed') {
+    activeComponent = <ProjectFeedWorkspace onNavigate={setView} />;
+  } else if (view === 'skill-match') {
+    activeComponent = <SkillMatchWorkspace onNavigate={setView} />;
+  } else if (view === 'workspace') {
+    activeComponent = (
+      <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col">
+        {/* Glowing background highlights */}
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-700/5 blur-[120px]" />
+          <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-violet-700/4 blur-[100px]" />
+        </div>
+        <div className="relative z-10 flex-1 flex flex-col justify-start">
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={() => setView('dashboard')}
+              className="text-xs font-bold text-slate-500 hover:text-indigo-400 cursor-pointer transition-colors flex items-center gap-1.5"
+            >
+              &larr; Back to Freelancer Dashboard
+            </button>
+            <button
+              onClick={() => setView('client-dashboard')}
+              className="text-xs font-bold text-slate-500 hover:text-indigo-400 cursor-pointer transition-colors flex items-center gap-1.5"
+            >
+              Back to Client Workspace &rarr;
+            </button>
+          </div>
+          <WorkspaceMessagesAndContracts onNavigate={setView} />
+        </div>
+      </div>
+    );
+  } else {
+    activeComponent = <LandingPage onNavigate={setView} />;
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      {activeComponent}
+      <GlobalDemoController setView={setView} currentView={view} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
