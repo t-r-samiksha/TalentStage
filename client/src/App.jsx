@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
@@ -9,9 +9,42 @@ import ProjectFeedWorkspace from './ProjectFeedWorkspace';
 import SkillMatchWorkspace from './SkillMatchWorkspace';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import GlobalDemoController from './GlobalDemoController';
+import { authStorage } from './api';
 
 function App() {
-  const [view, setView] = useState('skill-match');
+  const [view, setView] = useState('landing');
+
+  useEffect(() => {
+    // 1. Auto-login and route check on startup
+    if (authStorage.isAuthenticated()) {
+      const user = authStorage.getUser();
+      if (user?.role === 'CLIENT') {
+        setView('client-dashboard');
+      } else {
+        setView('dashboard');
+      }
+    } else {
+      setView('landing');
+    }
+
+    // 2. Global event listener to capture session expirations (e.g. 401 response interceptors)
+    const handleUnauthorized = () => {
+      setView('login');
+    };
+
+    // 3. Global event listener for manual logout
+    const handleLogout = () => {
+      setView('landing');
+    };
+
+    window.addEventListener('talentstage-unauthorized', handleUnauthorized);
+    window.addEventListener('talentstage-logout', handleLogout);
+
+    return () => {
+      window.removeEventListener('talentstage-unauthorized', handleUnauthorized);
+      window.removeEventListener('talentstage-logout', handleLogout);
+    };
+  }, []);
 
   let activeComponent = null;
 

@@ -6,6 +6,7 @@ import {
   ChevronRight, ArrowUpRight, Award, HelpCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
+import { authService } from './api';
 
 function FreelancerDashboard({ onNavigate }) {
   // Active state for sidebar navigation simulation
@@ -273,7 +274,7 @@ function FreelancerDashboard({ onNavigate }) {
           </div>
 
           <button
-            onClick={() => onNavigate('landing')}
+            onClick={() => authService.logout()}
             className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-[10px] font-bold text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />

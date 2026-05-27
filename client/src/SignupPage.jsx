@@ -4,6 +4,7 @@ import {
   Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight,
   Check, UserCheck,
 } from 'lucide-react';
+import { authService } from './api';
 
 // ─── Realistic multi-colour Google icon ───────────────────────────────────────
 const GoogleIcon = (props) => (
@@ -210,7 +211,7 @@ function SignupPage({ onNavigate }) {
   const selectedRole = ROLES.find((r) => r.id === role);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -232,10 +233,25 @@ function SignupPage({ onNavigate }) {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    const apiRole = role === 'client' ? 'CLIENT' : role === 'dual' ? 'BOTH' : 'FREELANCER';
+    const result = await authService.signup(email.trim(), password, apiRole);
+
+    if (result.success) {
+      // Create user profile details
+      await authService.updateProfile({ fullName: name.trim() });
+      
+      // Auto login on successful signup
+      const loginResult = await authService.login(email.trim(), password);
       setIsLoading(false);
-      setSuccess(true);
-    }, 1700);
+      if (loginResult.success) {
+        setSuccess(true);
+      } else {
+        setError('Account created, but automatic sign-in failed. Please go to Login page.');
+      }
+    } else {
+      setIsLoading(false);
+      setError(result.error?.message || 'Registration failed. Please try again.');
+    }
   };
 
   const handleOAuth = (provider) => {
@@ -286,7 +302,7 @@ function SignupPage({ onNavigate }) {
             </p>
 
             <button
-              onClick={() => onNavigate((role === 'freelancer' || role === 'dual') ? 'onboarding' : 'landing')}
+              onClick={() => onNavigate((role === 'freelancer' || role === 'dual') ? 'onboarding' : 'client-dashboard')}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>{(role === 'freelancer' || role === 'dual') ? 'Setup Professional Profile' : 'Go to Dashboard'}</span>

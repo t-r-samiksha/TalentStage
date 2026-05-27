@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Cpu, ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { authService, authStorage } from './api';
 
 // ─── Realistic multi-colour Google icon ───────────────────────────────────────
 const GoogleIcon = (props) => (
@@ -76,7 +77,7 @@ function LoginPage({ onNavigate }) {
   const [success, setSuccess]       = useState(false);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -86,11 +87,14 @@ function LoginPage({ onNavigate }) {
     }
 
     setIsLoading(true);
-    // Simulated API authentication
-    setTimeout(() => {
-      setIsLoading(false);
+    const result = await authService.login(email.trim(), password);
+    setIsLoading(false);
+
+    if (result.success) {
       setSuccess(true);
-    }, 1600);
+    } else {
+      setError(result.error?.message || 'Authentication failed. Please verify your email and password.');
+    }
   };
 
   const handleOAuth = (provider) => {
@@ -126,7 +130,14 @@ function LoginPage({ onNavigate }) {
               You've authenticated successfully. Your workspace is ready.
             </p>
             <button
-              onClick={() => onNavigate('landing')}
+              onClick={() => {
+                const user = authStorage.getUser();
+                if (user?.role === 'CLIENT') {
+                  onNavigate('client-dashboard');
+                } else {
+                  onNavigate('dashboard');
+                }
+              }}
               className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Enter Workspace</span>
