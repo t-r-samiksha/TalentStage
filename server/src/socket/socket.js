@@ -9,13 +9,30 @@ const onlineUsers = new Set();
 const socketUserMap = new Map();
 
 export const initSocket = (server) => {
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(",").map(o => o.trim())
+    : ["http://localhost:5173", "http://localhost:3000"];
 
   io = new Server(server, {
-
     cors: {
-      origin: "*",
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like server-to-server or postman/curl)
+        if (!origin) return callback(null, true);
+        
+        if (
+          allowedOrigins.includes("*") || 
+          allowedOrigins.includes(origin) ||
+          process.env.NODE_ENV !== "production"
+        ) {
+          callback(null, true);
+        } else {
+          console.warn(`[Socket CORS Blocked] Handshake from origin: ${origin} rejected.`);
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      methods: ["GET", "POST"],
+      credentials: true
     },
-
   });
 
   io.on("connection", (socket) => {

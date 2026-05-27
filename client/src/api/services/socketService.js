@@ -8,8 +8,19 @@ class SocketService {
 
   connect() {
     if (!this.socket) {
-      this.socket = io('http://localhost:5000', {
+      // Decouple socket server target to use VITE_SOCKET_URL env variable,
+      // with a fallback to API_URL (minus /api suffix) or localhost:5000.
+      const rawApiUrl = import.meta.env.VITE_API_URL || '';
+      const fallbackSocketUrl = rawApiUrl.replace(/\/api$/, '') || 'http://localhost:5000';
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || fallbackSocketUrl;
+
+      console.log(`[Socket] Connecting to server at: ${socketUrl}`);
+      
+      this.socket = io(socketUrl, {
         transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
       });
 
       this.socket.on('connect', () => {
