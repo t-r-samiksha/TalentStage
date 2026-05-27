@@ -1,320 +1,358 @@
 import React, { useState } from 'react';
 import {
-  Terminal, X, Layers, Sparkles, ShieldAlert, BarChart2,
-  ArrowRight, Cpu, Home, LogIn, UserPlus, FileText, CheckCircle2,
-  List, Eye, PlusCircle, CheckSquare, RefreshCw, Send, MessageSquare,
-  DollarSign, User, Activity, ShieldCheck, Compass, Settings, Zap
+  X, Layers, Sparkles, ShieldCheck, BarChart2, Cpu,
+  Home, LogIn, UserPlus, FileText, List, Eye, PlusCircle,
+  CheckSquare, RefreshCw, Send, MessageSquare, DollarSign,
+  User, ArrowRight, Zap, CheckCircle2, Terminal
 } from 'lucide-react';
 
-function GlobalDemoController({ setView, currentView }) {
+const PILLARS = [
+  {
+    id: 'gateway',
+    label: 'Gateway & Auth',
+    color: 'indigo',
+    icon: Home,
+    badge: '4 views',
+    items: [
+      {
+        label: 'Landing Page',
+        desc: 'Public marketing portal',
+        icon: Home,
+        view: 'landing',
+        tag: 'PUBLIC',
+        tagColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+      },
+      {
+        label: 'Login Portal',
+        desc: 'Secure user authentication',
+        icon: LogIn,
+        view: 'login',
+        tag: 'AUTH',
+        tagColor: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+      },
+      {
+        label: 'Sign Up',
+        desc: 'Create a new account',
+        icon: UserPlus,
+        view: 'signup',
+        tag: 'REGISTER',
+        tagColor: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+      },
+      {
+        label: 'Onboarding Wizard',
+        desc: 'Developer profile setup flow',
+        icon: FileText,
+        view: 'onboarding',
+        tag: 'SETUP',
+        tagColor: 'bg-slate-700 text-slate-300 border-slate-600',
+      },
+    ],
+  },
+  {
+    id: 'workspaces',
+    label: 'Core Workspaces',
+    color: 'violet',
+    icon: BarChart2,
+    badge: '4 views',
+    items: [
+      {
+        label: 'Freelancer Dashboard',
+        desc: 'Contractor analytics & projects',
+        icon: BarChart2,
+        view: 'dashboard',
+        tag: 'FREELANCER',
+        tagColor: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+      },
+      {
+        label: 'Client Workspace',
+        desc: 'Employer hiring cockpit',
+        icon: Cpu,
+        view: 'client-dashboard',
+        tag: 'CLIENT',
+        tagColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+      },
+      {
+        label: 'Project Feed',
+        desc: 'Browse & bid on contracts',
+        icon: List,
+        view: 'project-feed',
+        tag: 'LISTINGS',
+        tagColor: 'bg-slate-700 text-slate-300 border-slate-600',
+      },
+      {
+        label: 'AI Skill Match',
+        desc: 'AI-ranked talent discovery',
+        icon: Eye,
+        view: 'skill-match',
+        tag: 'AI',
+        tagColor: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+      },
+    ],
+  },
+  {
+    id: 'ai',
+    label: 'AI Engine Modules',
+    color: 'fuchsia',
+    icon: Sparkles,
+    badge: '5 views',
+    items: [
+      {
+        label: 'Post Project (AI Form)',
+        desc: 'AI-generated contract scope',
+        icon: PlusCircle,
+        view: 'client-dashboard',
+        tag: 'AI COMPOSE',
+        tagColor: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+      },
+      {
+        label: 'Submit Proposal',
+        desc: 'AI-evaluated bid submission',
+        icon: Send,
+        view: 'project-feed',
+        tag: 'AI SCORE',
+        tagColor: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+      },
+      {
+        label: 'Portfolio AI Diff',
+        desc: 'Deep portfolio review analysis',
+        icon: RefreshCw,
+        view: 'dashboard',
+        tag: 'AI REVIEW',
+        tagColor: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+      },
+      {
+        label: 'Skill Verification',
+        desc: 'Decentralized skill attestation',
+        icon: CheckSquare,
+        view: 'skill-match',
+        tag: 'VERIFIED',
+        tagColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      },
+      {
+        label: 'Vector Match Results',
+        desc: 'AI compatibility index report',
+        icon: Sparkles,
+        view: 'skill-match',
+        tag: 'MATCH AI',
+        tagColor: 'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30',
+      },
+    ],
+  },
+  {
+    id: 'operations',
+    label: 'Operations & Ledger',
+    color: 'emerald',
+    icon: ShieldCheck,
+    badge: '4 views',
+    items: [
+      {
+        label: 'Messages Hub',
+        desc: 'Secure candidate chat channels',
+        icon: MessageSquare,
+        view: 'workspace',
+        tag: 'PAGE 14',
+        tagColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+      },
+      {
+        label: 'Escrow Ledger',
+        desc: 'Smart contract payment flows',
+        icon: ShieldCheck,
+        view: 'workspace',
+        tag: 'PAGE 15',
+        tagColor: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      },
+      {
+        label: 'Financial Earnings',
+        desc: 'Balance sheets & payouts',
+        icon: DollarSign,
+        view: 'dashboard',
+        tag: 'FINANCE',
+        tagColor: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      },
+      {
+        label: 'Public Profile',
+        desc: 'Attested developer showcase',
+        icon: User,
+        view: 'dashboard',
+        tag: 'PROFILE',
+        tagColor: 'bg-slate-700 text-slate-300 border-slate-600',
+      },
+    ],
+  },
+];
+
+const PILLAR_ACCENT = {
+  indigo:  { dot: 'bg-indigo-400',  text: 'text-indigo-400',  border: 'border-indigo-500/40', bg: 'bg-indigo-500/10' },
+  violet:  { dot: 'bg-violet-400',  text: 'text-violet-400',  border: 'border-violet-500/40', bg: 'bg-violet-500/10' },
+  fuchsia: { dot: 'bg-fuchsia-400', text: 'text-fuchsia-400', border: 'border-fuchsia-500/40', bg: 'bg-fuchsia-500/10' },
+  emerald: { dot: 'bg-emerald-400', text: 'text-emerald-400', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10' },
+};
+
+export default function GlobalDemoController({ setView, currentView }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [activePillar, setActivePillar] = useState(0); // 0: All, 1: Gateway, 2: Core, 3: AI, 4: Operations
 
-  // Categories and links configuration for all 17 views
-  const categories = [
-    {
-      id: 1,
-      title: 'Gateway & Onboarding',
-      shortTitle: 'Gateway',
-      icon: Home,
-      accentColor: 'text-indigo-400 border-indigo-500/20 bg-indigo-500/5',
-      glow: 'shadow-indigo-500/5',
-      items: [
-        { name: 'Landing Portal', icon: Home, view: 'landing', path: '/', desc: 'Main public platform gateway' },
-        { name: 'Access Terminal', icon: LogIn, view: 'login', path: '/login', desc: 'Secure user login gate' },
-        { name: 'Signup Node', icon: UserPlus, view: 'signup', path: '/signup', desc: 'On-chain user registration' },
-        { name: 'Onboarding Flow', icon: FileText, view: 'onboarding', path: '/onboarding', desc: 'Developer/Client wizard' }
-      ]
-    },
-    {
-      id: 2,
-      title: 'Core Workspaces',
-      shortTitle: 'Workspaces',
-      icon: BarChart2,
-      accentColor: 'text-violet-400 border-violet-500/20 bg-violet-500/5',
-      glow: 'shadow-violet-500/5',
-      items: [
-        { name: 'Freelancer Core', icon: BarChart2, view: 'dashboard', path: '/dashboard/freelancer', desc: 'Contractor dashboard hub' },
-        { name: 'Client Console', icon: Cpu, view: 'client-dashboard', path: '/dashboard/client', desc: 'Employer metrics ledger' },
-        { name: 'Project Feed', icon: List, view: 'project-feed', path: '/projects', desc: 'Bidding and listings search' },
-        { name: 'Project Details', icon: Eye, view: 'project-feed', path: '/projects/id', desc: 'Milestone scope breakdown' }
-      ]
-    },
-    {
-      id: 3,
-      title: 'AI Engine Modules',
-      shortTitle: 'AI Core',
-      icon: Sparkles,
-      accentColor: 'text-fuchsia-400 border-fuchsia-500/20 bg-fuchsia-500/5',
-      glow: 'shadow-fuchsia-500/5',
-      items: [
-        { name: 'AI Scope Architect', icon: PlusCircle, view: 'client-dashboard', path: '/projects/post', desc: 'Natural language contract composer' },
-        { name: 'Proposal Optimizer', icon: Send, view: 'project-feed', path: '/projects/submit-proposal', desc: 'Bid success matching analyzer' },
-        { name: 'Portfolio Review Diff', icon: RefreshCw, view: 'dashboard', path: '/ai/portfolio-review', desc: 'Interactive skill verification' },
-        { name: 'Verification Sandbox', icon: CheckSquare, view: 'skill-match', path: '/ai/verification', desc: 'Decentralized skill testing' },
-        { name: 'Vector Match Logs', icon: Sparkles, view: 'skill-match', path: '/ai/match-results', desc: 'Compatibility index analytics' }
-      ]
-    },
-    {
-      id: 4,
-      title: 'Operations & Ledger',
-      shortTitle: 'Ledger',
-      icon: ShieldAlert,
-      accentColor: 'text-emerald-400 border-emerald-500/20 bg-emerald-500/5',
-      glow: 'shadow-emerald-500/5',
-      items: [
-        { name: 'Workspace Messages', icon: MessageSquare, view: 'workspace', path: '/messages', desc: 'Page 14: Secured chat tunnel' },
-        { name: 'Escrow Ledgers', icon: ShieldCheck, view: 'workspace', path: '/contract', desc: 'Page 15: On-chain vault flows' },
-        { name: 'Financial Ledger', icon: DollarSign, view: 'dashboard', path: '/earnings', desc: 'Balance ledger and earnings' },
-        { name: 'Developer Profile', icon: User, view: 'dashboard', path: '/profile', desc: 'Attested public credentials' }
-      ]
-    }
-  ];
-
-  const handleLinkClick = (item) => {
-    if (setView) {
-      setView(item.view);
-    }
+  const navigate = (view) => {
+    setView?.(view);
     setIsOpen(false);
   };
 
-  // Get active items based on selected pillar tab
-  const getDisplayedCategories = () => {
-    if (activePillar === 0) return categories;
-    return categories.filter(c => c.id === activePillar);
-  };
+  const totalViews = PILLARS.reduce((acc, p) => acc + p.items.length, 0);
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 font-sans select-none">
-      
-      {/* Dynamic Ambient Background Glows */}
-      {isOpen && (
-        <div className="absolute right-0 bottom-0 w-[520px] h-[480px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse-glow" />
-      )}
+    <div className="fixed bottom-6 right-6 z-50 select-none font-sans">
 
-      {/* ───────────────────────────────────────────────────────────────── */}
-      {/* ── 1. FUTURISTIC FAB TRIGGER STATE ────────────────────────────── */}
-      {/* ───────────────────────────────────────────────────────────────── */}
+      {/* ── FAB TRIGGER ─────────────────────────────────────── */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="
-            group flex items-center gap-0 hover:gap-3.5 px-4.5 py-4 rounded-full
-            bg-slate-950/90 backdrop-blur-md border border-slate-800/80 text-white
-            shadow-[0_0_20px_rgba(99,102,241,0.12)] hover:shadow-[0_0_30px_rgba(99,102,241,0.3)]
-            hover:border-indigo-500/50 hover:translate-y-[-2px]
-            transition-all duration-300 ease-in-out cursor-pointer relative
-          "
+          className="group relative flex items-center gap-3 pl-4 pr-6 py-3.5 rounded-2xl
+            bg-slate-900 border border-slate-700 text-white cursor-pointer
+            shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(99,102,241,0.1)]
+            hover:border-indigo-500 hover:shadow-[0_8px_40px_rgba(99,102,241,0.2)]
+            hover:-translate-y-1 transition-all duration-300 ease-out"
         >
-          {/* Pulsing ring indicator */}
-          <span className="absolute inset-0 rounded-full border border-indigo-500/20 scale-100 group-hover:scale-105 transition-all duration-300 pointer-events-none" />
-          <span className="absolute inset-0 rounded-full bg-indigo-500/5 animate-ping opacity-30 pointer-events-none" />
+          {/* Pulse ring */}
+          <span className="absolute inset-0 rounded-2xl ring-1 ring-indigo-500/0 group-hover:ring-indigo-500/30 transition-all duration-300 pointer-events-none" />
 
-          {/* Animated terminal icon */}
-          <div className="relative flex items-center justify-center">
-            <Terminal className="w-5 h-5 text-indigo-400 group-hover:text-indigo-300 group-hover:rotate-6 transition-transform duration-300" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 border border-slate-950 animate-pulse" />
+          {/* Icon */}
+          <div className="relative w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-shadow duration-300">
+            <Terminal className="w-4 h-4 text-white" />
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-slate-900 shadow animate-pulse" />
           </div>
 
-          {/* Collapsed label */}
-          <span className="
-            max-w-0 overflow-hidden text-[9px] font-black uppercase tracking-[0.2em] text-slate-300
-            group-hover:max-w-[170px] transition-all duration-350 ease-in-out whitespace-nowrap
-          ">
-            Launch System Navigator
-          </span>
+          {/* Label */}
+          <div>
+            <p className="text-sm font-bold text-white leading-none">Demo Navigator</p>
+            <p className="text-xs text-slate-400 mt-0.5 leading-none">{totalViews} pages ready</p>
+          </div>
+
+          {/* Arrow */}
+          <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all duration-200 ml-1" />
         </button>
       )}
 
-      {/* ───────────────────────────────────────────────────────────────── */}
-      {/* ── 2. PREMIUM COLLAPSIBLE MATRIX TERMINAL PANEL ───────────────── */}
-      {/* ───────────────────────────────────────────────────────────────── */}
+      {/* ── EXPANDED PANEL ──────────────────────────────────── */}
       {isOpen && (
-        <div className="
-          w-[520px] max-h-[500px] rounded-2xl overflow-hidden
-          bg-slate-950/95 border border-slate-800/90 shadow-2xl backdrop-blur-3xl
-          transition-all duration-300 ease-out animate-scaleUp flex flex-col justify-between
-          before:absolute before:inset-0 before:bg-gradient-to-b before:from-indigo-500/5 before:to-transparent before:pointer-events-none
-        ">
-          {/* Top hairline glass highlighting */}
-          <div className="absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+        <div className="w-[600px] max-h-[560px] flex flex-col rounded-2xl overflow-hidden
+          bg-[#0a0f1e] border border-slate-800/80
+          shadow-[0_24px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(99,102,241,0.08)]
+          animate-scaleUp">
 
-          {/* PANEL MAIN HEADER BLOCK */}
-          <div className="p-4 border-b border-slate-900 bg-slate-900/40 flex items-center justify-between z-10 select-none">
+          {/* Top gloss line */}
+          <div className="absolute top-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent" />
+
+          {/* ── HEADER ── */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/60 bg-slate-900/30 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-400 shadow-sm relative shrink-0">
-                <Layers className="w-4 h-4 animate-pulse" />
-                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 border border-slate-950" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+                <Layers className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-xs font-black text-white tracking-widest uppercase leading-none">
-                  IITB Demo Control Matrix
-                </h3>
-                <p className="text-[8.5px] font-mono text-slate-500 mt-1 uppercase tracking-widest leading-none flex items-center gap-1.5">
-                  <Activity className="w-3 h-3 text-emerald-400 shrink-0" />
-                  All 17 engine sub-systems operational
-                </p>
-              </div>
-            </div>
-
-            {/* Quick metrics */}
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-900 border border-slate-850 font-mono text-[8px] text-slate-500">
-                <span>CPU: 4%</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              </span>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded bg-slate-900 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer shadow-sm"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* DUAL-PANE SELECTION SCHEMATIC CONTAINER */}
-          <div className="flex-1 flex overflow-hidden min-h-[350px] z-10">
-            
-            {/* LEFT PILLAR SELECTOR TAB BAR */}
-            <div className="w-[125px] border-r border-slate-900 bg-slate-950/80 p-2 space-y-1 overflow-y-auto shrink-0 select-none">
-              
-              <div className="text-[7.5px] font-black tracking-widest text-slate-650 uppercase px-2 py-1">
-                SYSTEM PILLARS
-              </div>
-
-              {/* Tab button 0: All Categories */}
-              <button
-                onClick={() => setActivePillar(0)}
-                className={`
-                  w-full flex items-center gap-2 p-2 rounded-lg text-[9.5px] font-extrabold uppercase tracking-wide text-left transition-all cursor-pointer
-                  ${activePillar === 0
-                    ? 'bg-slate-900 text-indigo-400 border border-slate-850'
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/30'
-                  }
-                `}
-              >
-                <Compass className="w-3.5 h-3.5" />
-                <span>Show All</span>
-              </button>
-
-              {/* Category-specific pillars tabs */}
-              {categories.map((cat) => {
-                const TabIcon = cat.icon;
-                const isActive = activePillar === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => setActivePillar(cat.id)}
-                    className={`
-                      w-full flex flex-col p-2 rounded-lg text-left transition-all cursor-pointer gap-1
-                      ${isActive
-                        ? 'bg-slate-900 text-white border border-slate-850'
-                        : 'text-slate-500 hover:text-slate-300 hover:bg-slate-900/30'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-2">
-                      <TabIcon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-400' : ''}`} />
-                      <span className="text-[9.5px] font-extrabold uppercase tracking-wide leading-none">{cat.shortTitle}</span>
-                    </div>
-                  </button>
-                );
-              })}
-
-              {/* Diagnostics node */}
-              <div className="pt-8 px-2 space-y-1">
-                <div className="text-[7.5px] font-black tracking-widest text-slate-700 uppercase">SYS TELEMETRY</div>
-                <div className="font-mono text-[7px] text-slate-600 space-y-0.5 leading-tight">
-                  <p>TEMP: 38°C</p>
-                  <p>DB: CONNECTED</p>
-                  <p>TLS: SECURE</p>
+                <h2 className="text-base font-black text-white tracking-tight leading-none">
+                  TalentStage Demo Navigator
+                </h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    All {totalViews} pages compiled &amp; ready
+                  </span>
                 </div>
               </div>
-
             </div>
 
-            {/* RIGHT CONSOLE ROW MATRICES (THE LINKS GRID) */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[380px] bg-slate-950/20 scrollbar-thin">
-              {getDisplayedCategories().map((cat) => (
-                <div key={cat.id} className="space-y-2 select-none">
-                  
-                  {/* Category Title */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow shadow-indigo-500/80 animate-pulse" />
-                    <h4 className="text-[8.5px] font-mono tracking-widest text-slate-500 uppercase leading-none">
-                      {cat.title}
-                    </h4>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 hover:border-slate-600 flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* ── PILLARS GRID ── */}
+          <div className="overflow-y-auto flex-1 p-5 space-y-6">
+            {PILLARS.map((pillar) => {
+              const accent = PILLAR_ACCENT[pillar.color];
+              const PillarIcon = pillar.icon;
+              return (
+                <div key={pillar.id}>
+
+                  {/* Pillar heading */}
+                  <div className="flex items-center gap-2.5 mb-3">
+                    <div className={`w-7 h-7 rounded-lg ${accent.bg} border ${accent.border} flex items-center justify-center ${accent.text}`}>
+                      <PillarIcon className="w-3.5 h-3.5" />
+                    </div>
+                    <h3 className="text-sm font-bold text-white tracking-tight">{pillar.label}</h3>
+                    <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full border ${accent.bg} ${accent.border} ${accent.text}`}>
+                      {pillar.badge}
+                    </span>
                   </div>
 
-                  {/* Links options */}
-                  <div className="grid grid-cols-1 gap-1.5">
-                    {cat.items.map((item, itemIdx) => {
-                      const LinkIcon = item.icon;
+                  {/* Items grid */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {pillar.items.map((item) => {
+                      const ItemIcon = item.icon;
                       const isActive = currentView === item.view;
                       return (
-                        <div
-                          key={itemIdx}
-                          onClick={() => handleLinkClick(item)}
-                          className={`
-                            group w-full flex items-center justify-between p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer
+                        <button
+                          key={item.label}
+                          onClick={() => navigate(item.view)}
+                          className={`group relative flex items-start gap-3 p-3.5 rounded-xl border text-left cursor-pointer
+                            transition-all duration-200 ease-out
                             ${isActive
-                              ? 'bg-gradient-to-r from-indigo-950/50 to-violet-950/30 border-indigo-500/40 text-indigo-300 shadow shadow-indigo-500/5'
-                              : 'bg-slate-900/30 border-slate-900 hover:bg-slate-900/85 hover:border-slate-800 text-slate-400 hover:text-white'
-                            }
-                          `}
+                              ? `${accent.bg} ${accent.border} ring-1 ${accent.border.replace('border-', 'ring-')}`
+                              : 'bg-slate-900/50 border-slate-800 hover:bg-slate-800/80 hover:border-slate-700'
+                            }`}
                         >
-                          <div className="flex items-center gap-3 min-w-0">
-                            {/* Icon frame with hover translation */}
-                            <div className={`
-                              p-1.5 rounded-lg border transition-all duration-300 flex items-center justify-center shrink-0
-                              ${isActive
-                                ? 'bg-indigo-950/80 border-indigo-500/30 text-indigo-400'
-                                : 'bg-slate-950 border-slate-850 text-slate-500 group-hover:text-white group-hover:border-slate-700 group-hover:translate-x-0.5'
-                              }
-                            `}>
-                              <LinkIcon className="w-3.5 h-3.5" />
-                            </div>
-                            
-                            {/* Link title & details */}
-                            <div className="min-w-0 leading-tight">
-                              <p className="text-[10.5px] font-extrabold tracking-wide truncate">{item.name}</p>
-                              <p className="text-[8.5px] text-slate-650 truncate mt-0.5 font-medium">{item.desc}</p>
-                            </div>
+                          {/* Icon */}
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5
+                            transition-all duration-200
+                            ${isActive ? `${accent.bg} ${accent.text}` : 'bg-slate-800 text-slate-400 group-hover:text-white group-hover:bg-slate-700'}`}>
+                            <ItemIcon className="w-4 h-4" />
                           </div>
 
-                          {/* Navigation Indicator Arrow */}
-                          <div className="flex items-center gap-1.5 shrink-0 ml-3">
-                            <span className="font-mono text-[8.5px] text-slate-650 truncate group-hover:text-slate-500 transition-colors uppercase">
-                              {item.path}
+                          {/* Text */}
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-bold leading-tight truncate
+                              ${isActive ? accent.text : 'text-slate-200 group-hover:text-white'}`}>
+                              {item.label}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-0.5 truncate group-hover:text-slate-400 transition-colors leading-snug">
+                              {item.desc}
+                            </p>
+                            <span className={`inline-block mt-1.5 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${item.tagColor}`}>
+                              {item.tag}
                             </span>
-                            <ArrowRight className="w-3 h-3 text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
                           </div>
 
-                        </div>
+                          {/* Arrow indicator */}
+                          <ArrowRight className={`w-3.5 h-3.5 shrink-0 mt-1 transition-all duration-200
+                            ${isActive ? accent.text : 'text-slate-700 group-hover:text-slate-400 group-hover:translate-x-0.5'}`} />
+                        </button>
                       );
                     })}
                   </div>
 
                 </div>
-              ))}
-            </div>
-
+              );
+            })}
           </div>
 
-          {/* PLATFORM DIAGNOSTICS SYSTEMS FOOTER */}
-          <div className="p-3 border-t border-slate-900 bg-slate-950/70 select-none text-[8.5px] font-mono text-slate-600 flex justify-between items-center z-10">
-            <span className="flex items-center gap-1">
+          {/* ── FOOTER ── */}
+          <div className="px-6 py-3 border-t border-slate-800/60 bg-slate-900/30 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-emerald-400" />
-              DX CONTROL DEPLOYED (VITE 8.0.14)
-            </span>
-            <span className="text-slate-750 font-bold">PORT: 5173 / HOST: LOCAL</span>
+              <span className="text-xs font-semibold text-slate-400">
+                TalentStage · IITB Prototype · Vite 8.0 · Port 5173
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-bold text-emerald-400">Live</span>
+            </div>
           </div>
 
         </div>
       )}
-
     </div>
   );
 }
-
-export default GlobalDemoController;
