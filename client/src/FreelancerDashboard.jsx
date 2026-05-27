@@ -92,18 +92,18 @@ function FreelancerDashboard({ onNavigate }) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex relative overflow-hidden select-none">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex relative overflow-hidden select-none">
       
-      {/* ── Layered ambient radial glows ── */}
+      {/* ── Subtle light ambient accents ── */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-700/5 blur-[120px] animate-pulse-glow" />
-        <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-violet-700/4 blur-[100px] animate-pulse-glow-reverse" />
+        <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-100/60 blur-[120px]" />
+        <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-violet-100/40 blur-[100px]" />
       </div>
 
       {/* ───────────────────────────────────────────────────────────────── */}
       {/* ── 1. LEFT SIDEBAR ARCHITECTURE ───────────────────────────────── */}
       {/* ───────────────────────────────────────────────────────────────── */}
-      <aside className="w-64 h-screen sticky top-0 bg-slate-900/60 backdrop-blur-xl border-r border-slate-800/80 flex flex-col justify-between py-6 px-4 z-30 shrink-0">
+      <aside className="w-64 h-screen sticky top-0 bg-white border-r border-slate-200 flex flex-col justify-between py-6 px-4 z-30 shrink-0 shadow-sm">
         <div className="space-y-7">
           
           {/* Logo brand lockup */}
@@ -111,8 +111,8 @@ function FreelancerDashboard({ onNavigate }) {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4 h-4 text-white" />
             </div>
-            <span className="text-base font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              Freelance<span className="text-violet-400 font-extrabold">AI</span>
+            <span className="text-base font-bold tracking-tight text-slate-800">
+              Talent<span className="text-violet-600 font-extrabold">Stage</span>
             </span>
           </div>
 
@@ -123,10 +123,10 @@ function FreelancerDashboard({ onNavigate }) {
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'dashboard'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -140,21 +140,21 @@ function FreelancerDashboard({ onNavigate }) {
             {/* Browse Projects Link */}
             <button
               onClick={() => onNavigate('project-feed')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all relative group cursor-pointer"
             >
               <Cpu className="w-4 h-4 text-violet-400" />
               <span>Browse Projects</span>
-              <span className="ml-auto text-[8px] font-extrabold uppercase bg-violet-600/10 border border-violet-500/20 text-violet-400 px-1 rounded shadow-sm shadow-violet-500/10">Feed</span>
+              <span className="ml-auto text-xs font-extrabold uppercase bg-violet-100 border border-violet-200 text-violet-600 px-1 rounded shadow-sm">Feed</span>
             </button>
 
             {/* Portfolio Link */}
             <button
               onClick={() => setActiveTab('portfolio')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'portfolio'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -165,21 +165,21 @@ function FreelancerDashboard({ onNavigate }) {
             {/* Skill Verification */}
             <button
               onClick={() => onNavigate('skill-match')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all relative group cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4 text-violet-400" />
               <span>Skill Attestations</span>
-              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
+              <span className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
             </button>
 
             {/* Proposals */}
             <button
               onClick={() => setActiveTab('proposals')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'proposals'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -191,10 +191,10 @@ function FreelancerDashboard({ onNavigate }) {
             <button
               onClick={() => setActiveTab('projects')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'projects'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -206,10 +206,10 @@ function FreelancerDashboard({ onNavigate }) {
             <button
               onClick={() => setActiveTab('earnings')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'earnings'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -221,16 +221,16 @@ function FreelancerDashboard({ onNavigate }) {
             <button
               onClick={() => setActiveTab('messages')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'messages'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
               <MessageSquare className="w-4 h-4" />
               <span>Messages</span>
-              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-violet-600 text-white text-[8px] font-extrabold tracking-wide scale-95">
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-violet-600 text-white text-xs font-extrabold tracking-wide">
                 3
               </span>
             </button>
@@ -239,10 +239,10 @@ function FreelancerDashboard({ onNavigate }) {
             <button
               onClick={() => setActiveTab('profile')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'profile'
-                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }
               `}
             >
@@ -254,19 +254,19 @@ function FreelancerDashboard({ onNavigate }) {
         </div>
 
         {/* Bottom Profile / Logout */}
-        <div className="space-y-4 pt-4 border-t border-slate-800/60">
+        <div className="space-y-4 pt-4 border-t border-slate-200">
           <div className="flex items-center gap-3 px-1.5">
-            <div className="relative w-8 h-8 rounded-full border border-violet-500/30 overflow-hidden bg-slate-950 shrink-0">
-              <div className="w-full h-full bg-gradient-to-tr from-violet-600/40 to-indigo-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
+            <div className="relative w-8 h-8 rounded-full border border-violet-300 overflow-hidden bg-violet-50 shrink-0">
+              <div className="w-full h-full bg-gradient-to-tr from-violet-600/30 to-indigo-500/20 flex items-center justify-center text-xs font-bold text-violet-600">
                 A
               </div>
-              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
+              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-[11px] font-bold text-white tracking-tight leading-none truncate">
+              <h4 className="text-sm font-bold text-slate-800 leading-none truncate">
                 Ananya Sharma
               </h4>
-              <p className="text-[9.5px] font-medium text-slate-500 mt-1 truncate">
+              <p className="text-xs font-medium text-slate-500 mt-1 truncate">
                 ananya@talentstage.dev
               </p>
             </div>
@@ -274,7 +274,7 @@ function FreelancerDashboard({ onNavigate }) {
 
           <button
             onClick={() => onNavigate('landing')}
-            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-[10px] font-bold text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all cursor-pointer"
+            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Logout Account</span>
@@ -285,26 +285,26 @@ function FreelancerDashboard({ onNavigate }) {
       {/* ───────────────────────────────────────────────────────────────── */}
       {/* ── 2. MAIN WORKSPACE (Scrollable) ─────────────────────────────── */}
       {/* ───────────────────────────────────────────────────────────────── */}
-      <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8">
+      <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8 bg-slate-50">
         
         {/* ── CONDITIONAL TABS RENDER ── */}
         {(activeTab === 'dashboard' || activeTab === 'portfolio' || activeTab === 'proposals' || activeTab === 'profile') && <>
           
             {/* Workspace Top Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6 select-none">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6 select-none">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
               Welcome back, Ananya
-              <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-indigo-500 animate-pulse" />
             </h1>
-            <p className="text-xs text-slate-500 mt-1 leading-normal">
-              Escrow ledger checked. You have <span className="text-indigo-400 font-bold">2 project reviews</span> pending audit compliance.
+            <p className="text-sm text-slate-500 mt-1 leading-normal font-medium">
+              Escrow ledger checked. You have <span className="text-indigo-600 font-bold">2 project reviews</span> pending audit compliance.
             </p>
           </div>
 
           {/* Calendar date badge */}
-          <div className="flex items-center gap-2.5 py-2 px-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[10px] font-bold text-slate-400 shadow-md">
-            <Calendar className="w-3.5 h-3.5 text-violet-400" />
+          <div className="flex items-center gap-2.5 py-2 px-3.5 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 shadow-sm">
+            <Calendar className="w-4 h-4 text-violet-500" />
             <span>{currentDate}</span>
           </div>
         </header>
@@ -315,73 +315,73 @@ function FreelancerDashboard({ onNavigate }) {
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
           
           {/* Card 1: Total Earnings */}
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+          <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-indigo-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Earnings</span>
-                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹45,000</h3>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Total Earnings</span>
+                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">₹45,000</h3>
               </div>
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm">
-                <DollarSign className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-sm">
+                <DollarSign className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400">
+              <span className="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-600">
                 +12%
               </span>
-              <span className="text-[9.5px] text-slate-500 font-medium">this calendar month</span>
+              <span className="text-sm text-slate-500 font-medium">this calendar month</span>
             </div>
           </div>
 
           {/* Card 2: Active Projects */}
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+          <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-indigo-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
-                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">4</h3>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Active Projects</span>
+                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">4</h3>
               </div>
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
-                <Briefcase className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm">
+                <Briefcase className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-              <span className="text-[9.5px] text-slate-500 font-medium">2 pending audit review</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-sm text-slate-500 font-medium">2 pending audit review</span>
             </div>
           </div>
 
           {/* Card 3: AI Match Score */}
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+          <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-violet-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Match Rating</span>
-                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">92%</h3>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-violet-600">AI Match Rating</span>
+                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">92%</h3>
               </div>
-              <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
-                <Sparkles className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center text-violet-600 shadow-sm">
+                <Sparkles className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center">
-              <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-[8.5px] font-bold text-violet-300 uppercase tracking-wider shadow-sm shadow-violet-500/5">
+              <span className="px-2.5 py-0.5 rounded-full bg-violet-50 border border-violet-200 text-xs font-bold text-violet-700 uppercase tracking-wider shadow-sm">
                 Highly Optimized Profile
               </span>
             </div>
           </div>
 
           {/* Card 4: Verified Skills */}
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+          <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-fuchsia-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Verified Skills</span>
-                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">6</h3>
+                <span className="text-xs font-extrabold uppercase tracking-wider text-fuchsia-600">Verified Skills</span>
+                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">6</h3>
               </div>
-              <div className="w-8 h-8 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center text-fuchsia-400 shadow-sm">
-                <CheckCircle2 className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-lg bg-fuchsia-50 border border-fuchsia-200 flex items-center justify-center text-fuchsia-600 shadow-sm">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-fuchsia-400" />
-              <span className="text-[9.5px] text-slate-500 font-extrabold uppercase tracking-wide text-fuchsia-400">Top 5% Tier Developer</span>
+              <Award className="w-4 h-4 text-fuchsia-600" />
+              <span className="text-xs font-extrabold uppercase tracking-wide text-fuchsia-600">Top 5% Tier Developer</span>
             </div>
           </div>
 
@@ -393,19 +393,19 @@ function FreelancerDashboard({ onNavigate }) {
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* Custom SVG Radar Chart Card */}
-          <div className="lg:col-span-7 rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-6 md:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-7 rounded-2xl bg-white border border-slate-200 p-6 md:p-7 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
             
             {/* Header info */}
             <div className="flex justify-between items-start select-none">
               <div>
-                <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">AI Competency Mapping</h3>
-                <p className="text-[10px] text-slate-600 mt-0.5 leading-normal">
+                <h3 className="text-lg font-bold text-slate-900">AI Competency Mapping</h3>
+                <p className="text-sm text-slate-500 mt-0.5 leading-normal font-medium">
                   Attested skill profile. Verified by decentralized node testing frameworks.
                 </p>
               </div>
-              <div className="flex items-center gap-1 py-1 px-2 rounded-lg bg-slate-950 border border-slate-850 text-[9px] font-bold text-indigo-400">
-                <Award className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-1 py-1 px-2 rounded-lg bg-indigo-50 border border-indigo-200 text-xs font-bold text-indigo-600">
+                <Award className="w-4 h-4" />
                 <span>Escrow Verified</span>
               </div>
             </div>
@@ -429,7 +429,7 @@ function FreelancerDashboard({ onNavigate }) {
                 <polygon 
                   points="170,50 270,150 170,250 70,150" 
                   fill="none" 
-                  stroke="rgba(30, 41, 59, 0.6)" 
+                  stroke="rgba(148, 163, 184, 0.5)" 
                   strokeWidth="1" 
                   strokeDasharray="3,3" 
                 />
@@ -437,7 +437,7 @@ function FreelancerDashboard({ onNavigate }) {
                 <polygon 
                   points="170,75 245,150 170,225 95,150" 
                   fill="none" 
-                  stroke="rgba(30, 41, 59, 0.5)" 
+                  stroke="rgba(148, 163, 184, 0.4)" 
                   strokeWidth="1" 
                   strokeDasharray="3,3" 
                 />
@@ -445,7 +445,7 @@ function FreelancerDashboard({ onNavigate }) {
                 <polygon 
                   points="170,100 220,150 170,200 120,150" 
                   fill="none" 
-                  stroke="rgba(30, 41, 59, 0.4)" 
+                  stroke="rgba(148, 163, 184, 0.3)" 
                   strokeWidth="1" 
                   strokeDasharray="3,3" 
                 />
@@ -453,21 +453,21 @@ function FreelancerDashboard({ onNavigate }) {
                 <polygon 
                   points="170,125 195,150 170,175 145,150" 
                   fill="none" 
-                  stroke="rgba(30, 41, 59, 0.3)" 
+                  stroke="rgba(148, 163, 184, 0.2)" 
                   strokeWidth="1" 
                   strokeDasharray="3,3" 
                 />
 
                 {/* Axes dotted lines */}
-                <line x1="170" y1="150" x2="170" y2="50" stroke="rgba(30, 41, 59, 0.7)" strokeWidth="1" strokeDasharray="2,2" />
-                <line x1="170" y1="150" x2="270" y2="150" stroke="rgba(30, 41, 59, 0.7)" strokeWidth="1" strokeDasharray="2,2" />
-                <line x1="170" y1="150" x2="170" y2="250" stroke="rgba(30, 41, 59, 0.7)" strokeWidth="1" strokeDasharray="2,2" />
-                <line x1="170" y1="150" x2="70" y2="150" stroke="rgba(30, 41, 59, 0.7)" strokeWidth="1" strokeDasharray="2,2" />
+                <line x1="170" y1="150" x2="170" y2="50" stroke="rgba(148, 163, 184, 0.5)" strokeWidth="1" strokeDasharray="2,2" />
+                <line x1="170" y1="150" x2="270" y2="150" stroke="rgba(148, 163, 184, 0.5)" strokeWidth="1" strokeDasharray="2,2" />
+                <line x1="170" y1="150" x2="170" y2="250" stroke="rgba(148, 163, 184, 0.5)" strokeWidth="1" strokeDasharray="2,2" />
+                <line x1="170" y1="150" x2="70" y2="150" stroke="rgba(148, 163, 184, 0.5)" strokeWidth="1" strokeDasharray="2,2" />
 
                 {/* Axis Value Indicators (Ticks) */}
-                <text x="175" y="105" className="fill-slate-700 text-[8px] font-bold select-none">50%</text>
-                <text x="175" y="80" className="fill-slate-700 text-[8px] font-bold select-none">75%</text>
-                <text x="175" y="55" className="fill-slate-700 text-[8px] font-bold select-none">100%</text>
+                <text x="175" y="105" className="fill-slate-400 text-xs font-bold select-none">50%</text>
+                <text x="175" y="80" className="fill-slate-400 text-xs font-bold select-none">75%</text>
+                <text x="175" y="55" className="fill-slate-400 text-xs font-bold select-none">100%</text>
 
                 {/* ── SKILLS OVERLAY POLYGON ── */}
                 {/* React: 95% -> (170, 150 - 95) = (170, 55) */}
@@ -483,41 +483,41 @@ function FreelancerDashboard({ onNavigate }) {
                 />
 
                 {/* Skill Level Node Circles */}
-                <circle cx="170" cy="55" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
-                <circle cx="258" cy="150" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
-                <circle cx="170" cy="228" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
-                <circle cx="80" cy="150" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
+                <circle cx="170" cy="55" r="4" className="fill-white stroke-indigo-500 stroke-2" />
+                <circle cx="258" cy="150" r="4" className="fill-white stroke-indigo-500 stroke-2" />
+                <circle cx="170" cy="228" r="4" className="fill-white stroke-indigo-500 stroke-2" />
+                <circle cx="80" cy="150" r="4" className="fill-white stroke-indigo-500 stroke-2" />
 
                 {/* ── AXIS TYPOGRAPHY LABELS ── */}
                 {/* React Label */}
-                <text x="170" y="32" textAnchor="middle" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                <text x="170" y="32" textAnchor="middle" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
                   React Architecture
                 </text>
-                <text x="170" y="44" textAnchor="middle" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                <text x="170" y="44" textAnchor="middle" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
                   95% Expert
                 </text>
 
                 {/* TypeScript Label */}
-                <text x="285" y="148" textAnchor="start" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                <text x="285" y="148" textAnchor="start" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
                   TypeScript
                 </text>
-                <text x="285" y="160" textAnchor="start" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                <text x="285" y="160" textAnchor="start" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
                   88% Master
                 </text>
 
                 {/* Node.js Label */}
-                <text x="170" y="270" textAnchor="middle" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                <text x="170" y="270" textAnchor="middle" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
                   Node / Web3.js
                 </text>
-                <text x="170" y="282" textAnchor="middle" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                <text x="170" y="282" textAnchor="middle" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
                   78% Advanced
                 </text>
 
                 {/* Communication Label */}
-                <text x="55" y="148" textAnchor="end" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                <text x="55" y="148" textAnchor="end" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
                   Communication
                 </text>
-                <text x="55" y="160" textAnchor="end" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                <text x="55" y="160" textAnchor="end" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
                   90% Flawless
                 </text>
               </svg>
@@ -525,51 +525,51 @@ function FreelancerDashboard({ onNavigate }) {
           </div>
 
           {/* Right Panel: AI Optimization Feedback Card */}
-          <div className="lg:col-span-5 rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-6 md:p-7 shadow-lg flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-6 md:p-7 shadow-sm flex flex-col justify-between relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
             
             <div className="space-y-4 select-none">
-              <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-400">AI Optimization Feed</h3>
-              <p className="text-[11px] text-slate-500 leading-normal">
+              <h3 className="text-sm font-bold text-indigo-600 uppercase tracking-wider">AI Optimization Feed</h3>
+              <p className="text-sm text-slate-500 leading-normal font-medium">
                 Your portfolio, skills, and escrows have been audited. Here are recommendations to maximize contract match rates.
               </p>
 
               <div className="space-y-3 pt-2">
                 
                 {/* Optimization Row 1 */}
-                <div className="flex gap-3 p-3 rounded-xl bg-slate-950 border border-slate-900/80">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
                     <Code2 className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">GitHub Sync Active</h4>
-                    <p className="text-[9.5px] text-slate-500 mt-0.5 leading-relaxed">
+                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">GitHub Sync Active</h4>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                       Synced 4 codebases. React and Solidity smart contracts mapped to your verified credentials.
                     </p>
                   </div>
                 </div>
 
                 {/* Optimization Row 2 */}
-                <div className="flex gap-3 p-3 rounded-xl bg-slate-950 border border-slate-900/80">
-                  <div className="w-7 h-7 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shrink-0">
-                    <Sparkles className="w-4 h-4" />
+                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center text-violet-600 shrink-0">
+                    <Sparkles className="w-4 h-4 text-violet-600" />
                   </div>
                   <div>
-                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Proposal Scoring Alert</h4>
-                    <p className="text-[9.5px] text-slate-500 mt-0.5 leading-relaxed">
-                      AI Proposal Helper active. Bids optimized for Aave and ConsenSys projects with a <span className="text-emerald-400 font-bold">96% success probability</span>.
+                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Proposal Scoring Alert</h4>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
+                      AI Proposal Helper active. Bids optimized for Aave and ConsenSys projects with a <span className="text-emerald-600 font-bold">96% success probability</span>.
                     </p>
                   </div>
                 </div>
 
                 {/* Optimization Row 3 */}
-                <div className="flex gap-3 p-3 rounded-xl bg-slate-950 border border-slate-900/80">
-                  <div className="w-7 h-7 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center text-fuchsia-400 shrink-0">
+                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                  <div className="w-8 h-8 rounded-lg bg-fuchsia-50 border border-fuchsia-200 flex items-center justify-center text-fuchsia-600 shrink-0">
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Escrow Safeguard Enabled</h4>
-                    <p className="text-[9.5px] text-slate-500 mt-0.5 leading-relaxed">
+                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Escrow Safeguard Enabled</h4>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
                       Smart contract escrow is active on all contracts. Secure deposits guaranteed on Aave projects.
                     </p>
                   </div>
@@ -579,7 +579,7 @@ function FreelancerDashboard({ onNavigate }) {
             </div>
 
             {/* Quick action button */}
-            <button className="w-full mt-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-[11px] font-bold tracking-wider uppercase shadow-md shadow-violet-500/10 transition-all cursor-pointer">
+            <button className="w-full mt-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-wider uppercase shadow-md shadow-violet-500/10 transition-all cursor-pointer">
               Launch Skill Verification Test
             </button>
           </div>
@@ -592,16 +592,16 @@ function FreelancerDashboard({ onNavigate }) {
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           
           {/* Table A: Recent Projects */}
-          <div className="rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 md:p-6 shadow-lg relative overflow-hidden flex flex-col justify-between">
+          <div className="rounded-2xl bg-white border border-slate-200 p-5 md:p-6 shadow-sm relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
             
             <div>
               <div className="flex justify-between items-center mb-4 select-none">
                 <div>
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Active Work Contracts</h3>
-                  <p className="text-[10px] text-slate-600 mt-0.5 leading-normal">Active agreements with secured escrow deposits.</p>
+                  <h3 className="text-lg font-bold text-slate-900">Active Work Contracts</h3>
+                  <p className="text-sm text-slate-500 mt-0.5 leading-normal font-medium">Active agreements with secured escrow deposits.</p>
                 </div>
-                <button className="p-1.5 rounded-lg bg-slate-950 border border-slate-850 text-slate-400 hover:text-white hover:border-slate-700 transition-colors text-[9px] font-bold cursor-pointer flex items-center gap-1">
+                <button className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1">
                   <span>View All</span>
                   <ChevronRight className="w-3 h-3" />
                 </button>
@@ -611,50 +611,50 @@ function FreelancerDashboard({ onNavigate }) {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-800/80 select-none">
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Project</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Client</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Status</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Payment</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Deadline</th>
+                    <tr className="border-b border-slate-200 select-none">
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Project</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Client</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Payment</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Deadline</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentProjects.map((proj) => (
                       <tr 
                         key={proj.id} 
-                        className="border-b border-slate-900/40 hover:bg-slate-900/40 transition-colors duration-150 group"
+                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
                       >
-                        <td className="py-3 text-xs font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight">
+                        <td className="py-3 text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight">
                           {proj.name}
                         </td>
-                        <td className="py-3 text-xs font-medium text-slate-400">
+                        <td className="py-3 text-sm font-medium text-slate-600">
                           {proj.client}
                         </td>
-                        <td className="py-3 text-xs">
+                        <td className="py-3 text-sm">
                           {proj.status === 'In Progress' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-extrabold text-emerald-400">
-                              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-xs font-extrabold text-emerald-600">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                               Active
                             </span>
                           )}
                           {proj.status === 'Under Review' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[9px] font-extrabold text-amber-400">
-                              <span className="w-1 h-1 rounded-full bg-amber-400" />
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-xs font-extrabold text-amber-600">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                               Review
                             </span>
                           )}
                           {proj.status === 'Completed' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[9px] font-extrabold text-slate-500">
-                              <span className="w-1 h-1 rounded-full bg-slate-600" />
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-xs font-extrabold text-slate-500">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                               Done
                             </span>
                           )}
                         </td>
-                        <td className="py-3 text-xs font-bold text-slate-200">
+                        <td className="py-3 text-sm font-bold text-slate-700">
                           {proj.payment}
                         </td>
-                        <td className="py-3 text-[10.5px] font-medium text-slate-500">
+                        <td className="py-3 text-xs font-medium text-slate-500">
                           {proj.deadline}
                         </td>
                       </tr>
@@ -665,9 +665,9 @@ function FreelancerDashboard({ onNavigate }) {
             </div>
 
             {/* Quick action info */}
-            <div className="mt-4 pt-3.5 border-t border-slate-900/60 flex items-center justify-between text-[9px] font-bold text-slate-600 select-none">
+            <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500 select-none">
               <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
                 ₹30,000 active deposits secured in Escrow
               </span>
               <span>2/3 Contracts Audited</span>
@@ -675,16 +675,16 @@ function FreelancerDashboard({ onNavigate }) {
           </div>
 
           {/* Table B: Recent Proposals */}
-          <div className="rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 md:p-6 shadow-lg relative overflow-hidden flex flex-col justify-between">
+          <div className="rounded-2xl bg-white border border-slate-200 p-5 md:p-6 shadow-sm relative overflow-hidden flex flex-col justify-between">
             <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
             
             <div>
               <div className="flex justify-between items-center mb-4 select-none">
                 <div>
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">Recent Bid Proposals</h3>
-                  <p className="text-[10px] text-slate-600 mt-0.5 leading-normal">Smart-matching algorithms generated proposals.</p>
+                  <h3 className="text-lg font-bold text-slate-900">Recent Bid Proposals</h3>
+                  <p className="text-sm text-slate-500 mt-0.5 leading-normal font-medium">Smart-matching algorithms generated proposals.</p>
                 </div>
-                <button className="p-1.5 rounded-lg bg-slate-950 border border-slate-850 text-slate-400 hover:text-white hover:border-slate-700 transition-colors text-[9px] font-bold cursor-pointer flex items-center gap-1">
+                <button className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1">
                   <span>New Proposal</span>
                   <Plus className="w-3 h-3" />
                 </button>
@@ -694,34 +694,34 @@ function FreelancerDashboard({ onNavigate }) {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-800/80 select-none">
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Target Project</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Bid Offer</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Delivery</th>
-                      <th className="py-2.5 text-[9px] font-bold uppercase tracking-wider text-slate-500">Match Score</th>
+                    <tr className="border-b border-slate-200 select-none">
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Target Project</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Bid Offer</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Delivery</th>
+                      <th className="py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500">Match Score</th>
                     </tr>
                   </thead>
                   <tbody>
                     {recentProposals.map((prop) => (
                       <tr 
                         key={prop.id} 
-                        className="border-b border-slate-900/40 hover:bg-slate-900/40 transition-colors duration-150 group"
+                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
                       >
-                        <td className="py-3 text-xs font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight max-w-[200px] truncate">
+                        <td className="py-3 text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight max-w-[200px] truncate">
                           {prop.project}
                         </td>
-                        <td className="py-3 text-xs font-bold text-slate-200">
+                        <td className="py-3 text-sm font-bold text-slate-700">
                           {prop.bid}
                         </td>
                         <td className="py-3 text-xs font-medium text-slate-500">
                           {prop.timeline}
                         </td>
-                        <td className="py-3 text-xs">
+                        <td className="py-3 text-sm">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] font-bold text-violet-400">{prop.score}/100</span>
+                            <span className="text-sm font-bold text-violet-600">{prop.score}/100</span>
                             {prop.aiOptimized && (
-                              <span className="p-0.5 rounded bg-violet-600/10 border border-violet-500/20 text-violet-400 group-hover:bg-violet-600/20 transition-all" title="AI Optimized Bid Structure">
-                                <Sparkles className="w-3 h-3 text-violet-400" />
+                              <span className="p-0.5 rounded bg-violet-50 border border-violet-200 text-violet-600 group-hover:bg-violet-100 transition-all" title="AI Optimized Bid Structure">
+                                <Sparkles className="w-3.5 h-3.5 text-violet-600" />
                               </span>
                             )}
                           </div>
@@ -734,14 +734,14 @@ function FreelancerDashboard({ onNavigate }) {
             </div>
 
             {/* Quick action info */}
-            <div className="mt-4 pt-3.5 border-t border-slate-900/60 flex items-center justify-between text-[9px] font-bold text-slate-600 select-none">
+            <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500 select-none">
               <span className="flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5 text-violet-400/80" />
+                <Clock className="w-4 h-4 text-violet-500" />
                 Average matching decision in under 4 hours
               </span>
-              <span className="text-violet-400 font-extrabold flex items-center gap-0.5 hover:underline cursor-pointer">
+              <span className="text-violet-600 font-extrabold flex items-center gap-0.5 hover:underline cursor-pointer">
                 Launch AI Optimizer
-                <ArrowUpRight className="w-3 h-3" />
+                <ArrowUpRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </div>

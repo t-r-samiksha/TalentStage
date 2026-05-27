@@ -26,13 +26,13 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={id}
-        className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+        className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-450 select-none"
       >
         {label}
       </label>
       <div className="relative group">
         {/* Left icon */}
-        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-red-500 transition-colors duration-200 pointer-events-none">
           <Icon className="w-4 h-4" />
         </span>
 
@@ -46,15 +46,15 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
           required
           className="
             w-full pl-10 pr-10 py-3 rounded-xl
-            bg-slate-950 border border-slate-800
-            text-sm text-white placeholder:text-slate-700
-            focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
-            hover:border-slate-700
+            bg-slate-950 border border-[#22222a]
+            text-sm text-white placeholder:text-slate-600
+            focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30
+            hover:border-slate-800
             transition-all duration-200
           "
         />
 
-        {/* Right slot (e.g. eye toggle) */}
+        {/* Right slot */}
         {rightSlot && (
           <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center">
             {rightSlot}
@@ -105,29 +105,29 @@ function LoginPage({ onNavigate }) {
   // ── Success state ─────────────────────────────────────────────────────────
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#08080a] flex items-center justify-center px-6 relative overflow-hidden">
         {/* Ambient glows */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-emerald-600/5 blur-[140px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-red-950/10 blur-[140px]" />
         </div>
 
-        <div className="relative z-10 w-full max-w-md text-center">
-          <div className="glass-panel rounded-2xl p-10 border border-slate-800/80 shadow-2xl shadow-black">
+        <div className="relative z-10 w-full max-w-md text-center animate-scaleUp">
+          <div className="rounded-2xl p-10 border border-[#22222a] bg-[#121216]/50 backdrop-blur-xl shadow-2xl shadow-black/60">
             {/* Glow accent line */}
-            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-[#e50914] to-transparent" />
 
-            <div className="w-14 h-14 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-5 shadow-lg shadow-emerald-500/10">
+            <div className="w-14 h-14 rounded-2xl bg-red-950/20 border border-red-550/30 flex items-center justify-center text-red-400 mx-auto mb-5 shadow-lg shadow-red-500/10">
               <CheckCircle2 className="w-7 h-7" />
             </div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-white mb-2">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-100 mb-2">
               Welcome back.
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-8 max-w-xs mx-auto">
-              You've authenticated successfully. Your workspace is ready.
+              You\'ve authenticated successfully. Your workspace is ready.
             </p>
             <button
               onClick={() => onNavigate('landing')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-[#e50914] hover:bg-[#b80710] active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-red-950/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none"
             >
               <span>Enter Workspace</span>
               <ArrowRight className="w-4 h-4" />
@@ -140,23 +140,23 @@ function LoginPage({ onNavigate }) {
 
   // ── Main login view ───────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
+    <div className="min-h-screen bg-[#08080a] text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 overflow-hidden selection:bg-red-500/30 selection:text-red-205 animate-fadeIn">
 
       {/* ── Layered ambient radial glows ── */}
       <div className="pointer-events-none absolute inset-0 -z-0">
-        {/* Primary top-left violet bloom */}
-        <div className="absolute -top-20 -left-10 w-[560px] h-[560px] rounded-full bg-violet-700/8 blur-[130px] animate-pulse-glow" />
-        {/* Secondary bottom-right indigo bloom */}
-        <div className="absolute bottom-[-80px] right-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/7 blur-[110px] animate-pulse-glow-reverse" />
+        {/* Primary top-left red bloom */}
+        <div className="absolute -top-20 -left-10 w-[560px] h-[560px] rounded-full bg-red-950/15 blur-[130px] animate-pulse-glow" />
+        {/* Secondary bottom-right gray bloom */}
+        <div className="absolute bottom-[-80px] right-[-40px] w-[500px] h-[480px] rounded-full bg-slate-950/10 blur-[110px] animate-pulse-glow-reverse" />
         {/* Central soft undercard glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[300px] rounded-full bg-violet-600/4 blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[380px] h-[300px] rounded-full bg-red-950/5 blur-[80px]" />
       </div>
 
       {/* ── Back to home ── */}
       <div className="absolute top-7 left-6 md:left-10 z-20">
         <button
           onClick={() => onNavigate('landing')}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors duration-200 group cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors duration-200 group cursor-pointer bg-transparent border-none"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
           <span>Back to home</span>
@@ -167,40 +167,40 @@ function LoginPage({ onNavigate }) {
       <div className="relative z-10 w-full max-w-[420px]">
 
         {/* Brand lockup above card */}
-        <div className="flex flex-col items-center mb-7">
+        <div className="flex flex-col items-center mb-7 select-none">
           <button
             onClick={() => onNavigate('landing')}
-            className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer"
-            aria-label="FreelanceAI — home"
+            className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer bg-transparent border-none"
+            aria-label="TalentStage — home"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-9 h-9 rounded-xl bg-[#e50914] flex items-center justify-center shadow-lg shadow-red-500/10 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="text-[1.15rem] font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              Freelance<span className="text-violet-400 font-extrabold">AI</span>
+            <span className="text-[1.15rem] font-bold tracking-tight text-slate-100">
+              Talent<span className="text-red-500 font-extrabold">Stage</span>
             </span>
           </button>
 
-          <h2 className="text-2xl font-extrabold tracking-tight text-white leading-tight">Welcome back</h2>
-          <p className="text-sm text-slate-500 mt-1.5 text-center">
-            Sign in to access your workspace and active escrows.
+          <h2 className="text-2xl font-bold tracking-tight text-slate-100 leading-tight">Welcome back</h2>
+          <p className="text-sm text-slate-400 mt-1.5 text-center">
+            Sign in to access your workspace and escrow protection.
           </p>
         </div>
 
         {/* Glass card */}
-        <div className="relative rounded-2xl overflow-hidden backdrop-blur-lg bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70">
+        <div className="relative rounded-2xl overflow-hidden backdrop-blur-lg bg-[#121216]/50 border border-[#22222a] shadow-2xl shadow-black/60">
 
-          {/* Violet hairline accent on top edge */}
-          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          {/* Red hairline accent on top edge */}
+          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-[#e50914]/50 to-transparent" />
           {/* Soft inner top sheen */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.012] to-transparent pointer-events-none" />
 
           <div className="relative p-7 sm:p-8">
 
             {/* Error banner */}
             {error && (
-              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/25 text-xs text-rose-300 leading-relaxed">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-red-950/40 border border-red-900/40 text-xs text-red-350 leading-relaxed animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
                 <span>{error}</span>
               </div>
             )}
@@ -234,7 +234,7 @@ function LoginPage({ onNavigate }) {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                    className="text-slate-500 hover:text-slate-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword
@@ -249,7 +249,7 @@ function LoginPage({ onNavigate }) {
                 <button
                   type="button"
                   onClick={(e) => e.preventDefault()}
-                  className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 transition-colors duration-200 cursor-pointer"
+                  className="text-[11px] font-semibold text-red-400 hover:text-red-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
                 >
                   Forgot password?
                 </button>
@@ -261,13 +261,13 @@ function LoginPage({ onNavigate }) {
                 disabled={isLoading}
                 className="
                   w-full py-3.5 mt-1 rounded-xl
-                  bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600
+                  bg-[#e50914] hover:bg-[#b80710]
                   hover:brightness-110 active:scale-[0.98]
                   disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed
                   text-white text-sm font-bold tracking-tight
-                  shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30
+                  shadow-lg shadow-red-950/20 hover:shadow-red-950/30
                   flex items-center justify-center gap-2.5
-                  transition-all duration-200 cursor-pointer
+                  transition-all duration-200 cursor-pointer border-none
                 "
               >
                 {isLoading ? (
@@ -286,17 +286,17 @@ function LoginPage({ onNavigate }) {
 
             {/* Divider */}
             <div className="relative my-6 flex items-center gap-3">
-              <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600 shrink-0">
+              <div className="flex-1 h-px bg-slate-900" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 shrink-0">
                 or continue with
               </span>
-              <div className="flex-1 h-px bg-slate-800" />
+              <div className="flex-1 h-px bg-slate-900" />
             </div>
 
             {/* OAuth buttons */}
             <div className="grid grid-cols-2 gap-3">
 
-              {/* Google — full-colour, premium dark outline */}
+              {/* Google */}
               <button
                 type="button"
                 onClick={() => handleOAuth('google')}
@@ -304,8 +304,8 @@ function LoginPage({ onNavigate }) {
                 className="
                   relative flex items-center justify-center gap-2.5
                   py-2.5 px-4 rounded-xl
-                  bg-white/[0.04] border border-slate-800
-                  hover:bg-white/[0.08] hover:border-slate-700
+                  bg-slate-950 border border-[#22222a]
+                  hover:bg-slate-900 hover:border-slate-800
                   active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
                   text-slate-300 hover:text-white
                   text-xs font-semibold tracking-tight
@@ -314,10 +314,9 @@ function LoginPage({ onNavigate }) {
                 "
                 aria-label="Sign in with Google"
               >
-                {/* Subtle hover sheen */}
                 <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
                 {oauthLoading === 'google' ? (
-                  <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                  <span className="w-4 h-4 rounded-full border-2 border-slate-650 border-t-slate-200 animate-spin" />
                 ) : (
                   <GoogleIcon />
                 )}
@@ -332,8 +331,8 @@ function LoginPage({ onNavigate }) {
                 className="
                   relative flex items-center justify-center gap-2.5
                   py-2.5 px-4 rounded-xl
-                  bg-white/[0.04] border border-slate-800
-                  hover:bg-white/[0.08] hover:border-slate-700
+                  bg-slate-955 border border-[#22222a]
+                  hover:bg-slate-900 hover:border-slate-800
                   active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
                   text-slate-300 hover:text-white
                   text-xs font-semibold tracking-tight
@@ -344,7 +343,7 @@ function LoginPage({ onNavigate }) {
               >
                 <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
                 {oauthLoading === 'github' ? (
-                  <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                  <span className="w-4 h-4 rounded-full border-2 border-slate-650 border-t-slate-200 animate-spin" />
                 ) : (
                   <GithubIcon />
                 )}
@@ -353,12 +352,12 @@ function LoginPage({ onNavigate }) {
             </div>
 
             {/* Sign-up nudge */}
-            <p className="text-center text-[12px] text-slate-600 mt-6 leading-relaxed">
-              Don't have an account?{' '}
+            <p className="text-center text-[12px] text-slate-400 mt-6 leading-relaxed">
+              Don\'t have an account?{' '}
               <button
                 type="button"
                 onClick={() => onNavigate('signup')}
-                className="font-bold text-violet-400 hover:text-violet-300 transition-colors duration-200 cursor-pointer"
+                className="font-bold text-red-400 hover:text-red-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
               >
                 Create one free
               </button>
@@ -367,7 +366,7 @@ function LoginPage({ onNavigate }) {
         </div>
 
         {/* Trust micro-copy below card */}
-        <p className="mt-5 text-center text-[10px] font-medium text-slate-700 tracking-wide">
+        <p className="mt-5 text-center text-[10px] font-medium text-slate-500 tracking-wide">
           Protected by end-to-end encryption &middot; SOC 2 Type II compliant
         </p>
       </div>

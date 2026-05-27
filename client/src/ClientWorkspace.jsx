@@ -171,18 +171,18 @@ function ClientWorkspace({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex relative overflow-hidden select-none">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex relative overflow-hidden select-none">
       
       {/* ── Layered ambient radial glows ── */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-violet-700/5 blur-[120px] animate-pulse-glow" />
+        <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-violet-200/20 blur-[120px] animate-pulse-glow" />
         <div className="absolute bottom-[-100px] left-[200px] w-[450px] h-[450px] rounded-full bg-indigo-700/4 blur-[100px] animate-pulse-glow-reverse" />
       </div>
 
       {/* ───────────────────────────────────────────────────────────────── */}
       {/* ── PERSISTENT LEFT SIDEBAR NAVIGATION ─────────────────────────── */}
       {/* ───────────────────────────────────────────────────────────────── */}
-      <aside className="w-64 h-screen sticky top-0 bg-slate-900/60 backdrop-blur-xl border-r border-slate-800/80 flex flex-col justify-between py-6 px-4 z-30 shrink-0">
+      <aside className="w-64 h-screen sticky top-0 bg-white backdrop-blur-xl border-r border-slate-200 flex flex-col justify-between py-6 px-4 z-30 shrink-0">
         <div className="space-y-7">
           
           {/* Logo brand lockup */}
@@ -190,8 +190,8 @@ function ClientWorkspace({ onNavigate }) {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-650 to-violet-650 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4 h-4 text-white" />
             </div>
-            <span className="text-base font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-              Freelance<span className="text-indigo-400 font-extrabold">AI</span>
+            <span className="text-base font-bold tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+              Talent<span className="text-indigo-400 font-extrabold">Stage</span>
             </span>
           </div>
 
@@ -202,7 +202,7 @@ function ClientWorkspace({ onNavigate }) {
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'dashboard'
                   ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
                   : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
@@ -219,18 +219,18 @@ function ClientWorkspace({ onNavigate }) {
             {/* Browse Projects Link */}
             <button
               onClick={() => onNavigate('project-feed')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
             >
               <Cpu className="w-4 h-4 text-indigo-400" />
               <span>Browse Projects</span>
-              <span className="ml-auto text-[8px] font-extrabold uppercase bg-indigo-650/10 border border-indigo-500/20 text-indigo-400 px-1 rounded shadow-sm shadow-indigo-500/10">Feed</span>
+              <span className="ml-auto text-xs font-extrabold uppercase bg-indigo-650/10 border border-indigo-500/20 text-indigo-400 px-1 rounded shadow-sm shadow-indigo-500/10">Feed</span>
             </button>
 
             {/* Post Project Link (Page 7 view) */}
             <button
               onClick={() => setActiveTab('post-project')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'post-project'
                   ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
                   : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
@@ -245,7 +245,7 @@ function ClientWorkspace({ onNavigate }) {
             <button
               onClick={() => setActiveTab('listings')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'listings'
                   ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
                   : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
@@ -259,7 +259,7 @@ function ClientWorkspace({ onNavigate }) {
             {/* Saved Freelancers */}
             <button
               onClick={() => onNavigate('skill-match')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
+              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
             >
               <Award className="w-4 h-4 text-violet-400" />
               <span>Saved Freelancers</span>
@@ -270,7 +270,7 @@ function ClientWorkspace({ onNavigate }) {
             <button
               onClick={() => setActiveTab('messages')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'messages'
                   ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
                   : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
@@ -279,7 +279,7 @@ function ClientWorkspace({ onNavigate }) {
             >
               <MessageSquare className="w-4 h-4" />
               <span>Messages</span>
-              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-violet-600 text-white text-[8px] font-extrabold tracking-wide scale-95">
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-violet-600 text-slate-900 text-xs font-extrabold tracking-wide scale-95">
                 5
               </span>
             </button>
@@ -288,7 +288,7 @@ function ClientWorkspace({ onNavigate }) {
             <button
               onClick={() => setActiveTab('payments')}
               className={`
-                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-xs font-bold transition-all relative group cursor-pointer
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
                 ${activeTab === 'payments'
                   ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
                   : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
@@ -303,19 +303,19 @@ function ClientWorkspace({ onNavigate }) {
         </div>
 
         {/* Bottom Profile / Logout */}
-        <div className="space-y-4 pt-4 border-t border-slate-800/60">
+        <div className="space-y-4 pt-4 border-t border-slate-200">
           <div className="flex items-center gap-3 px-1.5">
-            <div className="relative w-8 h-8 rounded-full border border-indigo-500/30 overflow-hidden bg-slate-950 shrink-0">
+            <div className="relative w-8 h-8 rounded-full border border-indigo-300 overflow-hidden bg-indigo-50 shrink-0">
               <div className="w-full h-full bg-gradient-to-tr from-indigo-600/40 to-violet-500/30 flex items-center justify-center text-xs font-bold text-indigo-300">
                 P
               </div>
-              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
+              <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-200" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-[11px] font-bold text-white tracking-tight leading-none truncate">
+              <h4 className="text-sm font-bold text-slate-900 leading-none truncate">
                 Prisha Iyer
               </h4>
-              <p className="text-[9.5px] font-medium text-slate-500 mt-1 truncate">
+              <p className="text-xs font-medium text-slate-500 mt-1 truncate">
                 prisha.iyer@consensys.net
               </p>
             </div>
@@ -323,7 +323,7 @@ function ClientWorkspace({ onNavigate }) {
 
           <button
             onClick={() => onNavigate('landing')}
-            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-[10px] font-bold text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all cursor-pointer"
+            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-500/5 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Logout Account</span>
@@ -337,13 +337,13 @@ function ClientWorkspace({ onNavigate }) {
       <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8">
         
         {/* Workspace Top Header */}
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6 select-none">
+        <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6 select-none">
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
               {activeTab === 'dashboard' ? 'Client Workspace' : 'Post New Contract'}
-              <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+              <Sparkles className="w-6 h-6 text-indigo-400 animate-pulse animate-scaleUp" />
             </h1>
-            <p className="text-xs text-slate-500 mt-1 leading-normal">
+            <p className="text-sm text-slate-400 mt-1 leading-normal font-medium">
               {activeTab === 'dashboard'
                 ? 'Review bid proposals, secure contract escrows, and verify attested deliverables.'
                 : 'Configure project parameters. Our AI diagnostics will evaluate budget optimization in real-time.'
@@ -352,8 +352,8 @@ function ClientWorkspace({ onNavigate }) {
           </div>
 
           {/* Calendar date badge */}
-          <div className="flex items-center gap-2.5 py-2 px-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 text-[10px] font-bold text-slate-400 shadow-md">
-            <Calendar className="w-3.5 h-3.5 text-violet-400" />
+          <div className="flex items-center gap-2.5 py-2 px-3.5 rounded-xl bg-white border border-slate-805 text-sm font-semibold text-slate-300 shadow-md">
+            <Calendar className="w-4 h-4 text-violet-400" />
             <span>{currentDate}</span>
           </div>
         </header>
@@ -368,73 +368,73 @@ function ClientWorkspace({ onNavigate }) {
             <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 select-none">
               
               {/* Card 1: Active Projects */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">3 Active</h3>
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">Active Projects</span>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">3 Active</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm relative">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm relative">
                     <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                     <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-500" />
-                    <Briefcase className="w-4 h-4" />
+                    <Briefcase className="w-5 h-5" />
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-slate-500 font-medium">All escrows fully funded</span>
+                  <span className="text-sm text-slate-305 font-medium">All escrows fully funded</span>
                 </div>
               </div>
 
               {/* Card 2: Total Budget */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Budget</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹2,80,000</h3>
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">Total Budget</span>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">₹2,80,000</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
-                    <DollarSign className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
+                    <DollarSign className="w-5 h-5" />
                   </div>
                 </div>
                 <div className="mt-3 flex items-center">
-                  <span className="text-[9.5px] text-indigo-400/90 font-extrabold uppercase tracking-wider select-none">
+                  <span className="text-sm text-slate-300 font-medium">
                     Allocated to Escrow Ledger
                   </span>
                 </div>
               </div>
 
               {/* Card 3: AI Matches */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Matches</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">42 Top Fits</h3>
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">AI Matches</span>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">42 Top Fits</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
-                    <Sparkles className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
+                    <Sparkles className="w-5 h-5" />
                   </div>
                 </div>
                 <div className="mt-3 flex items-center">
-                  <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-[8.5px] font-bold text-violet-300 uppercase tracking-wider shadow-sm">
+                  <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-sm font-semibold text-violet-300 uppercase tracking-wider shadow-sm">
                     94% Average Match Rate
                   </span>
                 </div>
               </div>
 
               {/* Card 4: Pending Payments */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
+              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50 border border-slate-200 p-5 shadow-lg flex flex-col justify-between min-h-[110px] group hover:border-slate-700/80 transition-all duration-200">
                 <div className="flex justify-between items-start">
                   <div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Pending Payments</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">1 Milestone</h3>
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-400">Pending Payments</span>
+                    <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">1 Milestone</h3>
                   </div>
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm">
-                    <AlertCircle className="w-4 h-4" />
+                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm">
+                    <AlertCircle className="w-5 h-5" />
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-[9.5px] text-amber-400/90 font-extrabold uppercase tracking-wide">Awaiting Attestation Approval</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+                  <span className="text-sm text-amber-450 font-bold">Awaiting Attestation Approval</span>
                 </div>
               </div>
 
@@ -443,12 +443,12 @@ function ClientWorkspace({ onNavigate }) {
             {/* Project List Area */}
             <section className="space-y-5">
               <div className="flex justify-between items-center select-none">
-                <h3 className="text-xs font-extrabold uppercase tracking-[0.15em] text-slate-500">
+                <h3 className="text-lg font-bold text-white">
                   Active Project Listings ({clientProjects.length})
                 </h3>
                 <button
                   onClick={() => setActiveTab('post-project')}
-                  className="py-2 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:brightness-110 active:scale-[0.98] text-white text-xs font-bold tracking-wide shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:brightness-110 active:scale-[0.98] text-slate-900 text-sm font-semibold tracking-wide shadow-md flex items-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Post New Project</span>
@@ -461,29 +461,29 @@ function ClientWorkspace({ onNavigate }) {
                   <div
                     key={project.id}
                     className="
-                      relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl shadow-lg
+                      relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-200 bg-slate-50 backdrop-blur-xl shadow-lg
                       hover:translate-y-[-4px] hover:border-indigo-500/40 hover:shadow-[0_4px_25px_-5px_rgba(99,102,241,0.15)]
                       transition-all duration-300 group cursor-pointer
                     "
                   >
                     {/* Header line & status */}
                     <div className="flex justify-between items-start mb-3 select-none">
-                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
+                      <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
                         {project.status}
                       </span>
-                      <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                      <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-slate-450" />
                         {project.deadline}
                       </span>
                     </div>
 
                     {/* Title & Budget */}
                     <div className="space-y-2 mb-4">
-                      <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
+                      <h4 className="text-base font-bold text-slate-900 group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
                         {project.title}
                       </h4>
-                      <div className="text-indigo-400 font-extrabold text-sm tracking-tight flex items-center gap-1 select-none">
-                        <DollarSign className="w-3.5 h-3.5" />
+                      <div className="text-indigo-400 font-extrabold text-base tracking-tight flex items-center gap-1 select-none">
+                        <DollarSign className="w-4 h-4" />
                         <span>{project.budget}</span>
                       </div>
                     </div>
@@ -493,7 +493,7 @@ function ClientWorkspace({ onNavigate }) {
                       {project.skills.map((skill) => (
                         <span 
                           key={skill} 
-                          className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400"
+                          className="text-xs font-bold px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600"
                         >
                           {skill}
                         </span>
@@ -501,17 +501,17 @@ function ClientWorkspace({ onNavigate }) {
                     </div>
 
                     {/* Action & Proposal count footer */}
-                    <div className="pt-4 border-t border-slate-900 flex items-center justify-between gap-3">
+                    <div className="pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-1.5 select-none">
-                        <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-sm">
+                        <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-sm font-black text-indigo-400 shadow-sm">
                           {project.proposals}
                         </span>
-                        <span className="text-[10px] font-semibold text-slate-500">Proposals received</span>
+                        <span className="text-sm font-semibold text-slate-500">Proposals received</span>
                       </div>
                       
-                      <button className="py-1.5 px-3 rounded-lg border border-slate-800 text-[10.5px] font-bold text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-950 transition-all flex items-center gap-1 cursor-pointer">
+                      <button className="py-1.5 px-3 rounded-lg border border-slate-200 text-sm font-bold text-slate-600 hover:text-slate-900 hover:border-slate-400 hover:bg-slate-50 transition-all flex items-center gap-1 cursor-pointer">
                         <span>Details</span>
-                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
 
@@ -533,22 +533,22 @@ function ClientWorkspace({ onNavigate }) {
             <div className="lg:col-span-7 space-y-6">
               
               {/* Form Card */}
-              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 p-6 md:p-8 shadow-2xl">
+              <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-50/50 border border-slate-200 p-6 md:p-8 shadow-2xl">
                 
                 {/* Accent line */}
                 <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
                 {/* Inner sheen */}
                 <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
 
-                <h3 className="text-sm font-extrabold uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2 select-none">
-                  <Briefcase className="w-4 h-4 text-violet-400" />
+                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2 select-none">
+                  <Briefcase className="w-4.5 h-4.5 text-violet-400" />
                   Configure Project Parameters
                 </h3>
 
                 {/* Form Error Banner */}
                 {formError && (
-                  <div className="mb-5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5 text-xs text-rose-400 animate-fadeIn">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div className="mb-5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5 text-sm text-rose-400 animate-fadeIn">
+                    <AlertCircle className="w-4.5 h-4.5 shrink-0 mt-0.5" />
                     <span>{formError}</span>
                   </div>
                 )}
@@ -557,7 +557,7 @@ function ClientWorkspace({ onNavigate }) {
                   
                   {/* Project Title */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                    <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                       Project Title *
                     </label>
                     <input
@@ -567,8 +567,8 @@ function ClientWorkspace({ onNavigate }) {
                       onChange={(e) => setTitle(e.target.value)}
                       className="
                         w-full px-4 py-3 rounded-xl
-                        bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
+                        bg-white border border-slate-200
+                        text-sm text-slate-900 placeholder:text-slate-500
                         focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                         hover:border-slate-700
                         transition-all duration-200
@@ -578,7 +578,7 @@ function ClientWorkspace({ onNavigate }) {
 
                   {/* Project Description */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                    <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                       Contract Deliverables & Scope *
                     </label>
                     <textarea
@@ -587,8 +587,8 @@ function ClientWorkspace({ onNavigate }) {
                       onChange={(e) => setDescription(e.target.value)}
                       className="
                         w-full h-32 px-4 py-3 rounded-xl
-                        bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
+                        bg-white border border-slate-200
+                        text-sm text-slate-900 placeholder:text-slate-500
                         focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                         hover:border-slate-700 resize-none
                         transition-all duration-200
@@ -598,14 +598,14 @@ function ClientWorkspace({ onNavigate }) {
 
                   {/* Required Skills Tag Input */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                    <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                       Required Skills Tags
                     </label>
 
                     {/* Skill list box */}
-                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-950/60 border border-slate-900 min-h-[50px] items-center">
+                    <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200 min-h-[50px] items-center">
                       {skills.length === 0 ? (
-                        <span className="text-xs text-slate-700 select-none pl-1">No skill tags added.</span>
+                        <span className="text-xs text-slate-500 select-none pl-1">No skill tags added.</span>
                       ) : (
                         skills.map((skill) => (
                           <span
@@ -620,7 +620,7 @@ function ClientWorkspace({ onNavigate }) {
                             <button
                               type="button"
                               onClick={() => handleRemoveSkill(skill)}
-                              className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-indigo-500/30 text-indigo-400 hover:text-white transition-colors duration-150 cursor-pointer text-[10px]"
+                              className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-indigo-500/30 text-indigo-400 hover:text-slate-900 transition-colors duration-150 cursor-pointer text-sm"
                             >
                               &times;
                             </button>
@@ -637,8 +637,8 @@ function ClientWorkspace({ onNavigate }) {
                       onKeyDown={handleAddSkill}
                       className="
                         w-full px-4 py-3 rounded-xl
-                        bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
+                        bg-white border border-slate-200
+                        text-sm text-slate-900 placeholder:text-slate-500
                         focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                         hover:border-slate-700
                         transition-all duration-200
@@ -647,7 +647,7 @@ function ClientWorkspace({ onNavigate }) {
 
                     {/* Suggestions */}
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5 select-none">
-                      <span className="text-[10px] font-bold text-slate-600 mr-1">Quick add:</span>
+                      <span className="text-sm font-semibold text-slate-400 mr-1">Quick add:</span>
                       {['Solidity', 'Hardhat', 'Rust', 'TypeScript', 'Next.js', 'Go'].map((s) => {
                         const isAdded = skills.includes(s);
                         return (
@@ -657,10 +657,10 @@ function ClientWorkspace({ onNavigate }) {
                             onClick={() => handleQuickAddSkill(s)}
                             disabled={isAdded}
                             className={`
-                              text-[10px] font-semibold px-2 py-0.5 rounded border transition-all cursor-pointer
+                              text-sm font-semibold px-2 py-0.5 rounded border transition-all cursor-pointer
                               ${isAdded 
-                                ? 'bg-slate-900 border-slate-850 text-slate-700 cursor-not-allowed opacity-50' 
-                                : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                                ? 'bg-slate-50 border-slate-850 text-slate-700 cursor-not-allowed opacity-50' 
+                                : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-400 hover:text-slate-900'
                               }
                             `}
                           >
@@ -676,11 +676,11 @@ function ClientWorkspace({ onNavigate }) {
                     
                     {/* Budget Min */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                      <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                         Minimum Budget Limit
                       </label>
                       <div className="relative group">
-                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors pointer-events-none font-bold text-sm">
+                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-550 group-focus-within:text-indigo-400 transition-colors pointer-events-none font-bold text-sm">
                           ₹
                         </span>
                         <input
@@ -690,8 +690,8 @@ function ClientWorkspace({ onNavigate }) {
                           onChange={(e) => setBudgetMin(e.target.value)}
                           className="
                             w-full pl-8 pr-4 py-3 rounded-xl
-                            bg-slate-950 border border-slate-800
-                            text-sm text-white placeholder:text-slate-700
+                            bg-white border border-slate-200
+                            text-sm text-slate-900 placeholder:text-slate-500
                             focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                             hover:border-slate-700
                             transition-all duration-200
@@ -702,11 +702,11 @@ function ClientWorkspace({ onNavigate }) {
 
                     {/* Budget Max */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                      <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                         Maximum Budget Limit
                       </label>
                       <div className="relative group">
-                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500 group-focus-within:text-indigo-400 transition-colors pointer-events-none font-bold text-sm">
+                        <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-550 group-focus-within:text-indigo-400 transition-colors pointer-events-none font-bold text-sm">
                           ₹
                         </span>
                         <input
@@ -716,8 +716,8 @@ function ClientWorkspace({ onNavigate }) {
                           onChange={(e) => setBudgetMax(e.target.value)}
                           className="
                             w-full pl-8 pr-4 py-3 rounded-xl
-                            bg-slate-950 border border-slate-800
-                            text-sm text-white placeholder:text-slate-700
+                            bg-white border border-slate-200
+                            text-sm text-slate-900 placeholder:text-slate-500
                             focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                             hover:border-slate-700
                             transition-all duration-200
@@ -733,7 +733,7 @@ function ClientWorkspace({ onNavigate }) {
                     
                     {/* Project Deadline */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                      <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                         Contract Deadline
                       </label>
                       <div className="relative group">
@@ -743,8 +743,8 @@ function ClientWorkspace({ onNavigate }) {
                           onChange={(e) => setDeadline(e.target.value)}
                           className="
                             w-full px-4 py-3 rounded-xl
-                            bg-slate-950 border border-slate-800
-                            text-sm text-white cursor-pointer
+                            bg-white border border-slate-200
+                            text-sm text-slate-900 cursor-pointer
                             focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                             hover:border-slate-700
                             transition-all duration-200
@@ -755,7 +755,7 @@ function ClientWorkspace({ onNavigate }) {
 
                     {/* Project Type Dropdown */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                      <label className="text-xs font-extrabold uppercase tracking-[0.12em] text-indigo-400 select-none">
                         Billing Model Type
                       </label>
                       <div className="relative">
@@ -764,8 +764,8 @@ function ClientWorkspace({ onNavigate }) {
                           onChange={(e) => setProjectType(e.target.value)}
                           className="
                             w-full px-4 py-3 rounded-xl
-                            bg-slate-950 border border-slate-800
-                            text-sm text-white appearance-none cursor-pointer
+                            bg-white border border-slate-200
+                            text-sm text-slate-900 appearance-none cursor-pointer
                             focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
                             hover:border-slate-700
                             transition-all duration-200
@@ -774,7 +774,7 @@ function ClientWorkspace({ onNavigate }) {
                           <option value="fixed">Fixed Price Milestone Plan</option>
                           <option value="hourly">Hourly Rate Compensation</option>
                         </select>
-                        <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-600 pointer-events-none">
+                        <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 pointer-events-none">
                           <Plus className="w-4 h-4 rotate-45" />
                         </span>
                       </div>
@@ -783,7 +783,7 @@ function ClientWorkspace({ onNavigate }) {
                   </div>
 
                   {/* Submission Action Buttons */}
-                  <div className="pt-4 border-t border-slate-900 flex flex-col sm:flex-row items-center gap-4">
+                  <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row items-center gap-4">
                     
                     {/* Button A: Generate AI Brief */}
                     <button
@@ -794,7 +794,7 @@ function ClientWorkspace({ onNavigate }) {
                         w-full sm:w-auto px-5 py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider
                         bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600
                         hover:brightness-110 active:scale-[0.98] disabled:opacity-50
-                        text-white flex items-center justify-center gap-2 cursor-pointer shadow-md select-none
+                        text-slate-900 flex items-center justify-center gap-2 cursor-pointer shadow-md select-none
                       "
                     >
                       {generatingBrief ? (
@@ -853,12 +853,12 @@ function ClientWorkspace({ onNavigate }) {
 
                 <div className="flex justify-between items-center mb-6 select-none">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-4.5 h-4.5 text-indigo-400 animate-pulse" />
-                    <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-300">
+                    <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+                    <h3 className="text-sm font-bold tracking-wider text-indigo-300">
                       AI Co-Pilot Evaluation
                     </h3>
                   </div>
-                  <span className="text-[9px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/30 text-indigo-300">
+                  <span className="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/30 text-indigo-300">
                     Live Diagnostics
                   </span>
                 </div>
@@ -867,7 +867,7 @@ function ClientWorkspace({ onNavigate }) {
                   
                   {/* Outcome 1: Deliverables Checklist */}
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 select-none">
                       Suggested Scope Checklist
                     </h4>
                     
@@ -878,13 +878,13 @@ function ClientWorkspace({ onNavigate }) {
                         { text: 'Gas Optimization Audit (<85k limit)', weight: 'Crucial' },
                         { text: 'E2E Unit Attestations Suite', weight: 'Standard Requirement' }
                       ].map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-950/60 border border-slate-900/60 select-none">
+                        <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 select-none">
                           <div className="w-4.5 h-4.5 rounded-full bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-center text-emerald-400 shrink-0">
                             <Check className="w-3 h-3" strokeWidth={3} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[10.5px] font-bold text-white tracking-wide leading-none">{item.text}</p>
-                            <p className="text-[8.5px] font-semibold text-slate-500 mt-1 uppercase tracking-wide">{item.weight}</p>
+                            <p className="text-sm font-bold text-slate-900 tracking-wide leading-none">{item.text}</p>
+                            <p className="text-xs font-semibold text-indigo-300 mt-1.5 uppercase tracking-wide">{item.weight}</p>
                           </div>
                         </div>
                       ))}
@@ -893,24 +893,24 @@ function ClientWorkspace({ onNavigate }) {
 
                   {/* Outcome 2: Suggested Timeline Chart */}
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 select-none">
                       Milestone Timeline Optimization
                     </h4>
 
                     {/* Vertical Micro-Timeline Chart */}
-                    <div className="space-y-3 pl-2.5 border-l border-slate-900 select-none">
+                    <div className="space-y-3 pl-2.5 border-l border-slate-200 select-none">
                       {[
                         { phase: 'Phase 1: Solidity Smart Contract Audit', days: 'Optimized: 4 Days', width: 'w-2/3', color: 'from-violet-600 to-indigo-600' },
                         { phase: 'Phase 2: Escrow Bridge Compilation & Test', days: 'Optimized: 6 Days', width: 'w-full', color: 'from-indigo-600 to-violet-600' },
                         { phase: 'Phase 3: Attestations Attuned Compliance Review', days: 'Optimized: 2 Days', width: 'w-1/3', color: 'from-violet-600 to-fuchsia-600' }
                       ].map((t, index) => (
-                        <div key={index} className="relative space-y-1">
-                          <div className="absolute -left-[14.5px] top-1 w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/30" />
-                          <h5 className="text-[10.5px] font-bold text-white tracking-wide leading-none">{t.phase}</h5>
-                          <span className="text-[9px] font-semibold text-slate-500">{t.days}</span>
+                        <div key={index} className="relative space-y-1.5">
+                          <div className="absolute -left-[14.5px] top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/30" />
+                          <h5 className="text-sm font-bold text-slate-900 tracking-wide leading-none">{t.phase}</h5>
+                          <span className="text-xs font-semibold text-slate-400">{t.days}</span>
                           
                           {/* Dotted chart loading line */}
-                          <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                             <div className={`h-full bg-gradient-to-r ${t.color} ${t.width} transition-all duration-500`} />
                           </div>
                         </div>
@@ -920,20 +920,20 @@ function ClientWorkspace({ onNavigate }) {
 
                   {/* Outcome 3: Realistic Budget Predictor */}
                   <div className="space-y-3 select-none">
-                    <h4 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
                       Market Rate Budget Competition
                     </h4>
 
                     {/* Budget fit visual gauge */}
-                    <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-900/60 space-y-3">
-                      <div className="flex justify-between items-center text-[10px] font-bold">
-                        <span className="text-slate-500">Low Offer</span>
-                        <span className="text-indigo-400">Market Rate</span>
-                        <span className="text-slate-500">Premium Offer</span>
+                    <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3">
+                      <div className="flex justify-between items-center text-xs font-semibold">
+                        <span className="text-slate-400">Low Offer</span>
+                        <span className="text-indigo-400 font-bold">Market Rate</span>
+                        <span className="text-slate-400">Premium Offer</span>
                       </div>
                       
                       {/* Gauge Bar */}
-                      <div className="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden flex relative">
+                      <div className="w-full h-2.5 bg-slate-50 rounded-full overflow-hidden flex relative">
                         <div className="w-1/3 h-full bg-rose-500/30" />
                         <div className="w-1/3 h-full bg-emerald-500/30" />
                         <div className="w-1/3 h-full bg-indigo-500/30" />
@@ -942,11 +942,11 @@ function ClientWorkspace({ onNavigate }) {
                       </div>
 
                       <div className="flex items-center justify-between gap-4 pt-1.5">
-                        <span className="text-[9.5px] text-slate-500 font-semibold leading-relaxed">
+                        <span className="text-sm text-slate-400 font-medium leading-relaxed">
                           Your budget ranges are compared with 142 Solidity auditable contracts posted this quarter.
                         </span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[8px] font-extrabold text-emerald-400 uppercase tracking-widest shrink-0 shadow-sm shadow-emerald-500/5">
-                          Budget Fit: Optimized (Top 15% competitive placement)
+                        <span className="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-xs font-extrabold text-emerald-400 uppercase tracking-widest shrink-0 shadow-sm shadow-emerald-500/5">
+                          Budget Fit: Optimized
                         </span>
                       </div>
                     </div>
@@ -975,8 +975,8 @@ function ClientWorkspace({ onNavigate }) {
 
       {/* ── Simulated Success Modal Overlay (Page 7 success) ── */}
       {showPostSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-8 text-center animate-scaleUp">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-50/30 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-slate-50 border border-slate-200 shadow-2xl p-8 text-center animate-scaleUp">
             
             {/* Header glow */}
             <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
@@ -990,7 +990,7 @@ function ClientWorkspace({ onNavigate }) {
               </div>
             </div>
 
-            <h3 className="text-xl font-extrabold text-white tracking-tight leading-none mb-2">
+            <h3 className="text-xl font-extrabold text-slate-900 tracking-tight leading-none mb-2">
               Project Live & Escrow Secured!
             </h3>
             
@@ -999,7 +999,7 @@ function ClientWorkspace({ onNavigate }) {
             </p>
 
             {/* Mini Escrow Badge */}
-            <div className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-white/[0.03] border border-slate-800 text-[10px] text-slate-500">
+            <div className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-white/[0.03] border border-slate-200 text-sm text-slate-500">
               <ShieldCheck className="w-3.5 h-3.5 text-violet-400" />
               <span>₹{parseFloat(budgetMax).toLocaleString('en-IN')} Secured in Escrow Ledger</span>
             </div>

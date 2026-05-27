@@ -45,7 +45,7 @@ function FreelancerOnboarding({ onNavigate }) {
       title: 'Decentralized Smart Escrow Protocol',
       description: 'A cutting-edge Web3 freelance payment framework leveraging Solidity, OpenZeppelin, and multisig verification to guarantee safe contractor compensation.',
       tech: ['Solidity', 'React', 'Web3.js', 'Hardhat'],
-      link: 'https://escrow.freelanceai.network',
+      link: 'https://escrow.talentstage.network',
       repo: 'https://github.com/developer/smart-escrow',
       image: null // Fallback gradient will render
     }
@@ -226,20 +226,20 @@ function FreelancerOnboarding({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 py-14 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
+    <div className="onboarding-shell min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(88,80,245,0.18),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(56,189,248,0.12),transparent_24%),#080b16] text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 py-14 overflow-hidden selection:bg-cyan-300/30 selection:text-slate-950">
       
       {/* ── Layered ambient radial glows ── */}
       <div className="pointer-events-none absolute inset-0 -z-0">
-        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-700/8 blur-[130px] animate-pulse-glow" />
-        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/7 blur-[110px] animate-pulse-glow-reverse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-fuchsia-700/4 blur-[80px]" />
+        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-500/15 blur-[130px] animate-pulse-glow" />
+        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-cyan-400/12 blur-[110px] animate-pulse-glow-reverse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-fuchsia-400/12 blur-[80px]" />
       </div>
 
       {/* ── Back button breadcrumb ── */}
       <div className="absolute top-7 left-6 md:left-10 z-20">
         <button
           onClick={handlePrevStep}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors duration-200 group cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white transition-colors duration-200 group cursor-pointer"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
           <span>{step === 2 ? 'Back to Step 1' : 'Back to signup'}</span>
@@ -252,45 +252,45 @@ function FreelancerOnboarding({ onNavigate }) {
         {/* Brand Lockup */}
         <div className="flex flex-col items-center mb-6">
           <div className="inline-flex items-center gap-2.5 group mb-3 cursor-pointer" onClick={() => onNavigate('landing')}>
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="text-[1.15rem] font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              Freelance<span className="text-violet-400 font-extrabold">AI</span>
+            <span className="text-[1.15rem] font-bold tracking-tight bg-gradient-to-r from-slate-100 to-slate-200 bg-clip-text text-transparent">
+              Talent<span className="text-cyan-300 font-extrabold">Stage</span>
             </span>
           </div>
 
-          <h2 className="text-2xl font-extrabold tracking-tight text-white leading-tight text-center">
+          <h2 className="text-xl md:text-2xl font-semibold tracking-tight text-slate-200 leading-tight text-center">
             Set up your professional profile
           </h2>
-          <p className="text-sm text-slate-500 mt-1 text-center">
-            Let's customize your profile so clients can find your unique skills immediately.
+          <p className="text-sm text-slate-400 mt-1 text-center max-w-xl leading-6">
+            Craft a polished profile with refined visuals, clear sections, and a premium color palette.
           </p>
         </div>
 
         {/* ── GLASS CARD CONTAINER ── */}
-        <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70 p-6 md:p-8">
+        <div className="card-panel relative rounded-3xl overflow-hidden backdrop-blur-2xl border border-slate-700 shadow-2xl shadow-slate-950/45 p-6 md:p-8">
           
           {/* Accent Line */}
-          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          <div className="absolute -top-px left-1/4 right-1/4 h-px accent-line" />
           {/* Inner sheen */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
 
           {/* ── WIZARD PROGRESS TRACKER ── */}
           <div className="mb-8">
             <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-3">
-              <span className="text-indigo-400 font-extrabold">
+              <span className="text-cyan-300 font-extrabold">
                 {step === 1 ? 'Step 1: Professional Profile' : 'Step 2: Advanced Portfolio'}
               </span>
-              <span className="text-slate-500">
+              <span className="text-slate-400">
                 {step === 1 ? 'Step 1 of 2 • 50% Complete' : 'Step 2 of 2 • 100% Ready'}
               </span>
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden relative">
+            <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden relative">
               <div 
-                className="h-full bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 transition-all duration-500 ease-out"
+                className="h-full bg-gradient-to-r from-slate-600 via-violet-500 to-slate-600 transition-all duration-500 ease-out"
                 style={{ width: step === 1 ? '50%' : '100%' }}
               />
             </div>
@@ -301,19 +301,19 @@ function FreelancerOnboarding({ onNavigate }) {
                 onClick={() => setStep(1)}
                 className="flex items-center gap-2 group cursor-pointer"
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all duration-300 ${
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold border transition-all duration-300 ${
                   step === 2 
-                    ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' 
-                    : 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/30'
+                    ? 'bg-slate-800 border-slate-700 text-cyan-200 shadow-lg shadow-slate-900/20' 
+                    : 'bg-slate-700 border-slate-600 text-slate-100 shadow-lg shadow-slate-900/20'
                 }`}>
                   {step === 2 ? <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> : '1'}
                 </div>
-                <span className={`text-[11px] font-bold transition-colors ${step === 1 ? 'text-indigo-300' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                <span className={`text-sm font-bold transition-colors ${step === 1 ? 'text-cyan-300' : 'text-slate-300 group-hover:text-white'}`}>
                   Profile Info
                 </span>
               </button>
 
-              <div className="flex-1 h-px bg-slate-800/80 mx-4" />
+              <div className="flex-1 h-px bg-slate-800 mx-4" />
 
               <button 
                 onClick={handleNextStep}
@@ -324,14 +324,14 @@ function FreelancerOnboarding({ onNavigate }) {
                     : 'cursor-pointer'
                 }`}
               >
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border transition-all duration-300 ${
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold border transition-all duration-300 ${
                   step === 2 
                     ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/30' 
-                    : 'bg-slate-950 border-slate-800 text-slate-500'
+                    : 'bg-slate-800 border-slate-700 text-slate-300'
                 }`}>
-                  '2'
+                  2
                 </div>
-                <span className={`text-[11px] font-bold transition-colors ${step === 2 ? 'text-indigo-300' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                <span className={`text-sm font-bold transition-colors ${step === 2 ? 'text-cyan-300' : 'text-slate-300 group-hover:text-white'}`}>
                   Portfolio Items
                 </span>
               </button>
@@ -340,8 +340,8 @@ function FreelancerOnboarding({ onNavigate }) {
 
           {/* Form Error Banner */}
           {formError && (
-            <div className="mb-6 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5 text-xs text-rose-400 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="mb-6 p-3 rounded-xl bg-rose-500/10 border border-rose-400/30 flex items-start gap-2.5 text-xs text-rose-200 animate-fadeIn">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-300" />
               <span>{formError}</span>
             </div>
           )}
@@ -353,7 +353,7 @@ function FreelancerOnboarding({ onNavigate }) {
             <div className="space-y-6">
               
               {/* Profile Photo drag-and-drop */}
-              <div className="flex flex-col items-center md:flex-row gap-5 p-4 rounded-xl bg-slate-950/20 border border-slate-900/60">
+              <div className="flex flex-col items-center md:flex-row gap-5 p-4 rounded-2xl content-surface border border-slate-700">
                 <div 
                   onClick={() => avatarInputRef.current.click()}
                   onDragOver={(e) => { e.preventDefault(); setIsDraggingAvatar(true); }}
@@ -362,10 +362,10 @@ function FreelancerOnboarding({ onNavigate }) {
                   className={`
                     relative w-24 h-24 rounded-full border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-300 shrink-0 select-none overflow-hidden group
                     ${avatar 
-                      ? 'border-indigo-500/60 bg-slate-950' 
+                      ? 'border-cyan-400/60 bg-slate-950/80' 
                       : isDraggingAvatar
-                        ? 'border-indigo-400 bg-indigo-500/5' 
-                        : 'border-slate-800 hover:border-indigo-500/50 bg-slate-950/40 hover:bg-slate-900/20'
+                        ? 'border-cyan-400 bg-cyan-400/10' 
+                        : 'border-slate-700 hover:border-cyan-400 bg-slate-950/80 hover:bg-slate-900'
                     }
                   `}
                 >
@@ -381,15 +381,15 @@ function FreelancerOnboarding({ onNavigate }) {
                       <img src={avatar} alt="Avatar Preview" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity duration-200">
                         <Camera className="w-5 h-5 text-white/80 mb-1" />
-                        <span className="text-[8px] font-bold text-white/70 uppercase tracking-widest">Change</span>
+                        <span className="text-xs font-bold text-white/70 uppercase tracking-widest">Change</span>
                       </div>
                     </>
                   ) : (
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-8 h-8 rounded-lg bg-slate-900/80 flex items-center justify-center text-slate-500 group-hover:text-indigo-400 transition-colors duration-300">
+                      <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors duration-300">
                         <Camera className="w-4 h-4" />
                       </div>
-                      <span className="text-[8px] font-bold text-slate-500 group-hover:text-slate-400 mt-2 uppercase tracking-wider">
+                      <span className="text-xs font-bold text-slate-500 group-hover:text-slate-700 mt-2 uppercase tracking-wider">
                         Upload
                       </span>
                     </div>
@@ -397,17 +397,17 @@ function FreelancerOnboarding({ onNavigate }) {
                 </div>
 
                 <div className="text-center md:text-left flex-1">
-                  <h4 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                  <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">
                     Profile Photo
                   </h4>
-                  <p className="text-[11px] text-slate-600 mt-1 leading-relaxed max-w-sm">
+                  <p className="text-sm text-slate-400 mt-1 leading-relaxed max-w-sm">
                     Drag and drop your professional headshot, or click the frame to browse. Supported formats: JPG, PNG.
                   </p>
                   {avatar && (
                     <button 
                       type="button"
                       onClick={() => setAvatar(null)}
-                      className="mt-2 text-[10px] font-bold text-rose-500 hover:text-rose-400 hover:underline transition-colors cursor-pointer"
+                      className="mt-2 text-sm font-bold text-rose-500 hover:text-rose-400 hover:underline transition-colors cursor-pointer"
                     >
                       Remove Photo
                     </button>
@@ -418,10 +418,10 @@ function FreelancerOnboarding({ onNavigate }) {
               {/* Bio Field */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex justify-between items-center select-none">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Professional Summary / Bio
                   </label>
-                  <span className={`text-[10px] font-semibold transition-colors ${bio.length > 450 ? 'text-amber-500' : 'text-slate-600'}`}>
+                  <span className={`text-sm font-semibold transition-colors ${bio.length > 450 ? 'text-amber-500' : 'text-slate-550'}`}>
                     {bio.length} / 500
                   </span>
                 </div>
@@ -432,8 +432,8 @@ function FreelancerOnboarding({ onNavigate }) {
                   className="
                     w-full h-28 px-4 py-3 rounded-xl
                     bg-slate-950 border border-slate-800
-                    text-sm text-white placeholder:text-slate-700
-                    focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                    text-sm text-slate-100 placeholder:text-slate-500
+                    focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                     hover:border-slate-700 resize-none
                     transition-all duration-200
                   "
@@ -442,29 +442,29 @@ function FreelancerOnboarding({ onNavigate }) {
 
               {/* Skills Tag-Input Component */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                   Technical Expertise & Skills
                 </label>
                 
                 {/* Skill Pills Container */}
-                <div className="flex flex-wrap gap-2 p-3 rounded-xl bg-slate-950/60 border border-slate-900 min-h-[50px] items-center">
+                <div className="flex flex-wrap gap-2 p-3 rounded-2xl content-surface border border-slate-700 min-h-[50px] items-center">
                   {skills.length === 0 ? (
-                    <span className="text-xs text-slate-700 select-none pl-1">No skills added yet. Add some below.</span>
+                    <span className="text-xs text-slate-500 select-none pl-1">No skills added yet. Add some below.</span>
                   ) : (
                     skills.map((skill) => (
                       <span
                         key={skill}
                         className="
                           inline-flex items-center gap-1.5 px-3 py-1 rounded-full
-                          bg-indigo-950/50 border border-indigo-500/20
-                          text-xs text-indigo-300 font-semibold select-none
+                          bg-slate-950/80 border border-cyan-500/15
+                          text-xs text-cyan-300 font-semibold select-none
                         "
                       >
                         <span>{skill}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveSkill(skill)}
-                          className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-indigo-500/30 text-indigo-400 hover:text-white transition-colors duration-150 cursor-pointer text-[10px]"
+                          className="w-3.5 h-3.5 rounded-full flex items-center justify-center hover:bg-indigo-500/30 text-indigo-400 hover:text-white transition-colors duration-150 cursor-pointer text-sm"
                           aria-label={`Remove ${skill}`}
                         >
                           &times;
@@ -484,8 +484,8 @@ function FreelancerOnboarding({ onNavigate }) {
                   className="
                     w-full px-4 py-3 rounded-xl
                     bg-slate-950 border border-slate-800
-                    text-sm text-white placeholder:text-slate-700
-                    focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                    text-sm text-slate-100 placeholder:text-slate-500
+                    focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                     hover:border-slate-700
                     transition-all duration-200
                   "
@@ -493,7 +493,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                 {/* Autocomplete Suggestion Chips */}
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                  <span className="text-[10px] font-bold text-slate-600 mr-1 select-none">Quick add:</span>
+                  <span className="text-xs font-bold text-slate-400 mr-1 select-none">Quick add:</span>
                   {SUGGESTED_SKILLS.map((suggested) => {
                     const isAdded = skills.includes(suggested);
                     return (
@@ -503,10 +503,10 @@ function FreelancerOnboarding({ onNavigate }) {
                         onClick={() => handleQuickAddSkill(suggested)}
                         disabled={isAdded}
                         className={`
-                          text-[10px] font-semibold px-2 py-0.5 rounded border transition-all cursor-pointer
+                          text-sm font-semibold px-2 py-0.5 rounded border transition-all cursor-pointer
                           ${isAdded 
-                            ? 'bg-slate-900 border-slate-850 text-slate-700 cursor-not-allowed opacity-50' 
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600 hover:text-slate-200'
+                            ? 'bg-slate-900 border-slate-800 text-slate-500 cursor-not-allowed opacity-50' 
+                            : 'bg-slate-950 border-slate-700 text-slate-100 hover:border-cyan-400 hover:text-white hover:bg-slate-900'
                           }
                         `}
                       >
@@ -522,7 +522,7 @@ function FreelancerOnboarding({ onNavigate }) {
                 
                 {/* Hourly Rate */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     Target Hourly Rate
                   </label>
                   <div className="relative group">
@@ -537,8 +537,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-8 pr-12 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 placeholder:text-slate-500
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -551,7 +551,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                 {/* Years of Experience */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     Years of Experience
                   </label>
                   <div className="relative group">
@@ -566,8 +566,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-10 pr-16 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 placeholder:text-slate-500
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -584,7 +584,7 @@ function FreelancerOnboarding({ onNavigate }) {
                 
                 {/* Availability Dropdown */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     Availability Status
                   </label>
                   <div className="relative">
@@ -597,8 +597,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-10 pr-10 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white appearance-none cursor-pointer
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 appearance-none cursor-pointer
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -615,7 +615,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                 {/* Education Dropdown */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     Highest Education
                   </label>
                   <div className="relative">
@@ -628,8 +628,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-10 pr-10 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white appearance-none cursor-pointer
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 appearance-none cursor-pointer
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -651,7 +651,7 @@ function FreelancerOnboarding({ onNavigate }) {
                 
                 {/* LinkedIn Brand-Agnostic Input */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     LinkedIn Network URL
                   </label>
                   <div className="relative group">
@@ -666,8 +666,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-10 pr-4 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 placeholder:text-slate-500
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -677,7 +677,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                 {/* GitHub Brand-Agnostic Input */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                     GitHub Codebase URL
                   </label>
                   <div className="relative group">
@@ -692,8 +692,8 @@ function FreelancerOnboarding({ onNavigate }) {
                       className="
                         w-full pl-10 pr-4 py-3 rounded-xl
                         bg-slate-950 border border-slate-800
-                        text-sm text-white placeholder:text-slate-700
-                        focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
+                        text-sm text-slate-100 placeholder:text-slate-500
+                        focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/25
                         hover:border-slate-700
                         transition-all duration-200
                       "
@@ -717,16 +717,16 @@ function FreelancerOnboarding({ onNavigate }) {
                   <Sparkles className="w-4 h-4 text-violet-400 animate-pulse" />
                   Portfolio Construction
                 </h3>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   Demonstrate your expertise to employers by linking your flagship projects. Include descriptions and source codes.
                 </p>
               </div>
 
               {/* DYNAMIC PORTFOLIO INJECTOR CARD */}
-              <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 md:p-6 relative overflow-hidden">
+              <div className="content-surface border border-slate-700 rounded-2xl p-5 md:p-6 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
                 
-                <h4 className="text-xs font-extrabold uppercase tracking-widest text-indigo-400 mb-4 select-none">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-indigo-650 mb-4 select-none">
                   Add Project Portfolio
                 </h4>
 
@@ -736,7 +736,7 @@ function FreelancerOnboarding({ onNavigate }) {
                   <div className="space-y-4">
                     {/* Project Title */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Project Title *
                       </label>
                       <input
@@ -746,10 +746,10 @@ function FreelancerOnboarding({ onNavigate }) {
                         onChange={(e) => setProjectTitle(e.target.value)}
                         className="
                           w-full px-3.5 py-2.5 rounded-lg
-                          bg-slate-950 border border-slate-850
-                          text-xs text-white placeholder:text-slate-700
-                          focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/40
-                          hover:border-slate-800
+                          bg-slate-950 border border-slate-800
+                          text-xs text-slate-100 placeholder:text-slate-500
+                          focus:outline-none focus:border-cyan-400/80 focus:ring-1 focus:ring-cyan-400/25
+                          hover:border-slate-700
                           transition-all duration-200
                         "
                       />
@@ -757,7 +757,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                     {/* Technologies Tag input */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Technologies Used
                       </label>
                       <input
@@ -768,10 +768,10 @@ function FreelancerOnboarding({ onNavigate }) {
                         onKeyDown={handleAddTech}
                         className="
                           w-full px-3.5 py-2.5 rounded-lg
-                          bg-slate-950 border border-slate-850
-                          text-xs text-white placeholder:text-slate-700
-                          focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/40
-                          hover:border-slate-800
+                          bg-slate-950 border border-slate-800
+                          text-xs text-slate-100 placeholder:text-slate-500
+                          focus:outline-none focus:border-cyan-400/80 focus:ring-1 focus:ring-cyan-400/25
+                          hover:border-slate-700
                           transition-all duration-200
                         "
                       />
@@ -782,7 +782,7 @@ function FreelancerOnboarding({ onNavigate }) {
                           {projectTech.map(tech => (
                             <span 
                               key={tech} 
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] text-indigo-300 font-semibold"
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-sm text-cyan-300 font-semibold"
                             >
                               <span>{tech}</span>
                               <button 
@@ -800,7 +800,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                     {/* Project Live Link */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Project Link (Live demo)
                       </label>
                       <div className="relative group">
@@ -814,10 +814,10 @@ function FreelancerOnboarding({ onNavigate }) {
                           onChange={(e) => setProjectLink(e.target.value)}
                           className="
                             w-full pl-9 pr-3 py-2.5 rounded-lg
-                            bg-slate-950 border border-slate-850
-                            text-xs text-white placeholder:text-slate-700
-                            focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/40
-                            hover:border-slate-800
+                            bg-slate-950 border border-slate-800
+                            text-xs text-slate-100 placeholder:text-slate-500
+                            focus:outline-none focus:border-cyan-400/80 focus:ring-1 focus:ring-cyan-400/25
+                            hover:border-slate-700
                             transition-all duration-200
                           "
                         />
@@ -826,7 +826,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                     {/* Repository Link */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Codebase Link (GitHub/GitLab)
                       </label>
                       <div className="relative group">
@@ -840,10 +840,10 @@ function FreelancerOnboarding({ onNavigate }) {
                           onChange={(e) => setProjectRepo(e.target.value)}
                           className="
                             w-full pl-9 pr-3 py-2.5 rounded-lg
-                            bg-slate-950 border border-slate-850
-                            text-xs text-white placeholder:text-slate-700
-                            focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/40
-                            hover:border-slate-800
+                            bg-slate-950 border border-slate-800
+                            text-xs text-slate-100 placeholder:text-slate-500
+                            focus:outline-none focus:border-cyan-400/80 focus:ring-1 focus:ring-cyan-400/25
+                            hover:border-slate-700
                             transition-all duration-200
                           "
                         />
@@ -856,7 +856,7 @@ function FreelancerOnboarding({ onNavigate }) {
                     
                     {/* Project Description */}
                     <div className="flex flex-col gap-1.5 flex-1">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Project Description *
                       </label>
                       <textarea
@@ -865,10 +865,10 @@ function FreelancerOnboarding({ onNavigate }) {
                         onChange={(e) => setProjectDesc(e.target.value)}
                         className="
                           w-full h-24 px-3.5 py-2.5 rounded-lg flex-1
-                          bg-slate-950 border border-slate-850
-                          text-xs text-white placeholder:text-slate-700
-                          focus:outline-none focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/40
-                          hover:border-slate-800 resize-none
+                          bg-slate-950 border border-slate-800
+                          text-xs text-slate-100 placeholder:text-slate-500
+                          focus:outline-none focus:border-cyan-400/80 focus:ring-1 focus:ring-cyan-400/25
+                          hover:border-slate-700 resize-none
                           transition-all duration-200
                         "
                       />
@@ -876,7 +876,7 @@ function FreelancerOnboarding({ onNavigate }) {
 
                     {/* Dashboard Image drag-and-drop */}
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-wider text-slate-500 select-none">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                         Project Mockup / Screenshot
                       </label>
                       <div 
@@ -887,10 +887,10 @@ function FreelancerOnboarding({ onNavigate }) {
                         className={`
                           relative h-24 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-350 overflow-hidden group
                           ${projectImage 
-                            ? 'border-indigo-500/50 bg-slate-950' 
+                            ? 'border-cyan-500/50 bg-slate-950/85' 
                             : isDraggingProjImg
-                              ? 'border-indigo-400 bg-indigo-500/5'
-                              : 'border-slate-800 bg-slate-950/30 hover:border-indigo-500/50 hover:bg-slate-900/10'
+                              ? 'border-cyan-400 bg-cyan-400/10'
+                              : 'border-slate-700 bg-slate-950/85 hover:border-cyan-500/50 hover:bg-slate-900'
                           }
                         `}
                       >
@@ -906,16 +906,16 @@ function FreelancerOnboarding({ onNavigate }) {
                             <img src={projectImage} alt="Project Mockup Preview" className="w-full h-full object-cover opacity-80" />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
                               <UploadCloud className="w-4 h-4 text-white mr-1.5" />
-                              <span className="text-[8px] font-bold text-white uppercase tracking-widest">Change Mockup</span>
+                              <span className="text-xs font-bold text-white uppercase tracking-widest">Change Mockup</span>
                             </div>
                           </>
                         ) : (
                           <>
-                            <UploadCloud className="w-5 h-5 text-slate-600 group-hover:text-indigo-400 transition-colors duration-300" />
-                            <span className="text-[8px] font-bold text-slate-600 group-hover:text-slate-400 uppercase tracking-widest mt-1.5">
+                            <UploadCloud className="w-5 h-5 text-cyan-300 group-hover:text-cyan-100 transition-colors duration-300" />
+                            <span className="text-xs font-bold text-slate-400 group-hover:text-cyan-200 uppercase tracking-widest mt-1.5">
                               {isDraggingProjImg ? 'Drop image here' : 'Drop project cover'}
                             </span>
-                            <span className="text-[7.5px] text-slate-700 mt-0.5">Click to select files</span>
+                            <span className="text-xs text-slate-400 mt-0.5">Click to select files</span>
                           </>
                         )}
                       </div>
@@ -929,27 +929,27 @@ function FreelancerOnboarding({ onNavigate }) {
                   type="button"
                   onClick={handleAddProjectToRegistry}
                   className="
-                    w-full py-2.5 rounded-lg border border-indigo-500/30
-                    bg-indigo-950/20 hover:bg-indigo-500/10 hover:border-indigo-500/60
-                    text-indigo-300 font-bold text-xs tracking-wide
+                    w-full py-2.5 rounded-lg border border-cyan-400/30
+                    bg-cyan-500/10 hover:bg-cyan-500/15 hover:border-cyan-400/60
+                    text-cyan-200 font-bold text-xs tracking-wide
                     flex items-center justify-center gap-2
                     transition-all duration-200 cursor-pointer active:scale-[0.99]
                   "
                 >
-                  <Plus className="w-4 h-4 text-indigo-400" />
+                  <Plus className="w-4 h-4 text-indigo-500" />
                   <span>Add Project to Portfolio</span>
                 </button>
               </div>
 
               {/* RENDERED REGISTERED PORTFOLIO ITEMS GALLERY */}
               <div className="space-y-4">
-                <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 select-none">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 select-none">
                   Added Projects Registry ({portfolioItems.length})
                 </h4>
 
                 {portfolioItems.length === 0 ? (
-                  <div className="text-center py-6 border border-slate-900 bg-slate-950/10 rounded-xl">
-                    <p className="text-xs text-slate-600 leading-normal">
+                  <div className="text-center py-6 content-surface border border-slate-700 rounded-2xl">
+                    <p className="text-xs text-slate-400 leading-normal">
                       No active portfolio elements. Construct a project above and inject it.
                     </p>
                   </div>
@@ -959,7 +959,7 @@ function FreelancerOnboarding({ onNavigate }) {
                       <div 
                         key={item.id}
                         className="
-                          relative overflow-hidden flex flex-col md:flex-row gap-4 p-4 rounded-xl border border-slate-850 bg-slate-950/40 hover:border-slate-750 transition-all duration-200 group
+                          relative overflow-hidden flex flex-col md:flex-row gap-4 p-4 rounded-2xl border border-slate-700 content-surface hover:border-cyan-400/40 hover:shadow-xl hover:shadow-slate-950/20 transition-all duration-200 group
                         "
                       >
                         {/* Project Thumbnail Image */}
@@ -967,8 +967,8 @@ function FreelancerOnboarding({ onNavigate }) {
                           {item.image ? (
                             <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full bg-gradient-to-tr from-violet-900/60 to-indigo-900/40 flex items-center justify-center text-slate-500">
-                              <Code2 className="w-5 h-5 text-indigo-400/50" />
+                            <div className="w-full h-full bg-slate-950 flex items-center justify-center text-slate-400">
+                              <Code2 className="w-5 h-5 text-cyan-300/80" />
                             </div>
                           )}
                         </div>
@@ -977,7 +977,7 @@ function FreelancerOnboarding({ onNavigate }) {
                         <div className="flex-1 flex flex-col justify-between">
                           <div>
                             <div className="flex justify-between items-start gap-4">
-                              <h5 className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">
+                              <h5 className="text-xs font-bold text-slate-100 group-hover:text-cyan-200 transition-colors">
                                 {item.title}
                               </h5>
                               <button
@@ -989,7 +989,7 @@ function FreelancerOnboarding({ onNavigate }) {
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
-                            <p className="text-[11px] text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                            <p className="text-sm text-slate-400 leading-relaxed mt-1 line-clamp-2">
                               {item.description}
                             </p>
                           </div>
@@ -999,7 +999,7 @@ function FreelancerOnboarding({ onNavigate }) {
                             {/* Tech Stack Chips */}
                             <div className="flex flex-wrap gap-1">
                               {item.tech.map((t) => (
-                                <span key={t} className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-indigo-950/30 border border-indigo-900/40 text-indigo-300/80">
+                                <span key={t} className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-900/85 border border-cyan-500/15 text-cyan-300">
                                   {t}
                                 </span>
                               ))}
@@ -1012,7 +1012,7 @@ function FreelancerOnboarding({ onNavigate }) {
                                   href={item.link} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold text-slate-500 hover:text-white transition-colors"
+                                  className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-white transition-colors"
                                 >
                                   <Globe className="w-3 h-3" />
                                   <span>Live Demo</span>
@@ -1024,7 +1024,7 @@ function FreelancerOnboarding({ onNavigate }) {
                                   href={item.repo} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold text-slate-500 hover:text-white transition-colors"
+                                  className="inline-flex items-center gap-1 text-xs font-bold text-slate-400 hover:text-white transition-colors"
                                 >
                                   <Code2 className="w-3 h-3" />
                                   <span>Repository</span>
@@ -1103,7 +1103,7 @@ function FreelancerOnboarding({ onNavigate }) {
         </div>
 
         {/* Protection / trust label */}
-        <p className="mt-5 text-center text-[10px] font-medium text-slate-700 tracking-wide select-none">
+        <p className="mt-5 text-center text-sm font-medium text-slate-500 tracking-wide select-none">
           Data stored safely on our encrypted cloud networks. You can edit this at any time in settings.
         </p>
 
@@ -1111,9 +1111,8 @@ function FreelancerOnboarding({ onNavigate }) {
 
       {/* ── Simulated Onboarding Completed Success Modal Overlay ── */}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-slate-900 border border-slate-800 shadow-2xl p-8 text-center animate-scaleUp">
-            
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-900/20 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-sm overflow-hidden rounded-3xl bg-slate-950 border border-slate-700 shadow-2xl p-8 text-center animate-scaleUp">
             {/* Header glow */}
             <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none" />
             <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
@@ -1121,22 +1120,22 @@ function FreelancerOnboarding({ onNavigate }) {
             {/* Checked Circular Banner */}
             <div className="relative w-16 h-16 mx-auto mb-6">
               <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping opacity-35" />
-              <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-600/30 to-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/25">
+              <div className="relative w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-600/30 to-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-600 shadow-lg shadow-emerald-500/25">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
             </div>
 
-            <h3 className="text-xl font-extrabold text-white tracking-tight leading-none mb-2">
+            <h3 className="text-xl font-extrabold text-slate-100 tracking-tight leading-none mb-2">
               Profile Completed!
             </h3>
             
-            <p className="text-xs text-slate-400 leading-relaxed max-w-xs mx-auto mb-6">
-              Your developer profile has been constructed and injected into the FreelanceAI ecosystem. Redirecting you to the workspace...
+            <p className="text-sm text-slate-650 leading-relaxed max-w-xs mx-auto mb-6">
+              Your developer profile has been constructed and injected into the TalentStage ecosystem. Redirecting you to the workspace...
             </p>
 
             {/* Mini Escrow Badge */}
-            <div className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-white/[0.03] border border-slate-800 text-[10px] text-slate-500">
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+            <div className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-slate-950/90 border border-slate-700 text-sm text-slate-300">
+              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
               <span>Smart Escrow Ledger Activated</span>
             </div>
 

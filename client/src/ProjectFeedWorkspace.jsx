@@ -186,7 +186,7 @@ function StarRating({ rating }) {
           className={`w-3 h-3 ${i < full ? 'text-amber-400 fill-amber-400' : half && i === full ? 'text-amber-400 fill-amber-400/50' : 'text-slate-700'}`}
         />
       ))}
-      <span className="ml-1 text-[9px] font-bold text-slate-500">{rating.toFixed(2)}</span>
+      <span className="ml-1 text-xs font-bold text-slate-500">{rating.toFixed(2)}</span>
     </div>
   );
 }
@@ -202,7 +202,7 @@ function MatchBadge({ match }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] font-extrabold uppercase tracking-wider select-none ${color.text} ${color.bg} ${color.border}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-sm font-extrabold uppercase tracking-wider select-none ${color.text} ${color.bg} ${color.border}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${color.dot}`} />
       {match}% Match
@@ -279,21 +279,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative overflow-x-hidden selection:bg-violet-500/30 selection:text-violet-200">
+    <div className="project-feed-shell min-h-screen bg-slate-950 text-slate-100 font-sans relative overflow-x-hidden">
       {/* ── Ambient glows ── */}
       <div className="pointer-events-none fixed inset-0 z-0">
-        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-700/6 blur-[130px] animate-pulse-glow" />
-        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/5 blur-[110px] animate-pulse-glow-reverse" />
+        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-500/10 blur-[130px]" />
+        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-cyan-400/10 blur-[110px]" />
       </div>
 
       {/* ── Top Nav Bar ── */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80">
+      <header className="sticky top-0 z-40 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {view === 'details' && (
               <button
                 onClick={() => setView('feed')}
-                className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-white transition-colors cursor-pointer group select-none mr-2"
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group select-none mr-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
                 <span>Back to Feed</span>
@@ -306,28 +306,28 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-105 transition-transform duration-200">
                 <Cpu className="w-3.5 h-3.5 text-white" />
               </div>
-              <span className="text-sm font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                Freelance<span className="text-violet-400 font-extrabold">AI</span>
+              <span className="text-sm font-bold tracking-tight text-slate-800">
+                Talent<span className="text-violet-600 font-extrabold">Stage</span>
               </span>
             </button>
           </div>
 
-          <div className="flex items-center gap-3 text-[10px] font-bold text-slate-500">
+          <div className="flex items-center gap-3 text-sm font-bold text-slate-500">
             <button
               onClick={() => setView('feed')}
-              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none ${view === 'feed' ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' : 'hover:text-slate-200'}`}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer select-none ${view === 'feed' ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-400/20' : 'text-slate-300 hover:text-white'}`}
             >
               Project Feed
             </button>
             <button
               onClick={() => onNavigate('client-dashboard')}
-              className="px-3 py-1.5 rounded-lg hover:text-slate-200 transition-all cursor-pointer select-none"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
             >
               Client Dashboard
             </button>
             <button
               onClick={() => onNavigate('dashboard')}
-              className="px-3 py-1.5 rounded-lg hover:text-slate-200 transition-all cursor-pointer select-none"
+              className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white transition-all cursor-pointer select-none"
             >
               My Dashboard
             </button>
@@ -346,21 +346,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
             {/* Page header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
               <div>
-                <h1 className="text-3xl font-black tracking-tight text-white leading-tight">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-100 leading-tight">
                   Browse Open Projects
                 </h1>
-                <p className="text-sm text-slate-500 mt-1.5 leading-relaxed">
+                <p className="text-sm text-slate-400 mt-1.5 leading-relaxed font-medium">
                   AI-curated contracts matched to your verified skill attestations and proposal history.
                 </p>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 select-none">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-slate-400">{filteredProjects.length} contracts available</span>
+              <div className="flex items-center gap-2 text-sm font-bold text-slate-500 select-none">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-slate-500">{filteredProjects.length} contracts available</span>
               </div>
             </div>
 
             {/* ── Top Filter / Search Bar ── */}
-            <div className="flex flex-col lg:flex-row gap-3 p-4 rounded-2xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-xl shadow-lg">
+            <div className="flex flex-col lg:flex-row gap-3 p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-sm">
 
               {/* Search */}
               <div className="relative flex-1 group">
@@ -374,9 +374,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="
                     w-full pl-10 pr-4 py-2.5 rounded-xl
-                    bg-slate-950 border border-slate-800
-                    text-sm text-white placeholder:text-slate-700
-                    focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
+                    bg-slate-900 border border-slate-800
+                    text-sm text-slate-100 placeholder:text-slate-500
+                    focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/20
                     hover:border-slate-700 transition-all duration-200
                   "
                 />
@@ -389,9 +389,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   onChange={(e) => setFilterSkill(e.target.value)}
                   className="
                     pl-3.5 pr-8 py-2.5 rounded-xl
-                    bg-slate-950 border border-slate-800
-                    text-xs text-slate-300 appearance-none cursor-pointer
-                    focus:outline-none focus:border-indigo-500 hover:border-slate-700
+                    bg-slate-900 border border-slate-800
+                    text-sm text-slate-200 appearance-none cursor-pointer font-medium
+                    focus:outline-none focus:border-cyan-400 hover:border-slate-700
                     transition-all duration-200
                   "
                 >
@@ -413,9 +413,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   onChange={(e) => setFilterBudget(e.target.value)}
                   className="
                     pl-3.5 pr-8 py-2.5 rounded-xl
-                    bg-slate-950 border border-slate-800
-                    text-xs text-slate-300 appearance-none cursor-pointer
-                    focus:outline-none focus:border-indigo-500 hover:border-slate-700
+                    bg-slate-900 border border-slate-800
+                    text-sm text-slate-200 appearance-none cursor-pointer font-medium
+                    focus:outline-none focus:border-cyan-400 hover:border-slate-700
                     transition-all duration-200
                   "
                 >
@@ -434,9 +434,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   onChange={(e) => setFilterCategory(e.target.value)}
                   className="
                     pl-3.5 pr-8 py-2.5 rounded-xl
-                    bg-slate-950 border border-slate-800
-                    text-xs text-slate-300 appearance-none cursor-pointer
-                    focus:outline-none focus:border-indigo-500 hover:border-slate-700
+                    bg-slate-900 border border-slate-800
+                    text-sm text-slate-200 appearance-none cursor-pointer font-medium
+                    focus:outline-none focus:border-cyan-400 hover:border-slate-700
                     transition-all duration-200
                   "
                 >
@@ -452,7 +452,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               {/* Active filters indicator */}
               <button
                 onClick={() => { setSearchQuery(''); setFilterSkill('all'); setFilterBudget('all'); setFilterCategory('all'); }}
-                className="flex items-center gap-2 py-2.5 px-4 rounded-xl border border-slate-800 text-xs font-bold text-slate-500 hover:text-slate-200 hover:border-slate-700 transition-all cursor-pointer select-none whitespace-nowrap"
+                className="flex items-center gap-2 py-2.5 px-4 rounded-xl border border-slate-800 text-sm font-semibold text-slate-300 hover:text-white hover:border-slate-600 transition-all cursor-pointer select-none whitespace-nowrap"
               >
                 <Filter className="w-3.5 h-3.5" />
                 Clear Filters
@@ -462,9 +462,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
             {/* ── Project Card Grid ── */}
             {filteredProjects.length === 0 ? (
               <div className="text-center py-24 space-y-3">
-                <Search className="w-10 h-10 text-slate-700 mx-auto" />
-                <p className="text-sm font-bold text-slate-500">No contracts match your active filters.</p>
-                <p className="text-xs text-slate-700">Try broadening your search or resetting filters.</p>
+                <Search className="w-10 h-10 text-slate-400 mx-auto" />
+                <p className="text-base font-bold text-slate-800">No contracts match your active filters.</p>
+                <p className="text-sm text-slate-500 font-medium">Try broadening your search or resetting filters.</p>
               </div>
             ) : (
               <div className="space-y-5">
@@ -472,8 +472,8 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   <div
                     key={project.id}
                     className="
-                      relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-900/40 backdrop-blur-xl shadow-lg p-6
-                      hover:border-indigo-500/30 hover:shadow-[0_6px_30px_-8px_rgba(99,102,241,0.15)]
+                      relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-sm p-6
+                      hover:border-cyan-500/30 hover:shadow-lg
                       transition-all duration-300 group
                     "
                   >
@@ -489,19 +489,19 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap mb-1">
-                              <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-500">
+                              <span className="text-xs font-semibold uppercase tracking-widest px-2.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">
                                 {project.category}
                               </span>
-                              <span className="text-[9px] text-slate-600 font-medium flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                              <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
                                 {project.postedAgo}
                               </span>
                             </div>
-                            <h2 className="text-base font-extrabold tracking-tight text-white group-hover:text-indigo-400 transition-colors leading-snug">
+                            <h2 className="text-lg font-black tracking-tight text-slate-100 group-hover:text-cyan-300 transition-colors leading-snug">
                               {project.title}
                             </h2>
-                            <p className="text-xs font-semibold text-slate-500 mt-0.5">
-                              Posted by <span className="text-indigo-400">{project.client}</span>
+                            <p className="text-sm font-medium text-slate-400 mt-0.5">
+                              Posted by <span className="text-cyan-300 font-semibold">{project.client}</span>
                             </p>
                           </div>
 
@@ -510,7 +510,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         </div>
 
                         {/* Description — 2-line clamp */}
-                        <p className="text-[12.5px] text-slate-400 leading-relaxed line-clamp-2">
+                        <p className="text-sm text-slate-305 leading-relaxed line-clamp-2">
                           {project.description}
                         </p>
 
@@ -519,21 +519,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                           {project.skills.map((skill) => (
                             <span
                               key={skill}
-                              className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-slate-400 select-none"
+                              className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-slate-300 select-none"
                             >
                               {skill}
                             </span>
                           ))}
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-indigo-400 px-2.5 py-0.5 rounded-full bg-indigo-950/30 border border-indigo-900/40 select-none">
-                            <DollarSign className="w-3 h-3" />
+                          <span className="flex items-center gap-1 text-sm font-bold text-cyan-300 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/20 select-none">
+                            <DollarSign className="w-3.5 h-3.5 text-cyan-300" />
                             {project.budget}
                           </span>
-                          <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 select-none">
-                            <Calendar className="w-3 h-3" />
+                          <span className="flex items-center gap-1 text-sm font-semibold text-slate-300 px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 select-none">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
                             Due {project.deadline}
                           </span>
-                          <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-500 px-2.5 py-0.5 rounded-full bg-slate-950 border border-slate-800 select-none">
-                            <Send className="w-3 h-3" />
+                          <span className="flex items-center gap-1 text-sm font-semibold text-slate-400 px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 select-none">
+                            <Send className="w-3.5 h-3.5 text-slate-400" />
                             {project.proposals} proposals
                           </span>
                         </div>
@@ -544,20 +544,20 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         <button
                           onClick={() => openDetails(project)}
                           className="
-                            flex-1 lg:flex-none py-2.5 px-5 rounded-xl border border-slate-700 text-xs font-bold text-slate-300
-                            hover:bg-slate-800/50 hover:border-slate-600 hover:text-white
+                            flex-1 lg:flex-none py-2.5 px-5 rounded-xl border border-slate-700 text-sm font-semibold text-slate-300
+                            hover:bg-slate-800 hover:border-cyan-400 hover:text-white
                             active:scale-[0.98] transition-all duration-200 cursor-pointer select-none
                             flex items-center justify-center gap-1.5
                           "
                         >
-                          <ExternalLink className="w-3.5 h-3.5" />
+                          <ExternalLink className="w-4 h-4 text-slate-400" />
                           View Project
                         </button>
                         <button
                           onClick={() => handleSubmitProposal(project.id)}
                           disabled={submitting === project.id || submitted === project.id}
                           className="
-                            flex-1 lg:flex-none py-2.5 px-5 rounded-xl text-xs font-bold
+                            flex-1 lg:flex-none py-2.5 px-5 rounded-xl text-sm font-semibold
                             bg-gradient-to-r from-indigo-600 to-violet-600
                             hover:brightness-110 active:scale-[0.98]
                             disabled:opacity-70 disabled:cursor-not-allowed
@@ -600,21 +600,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
 
             {/* Details page header breadcrumb */}
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-600 select-none">
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-400 select-none">
                 <span>Project Feed</span>
-                <ChevronDown className="w-3 h-3 -rotate-90" />
-                <span className="text-indigo-400">{selectedProject.title}</span>
+                <ChevronDown className="w-3 h-3 -rotate-90 text-slate-500" />
+                <span className="text-indigo-400 font-bold">{selectedProject.title}</span>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight max-w-3xl">
+                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-slate-100 leading-tight max-w-3xl">
                   {selectedProject.title}
                 </h1>
                 <MatchBadge match={selectedProject.match} />
               </div>
-              <p className="text-xs font-semibold text-slate-500">
-                Posted by <span className="text-indigo-400 font-bold">{selectedProject.client}</span>
-                <span className="mx-2 text-slate-700">·</span>
-                <span className="text-slate-600">{selectedProject.postedAgo}</span>
+              <p className="text-sm font-medium text-slate-500">
+                Posted by <span className="text-indigo-600 font-bold">{selectedProject.client}</span>
+                <span className="mx-2 text-slate-300">·</span>
+                <span className="text-slate-500">{selectedProject.postedAgo}</span>
               </p>
             </div>
 
@@ -625,23 +625,23 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               <div className="lg:col-span-7 space-y-7">
 
                 {/* Full Description */}
-                <div className="rounded-2xl bg-slate-900/40 border border-slate-800/60 p-6 md:p-7 backdrop-blur-xl shadow-lg relative overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-7 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-slate-800/80 to-transparent pointer-events-none" />
 
-                  <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-4 select-none">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-cyan-300 select-none">
                     Project Scope & Deliverables
                   </h3>
                   <p className="text-sm text-slate-300 leading-relaxed">
                     {selectedProject.description}
                   </p>
-                  <p className="text-[12.5px] text-slate-400 leading-relaxed mt-4">
+                  <p className="text-sm text-slate-500 leading-relaxed mt-4">
                     All deliverables must be accompanied by a comprehensive technical documentation package including architecture decision records (ADRs), deployment runbooks, and integration test coverage exceeding 90%. A code walkthrough session with the engineering team will be required before milestone release.
                   </p>
                 </div>
 
                 {/* Required Skills grid */}
-                <div className="rounded-2xl bg-slate-900/40 border border-slate-800/60 p-6 backdrop-blur-xl shadow-lg">
-                  <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-4 select-none">
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-sm">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-cyan-300 mb-4 select-none">
                     Required Technical Stack
                   </h3>
                   <div className="flex flex-wrap gap-2.5">
@@ -650,9 +650,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         key={skill}
                         className="
                           inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl
-                          bg-indigo-950/40 border border-indigo-500/20
-                          text-xs text-indigo-300 font-bold select-none
-                          hover:bg-indigo-950/60 hover:border-indigo-500/40 transition-all duration-200
+                          bg-indigo-50 border border-indigo-200
+                          text-xs text-indigo-700 font-bold select-none
+                          hover:bg-indigo-100 hover:border-indigo-300 transition-all duration-200
                         "
                       >
                         <Code2 className="w-3 h-3" />
@@ -666,46 +666,46 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
                   {/* Budget Allocation */}
-                  <div className="rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 backdrop-blur-xl shadow-lg space-y-4">
-                    <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 select-none">
+                  <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 shadow-sm space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-cyan-300 select-none">
                       Budget Allocation
                     </h3>
                     <div className="flex items-end gap-2">
-                      <span className="text-2xl font-black tracking-tight text-white">{selectedProject.budget}</span>
+                      <span className="text-2xl font-black tracking-tight text-slate-100">{selectedProject.budget}</span>
                       <span className="text-xs font-bold text-slate-500 mb-0.5">fixed price</span>
                     </div>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-[10px] font-bold text-slate-500 select-none">
+                      <div className="flex justify-between text-sm font-bold text-slate-500 select-none">
                         <span>Escrow Deposit</span>
-                        <span className="text-emerald-400">100% Secured</span>
+                        <span className="text-emerald-600">100% Secured</span>
                       </div>
-                      <div className="w-full h-1.5 rounded-full bg-slate-950 overflow-hidden">
-                        <div className="h-full w-full bg-gradient-to-r from-emerald-500 to-indigo-500 rounded-full" />
+                      <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div className="h-full w-full bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[9.5px] font-semibold text-slate-500 select-none">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 select-none">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                       Smart contract escrow active
                     </div>
                   </div>
 
                   {/* Milestone Deadlines */}
-                  <div className="rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 backdrop-blur-xl shadow-lg space-y-4">
-                    <h3 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 select-none">
+                  <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 shadow-sm space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-cyan-300 select-none">
                       Milestone Schedule
                     </h3>
-                    <div className="space-y-3 pl-2 border-l border-slate-800">
+                    <div className="space-y-3 pl-2 border-l border-slate-700">
                       {[
                         { label: 'M1 – Architecture & Setup', date: 'Jun 20, 2026', pct: '25%' },
                         { label: 'M2 – Core Protocol Build', date: 'Jul 01, 2026', pct: '60%' },
                         { label: 'M3 – Audit & Finalisation', date: selectedProject.deadline, pct: '100%' },
                       ].map((m, i) => (
                         <div key={i} className="relative space-y-0.5 pl-3">
-                          <div className="absolute -left-[15.5px] top-1 w-2 h-2 rounded-full bg-indigo-500 border border-slate-950" />
-                          <p className="text-[10.5px] font-bold text-white leading-none">{m.label}</p>
-                          <div className="flex items-center gap-2 text-[9px] text-slate-500 font-semibold">
+                          <div className="absolute -left-[15.5px] top-1.5 w-2 h-2 rounded-full bg-indigo-500 border border-slate-950" />
+                          <p className="text-sm font-bold text-slate-100 leading-none">{m.label}</p>
+                          <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold">
                             <span>{m.date}</span>
-                            <span className="px-1.5 py-0.5 rounded bg-indigo-950/40 text-indigo-400 border border-indigo-900/40">
+                            <span className="px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 font-bold">
                               {m.pct} payment
                             </span>
                           </div>
@@ -716,10 +716,10 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                 </div>
 
                 {/* Submit your proposal inline CTA */}
-                <div className="rounded-2xl bg-indigo-950/10 border border-indigo-500/20 p-5 flex items-center justify-between gap-4">
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex items-center justify-between gap-4">
                   <div>
-                    <h4 className="text-sm font-extrabold text-white tracking-tight select-none">Interested in this contract?</h4>
-                    <p className="text-[11px] text-slate-500 mt-0.5 select-none">Our AI will optimise your bid for maximum acceptance probability.</p>
+                    <h4 className="text-base font-extrabold text-slate-100 tracking-tight select-none">Interested in this contract?</h4>
+                    <p className="text-sm text-slate-400 mt-1 select-none">Our AI will optimise your bid for maximum acceptance probability.</p>
                   </div>
                   <button
                     onClick={() => handleSubmitProposal(selectedProject.id)}
@@ -747,18 +747,18 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               {/* ── Column B: AI Match Radar Matrix (Right) ── */}
               <div className="lg:col-span-5 space-y-5">
 
-                <div className="rounded-2xl bg-indigo-950/10 border border-indigo-500/20 p-6 backdrop-blur-xl shadow-xl relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-indigo-500/8 blur-2xl pointer-events-none" />
-                  <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-indigo-500/8 to-transparent pointer-events-none" />
+                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-cyan-400/10 blur-2xl pointer-events-none" />
+                  <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-cyan-400/10 to-transparent pointer-events-none" />
 
                   <div className="flex items-center justify-between mb-5 select-none">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-                      <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-300">
+                      <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-700">
                         Top AI Freelancer Fits
                       </h3>
                     </div>
-                    <span className="text-[9px] font-extrabold uppercase tracking-wide px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/30 text-indigo-400 select-none">
+                    <span className="text-xs font-extrabold uppercase tracking-wide px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 select-none">
                       Live Match
                     </span>
                   </div>
@@ -767,21 +767,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                     {AI_CANDIDATE_MATCHES.map((c) => (
                       <div
                         key={c.id}
-                        className={`relative rounded-xl border p-4 bg-slate-950/60 transition-all duration-200 ${c.isTopPick ? `${c.borderColor} shadow-lg` : 'border-slate-900'}`}
+                        className={`relative rounded-xl border p-4 bg-slate-900 transition-all duration-200 ${c.isTopPick ? `${c.borderColor} shadow-sm` : 'border-slate-700'}`}
                       >
                         {c.isTopPick && (
                           <span className="absolute -top-px left-4 right-4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
                         )}
                         {c.isTopPick && (
-                          <span className="absolute top-2.5 right-2.5 text-[8px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full bg-violet-500 text-white select-none">
+                          <span className="absolute top-2.5 right-2.5 text-xs font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-full bg-violet-500 text-white select-none">
                             Top Pick
                           </span>
                         )}
 
                         <div className="flex items-start gap-3">
                           {/* Avatar */}
-                          <div className={`w-9 h-9 rounded-full border ${c.borderColor} overflow-hidden bg-slate-950 shrink-0`}>
-                            <div className={`w-full h-full bg-gradient-to-tr ${c.gradient} flex items-center justify-center text-xs font-black text-white`}>
+                          <div className={`w-9 h-9 rounded-full border ${c.borderColor} overflow-hidden bg-slate-200 shrink-0`}>
+                            <div className={`w-full h-full bg-gradient-to-tr ${c.gradient} flex items-center justify-center text-xs font-black text-slate-100`}>
                               {c.initials}
                             </div>
                           </div>
@@ -789,17 +789,17 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                               <div>
-                                <h4 className="text-xs font-extrabold text-white tracking-tight leading-none">{c.name}</h4>
-                                <p className="text-[9.5px] text-slate-500 mt-0.5 leading-none">{c.role}</p>
+                                <h4 className="text-xs font-extrabold text-slate-100 tracking-tight leading-none">{c.name}</h4>
+                                <p className="text-xs text-slate-500 mt-0.5 leading-none">{c.role}</p>
                               </div>
-                              <span className={`text-[10px] font-black ${c.matchColor} shrink-0`}>{c.match}%</span>
+                              <span className={`text-sm font-black ${c.matchColor} shrink-0`}>{c.match}%</span>
                             </div>
 
                             <StarRating rating={c.rating} />
 
-                            <div className="flex items-center gap-2 mt-2 text-[9px] font-semibold text-slate-600 select-none">
+                            <div className="flex items-center gap-2 mt-2 text-xs font-semibold text-slate-600 select-none">
                               <span className="flex items-center gap-0.5">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                                 {c.verifiedSkills} verified skills
                               </span>
                               <span>·</span>
@@ -808,11 +808,11 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
 
                             {/* Match Metrics Bar */}
                             <div className="mt-3 space-y-1">
-                              <div className="flex justify-between text-[8.5px] font-bold text-slate-600 select-none">
+                              <div className="flex justify-between text-xs font-bold text-slate-600 select-none">
                                 <span>Structural Overlap</span>
                                 <span className={c.matchColor}>{c.match}%</span>
                               </div>
-                              <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                              <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
                                 <div
                                   className={`h-full bg-gradient-to-r ${c.barColor} rounded-full transition-all duration-700`}
                                   style={{ width: `${c.match}%` }}
@@ -843,7 +843,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                           </button>
                         )}
                         {hired && c.id === hired.id && (
-                          <div className="w-full mt-3.5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center gap-1.5 select-none">
+                          <div className="w-full mt-3.5 py-2.5 rounded-xl text-xs font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 flex items-center justify-center gap-1.5 select-none">
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             Hired · Escrow Secured
                           </div>
@@ -857,17 +857,17 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
             </div>
 
             {/* ── Proposals Evaluation Queue (Bottom) ── */}
-            <div className="rounded-2xl bg-slate-900/40 border border-slate-800/60 p-6 md:p-7 backdrop-blur-xl shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-7 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-slate-800/80 to-transparent pointer-events-none" />
 
               <div className="flex items-center justify-between mb-6 select-none">
                 <div>
-                  <h3 className="text-xs font-extrabold uppercase tracking-widest text-slate-400">
+                  <h3 className="text-lg font-bold text-slate-100">
                     Candidate Proposals — Evaluation Queue
                   </h3>
-                  <p className="text-[10px] text-slate-600 mt-0.5">AI-ranked by bid optimality, clarity score, and technical depth.</p>
+                  <p className="text-sm text-slate-500 mt-0.5 font-medium">AI-ranked by bid optimality, clarity score, and technical depth.</p>
                 </div>
-                <span className="text-[9px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full bg-violet-600/10 border border-violet-500/20 text-violet-400 select-none">
+                <span className="text-xs font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full bg-slate-800 border border-violet-500/20 text-violet-300 select-none">
                   {PROPOSALS.length} Bids Received
                 </span>
               </div>
@@ -881,8 +881,8 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                       className={`
                         relative overflow-hidden rounded-xl border p-5 transition-all duration-300 group
                         ${isAccepted
-                          ? 'border-emerald-500/40 bg-emerald-950/10 shadow-md shadow-emerald-500/5'
-                          : 'border-slate-800/80 bg-slate-950/30 hover:bg-slate-800/20 hover:border-slate-700'}
+                          ? 'border-emerald-300 bg-slate-950 shadow-md'
+                          : 'border-slate-700 bg-slate-900 hover:bg-slate-800 hover:border-slate-600'}
                       `}
                     >
                       {isAccepted && (
@@ -893,18 +893,18 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
 
                         {/* Profile & metadata */}
                         <div className="flex items-start gap-3.5 lg:w-56 shrink-0">
-                          <div className={`w-9 h-9 rounded-full border ${idx === 0 ? 'border-violet-500/40' : 'border-slate-800'} overflow-hidden bg-slate-950 shrink-0`}>
+                          <div className={`w-9 h-9 rounded-full border ${idx === 0 ? 'border-violet-400' : 'border-slate-700'} overflow-hidden bg-slate-800 shrink-0`}>
                             <div className={`w-full h-full bg-gradient-to-tr ${proposal.gradient} flex items-center justify-center text-xs font-black text-white`}>
                               {proposal.initials}
                             </div>
                           </div>
                           <div>
-                            <h4 className="text-xs font-extrabold text-white tracking-tight leading-none">{proposal.name}</h4>
+                            <h4 className="text-sm font-bold text-slate-100 tracking-tight leading-none">{proposal.name}</h4>
                             <div className="flex items-center gap-2 mt-1.5">
-                              <span className="text-[10px] font-bold text-indigo-400">{proposal.bid}</span>
-                              <span className="text-slate-700">·</span>
-                              <span className="text-[10px] font-semibold text-slate-500 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
+                              <span className="text-sm font-bold text-cyan-300">{proposal.bid}</span>
+                              <span className="text-slate-500">·</span>
+                              <span className="text-sm font-semibold text-slate-400 flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5 text-slate-500" />
                                 {proposal.timeline}
                               </span>
                             </div>
@@ -913,7 +913,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
 
                         {/* Cover letter snippet */}
                         <div className="flex-1 min-w-0">
-                          <p className="text-[11.5px] text-slate-400 leading-relaxed line-clamp-3">
+                          <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
                             {proposal.coverSnippet}
                           </p>
                         </div>
@@ -921,10 +921,10 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                         {/* Score + action */}
                         <div className="flex lg:flex-col items-center lg:items-end gap-3 lg:gap-3 shrink-0">
                           {/* AI Score Badge */}
-                          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-violet-950/40 border border-violet-500/20 select-none">
-                            <Sparkles className="w-3 h-3 text-violet-400" />
-                            <span className="text-[10px] font-black text-violet-300">{proposal.aiScore}/100</span>
-                            <span className="text-[8px] font-bold text-violet-500 uppercase tracking-widest hidden sm:block">
+                          <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 border border-slate-700 select-none">
+                            <Sparkles className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+                            <span className="text-sm font-black text-cyan-300">{proposal.aiScore}/100</span>
+                            <span className="text-xs font-extrabold text-cyan-300 uppercase tracking-widest hidden sm:block">
                               {proposal.aiLabel}
                             </span>
                           </div>
@@ -934,9 +934,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                             <button
                               onClick={() => handleAcceptProposal(proposal.id)}
                               className="
-                                py-2 px-4 rounded-xl text-[10px] font-extrabold uppercase tracking-wide
+                                py-2 px-4 rounded-xl text-sm font-bold uppercase tracking-wide
                                 border border-slate-700 text-slate-300
-                                hover:bg-emerald-500/10 hover:border-emerald-500/40 hover:text-emerald-300
+                                hover:bg-slate-800 hover:border-cyan-400 hover:text-white
                                 active:scale-[0.97]
                                 transition-all duration-200 cursor-pointer select-none whitespace-nowrap
                                 flex items-center gap-1.5
@@ -946,7 +946,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                               Accept Proposal
                             </button>
                           ) : (
-                            <div className="py-2 px-4 rounded-xl text-[10px] font-extrabold uppercase tracking-wide bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-1.5 select-none">
+                            <div className="py-2 px-4 rounded-xl text-sm font-extrabold uppercase tracking-wide bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-1.5 select-none">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               Accepted
                             </div>

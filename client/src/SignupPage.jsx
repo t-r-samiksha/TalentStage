@@ -34,10 +34,10 @@ function usePasswordStrength(password) {
     if (/[A-Z]/.test(password))          score++;
     if (/[0-9]/.test(password))          score++;
     if (/[^A-Za-z0-9]/.test(password))  score++;
-    if (score <= 1) return { score, label: 'Weak',      color: 'bg-rose-500' };
-    if (score <= 2) return { score, label: 'Fair',      color: 'bg-amber-500' };
-    if (score <= 3) return { score, label: 'Good',      color: 'bg-yellow-400' };
-    if (score <= 4) return { score, label: 'Strong',    color: 'bg-emerald-500' };
+    if (score <= 1) return { score, label: 'Weak',      color: 'bg-red-700' };
+    if (score <= 2) return { score, label: 'Fair',      color: 'bg-red-500' };
+    if (score <= 3) return { score, label: 'Good',      color: 'bg-amber-600' };
+    if (score <= 4) return { score, label: 'Strong',    color: 'bg-emerald-600' };
     return             { score, label: 'Excellent', color: 'bg-emerald-400' };
   }, [password]);
 }
@@ -48,12 +48,12 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
     <div className="flex flex-col gap-1.5">
       <label
         htmlFor={id}
-        className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+        className="text-[10px] font-bold uppercase tracking-wider text-slate-405 select-none"
       >
         {label}
       </label>
       <div className="relative group">
-        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 group-focus-within:text-red-500 transition-colors duration-200 pointer-events-none">
           <Icon className="w-4 h-4" />
         </span>
         <input
@@ -66,10 +66,10 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
           required
           className="
             w-full pl-10 pr-10 py-3 rounded-xl
-            bg-slate-950 border border-slate-800
-            text-sm text-white placeholder:text-slate-700
-            focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
-            hover:border-slate-700
+            bg-slate-950 border border-[#22222a]
+            text-sm text-white placeholder:text-slate-600
+            focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30
+            hover:border-slate-800
             transition-all duration-200
           "
         />
@@ -90,36 +90,36 @@ const ROLES = [
     icon: UserCheck,
     title: 'Freelancer',
     description: 'Get matched with projects & earn with smart escrow protection',
-    accentFrom: 'from-violet-600/20',
-    accentTo: 'to-violet-800/10',
-    border: 'border-violet-500/70',
-    glow: 'shadow-violet-500/25',
-    iconColor: 'text-violet-400',
-    badgeBg: 'bg-violet-500',
+    accentFrom: 'from-red-950/20',
+    accentTo: 'to-red-900/10',
+    border: 'border-red-500/70',
+    glow: 'shadow-red-500/10',
+    iconColor: 'text-red-400',
+    badgeBg: 'bg-[#e50914]',
   },
   {
     id: 'client',
     icon: Briefcase,
     title: 'Client',
     description: 'Post projects, hire top talent & deploy on-chain escrows seamlessly',
-    accentFrom: 'from-indigo-600/20',
-    accentTo: 'to-indigo-800/10',
-    border: 'border-indigo-500/70',
-    glow: 'shadow-indigo-500/25',
-    iconColor: 'text-indigo-400',
-    badgeBg: 'bg-indigo-500',
+    accentFrom: 'from-red-950/20',
+    accentTo: 'to-red-900/10',
+    border: 'border-red-500/70',
+    glow: 'shadow-red-500/10',
+    iconColor: 'text-red-400',
+    badgeBg: 'bg-[#e50914]',
   },
   {
     id: 'dual',
     icon: Sparkles,
     title: 'Dual Account',
     description: 'Full access — hire talent and take on projects simultaneously',
-    accentFrom: 'from-fuchsia-600/20',
-    accentTo: 'to-indigo-700/10',
-    border: 'border-fuchsia-500/70',
-    glow: 'shadow-fuchsia-500/25',
-    iconColor: 'text-fuchsia-400',
-    badgeBg: 'bg-fuchsia-500',
+    accentFrom: 'from-red-950/20',
+    accentTo: 'to-red-900/10',
+    border: 'border-red-500/70',
+    glow: 'shadow-red-500/10',
+    iconColor: 'text-red-400',
+    badgeBg: 'bg-[#e50914]',
   },
 ];
 
@@ -137,19 +137,19 @@ function RoleCard({ role, selected, onClick }) {
         overflow-hidden transition-all duration-300 group
         ${selected
           ? `${border} bg-gradient-to-b ${accentFrom} ${accentTo} shadow-lg ${glow}`
-          : 'border-slate-800 bg-slate-950/60 hover:border-slate-700 hover:bg-slate-900/40'
+          : 'border-slate-850 bg-slate-950 hover:border-slate-800 hover:bg-slate-900'
         }
       `}
       aria-pressed={selected}
     >
       {/* Inner top sheen when active */}
       {selected && (
-        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.07] to-transparent pointer-events-none rounded-2xl" />
+        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none rounded-2xl" />
       )}
 
       {/* Hover shimmer when inactive */}
       {!selected && (
-        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl pointer-events-none" />
+        <span className="absolute inset-0 bg-gradient-to-b from-white/[0.015] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl pointer-events-none" />
       )}
 
       {/* Checkmark badge — appears when selected */}
@@ -159,7 +159,7 @@ function RoleCard({ role, selected, onClick }) {
           transition-all duration-300
           ${selected
             ? `${badgeBg} scale-100 opacity-100 shadow-sm`
-            : 'bg-slate-800 scale-75 opacity-0'
+            : 'bg-slate-900 scale-75 opacity-0'
           }
         `}
       >
@@ -172,19 +172,19 @@ function RoleCard({ role, selected, onClick }) {
         transition-all duration-300
         ${selected
           ? `${iconColor} bg-white/10 shadow-sm`
-          : 'text-slate-500 bg-slate-900/60 group-hover:text-slate-300'
+          : 'text-slate-500 bg-slate-900 group-hover:text-slate-400'
         }
       `}>
         <Icon className="w-5 h-5" strokeWidth={selected ? 2.2 : 1.8} />
       </div>
 
       {/* Title */}
-      <span className={`text-[12px] font-bold tracking-tight transition-colors duration-200 ${selected ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`}>
+      <span className={`text-xs font-bold tracking-tight transition-colors duration-200 ${selected ? 'text-white' : 'text-slate-400 group-hover:text-slate-350'}`}>
         {title}
       </span>
 
       {/* Micro description */}
-      <span className={`text-[9.5px] leading-relaxed font-medium transition-colors duration-200 ${selected ? 'text-slate-300 opacity-80' : 'text-slate-600 group-hover:text-slate-500'}`}>
+      <span className={`text-[10px] leading-relaxed font-medium transition-colors duration-200 ${selected ? 'text-slate-300' : 'text-slate-500 group-hover:text-slate-450'}`}>
         {description}
       </span>
     </button>
@@ -250,44 +250,44 @@ function SignupPage({ onNavigate }) {
   // ── Success / confirmation state ──────────────────────────────────────────
   if (success) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center px-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#08080a] flex items-center justify-center px-6 relative overflow-hidden">
         {/* Ambient glow */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-violet-600/6 blur-[150px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-indigo-600/8 blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-red-950/15 blur-[150px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-slate-950/10 blur-[100px]" />
         </div>
 
         <div className="relative z-10 w-full max-w-md text-center">
-          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70 p-10">
+          <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-[#121216]/50 border border-[#22222a] shadow-2xl shadow-black/60 p-10">
             {/* Accent line */}
-            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-emerald-500 to-transparent" />
+            <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-[#e50914] to-transparent" />
             {/* Inner sheen */}
-            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.012] to-transparent pointer-events-none" />
 
             {/* Animated success icon */}
             <div className="relative w-16 h-16 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-2xl bg-emerald-500/15 animate-ping opacity-30" />
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-600/25 to-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/15">
+              <div className="absolute inset-0 rounded-2xl bg-red-500/10 animate-ping opacity-35" />
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-tr from-red-600/20 to-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shadow-lg">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
             </div>
 
-            <h2 className="text-2xl font-extrabold tracking-tight text-white mb-2">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-100 mb-2">
               You're in. 🎉
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed mb-1 max-w-xs mx-auto">
               Account created as a{' '}
-              <span className={`font-bold ${selectedRole?.iconColor ?? 'text-violet-400'}`}>
+              <span className={`font-bold ${selectedRole?.iconColor ?? 'text-red-400'}`}>
                 {selectedRole?.title ?? role}
               </span>.
             </p>
-            <p className="text-xs text-slate-600 mb-8">
-              Welcome to the FreelanceAI smart-escrow network.
+            <p className="text-xs text-slate-500 mb-8">
+              Welcome to the TalentStage smart-escrow network.
             </p>
 
             <button
               onClick={() => onNavigate((role === 'freelancer' || role === 'dual') ? 'onboarding' : 'landing')}
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-violet-500/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 rounded-xl bg-[#e50914] hover:bg-[#b80710] active:scale-[0.98] text-white text-sm font-bold tracking-tight shadow-lg shadow-red-950/20 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer border-none"
             >
               <span>{(role === 'freelancer' || role === 'dual') ? 'Setup Professional Profile' : 'Go to Dashboard'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -300,20 +300,20 @@ function SignupPage({ onNavigate }) {
 
   // ── Main signup view ──────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 py-14 overflow-hidden selection:bg-violet-500/30 selection:text-violet-200">
+    <div className="min-h-screen bg-[#08080a] text-slate-100 font-sans relative flex flex-col justify-center items-center px-6 py-14 overflow-hidden selection:bg-red-500/30 selection:text-red-200">
 
       {/* ── Layered ambient radial glows ── */}
       <div className="pointer-events-none absolute inset-0 -z-0">
-        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-violet-700/8 blur-[130px] animate-pulse-glow" />
-        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-indigo-700/7 blur-[110px] animate-pulse-glow-reverse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-fuchsia-700/4 blur-[80px]" />
+        <div className="absolute -top-10 right-[-60px] w-[540px] h-[540px] rounded-full bg-red-955/15 blur-[130px] animate-pulse-glow" />
+        <div className="absolute bottom-[-60px] left-[-40px] w-[500px] h-[480px] rounded-full bg-slate-955/10 blur-[110px] animate-pulse-glow-reverse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[280px] rounded-full bg-red-955/5 blur-[80px]" />
       </div>
 
       {/* ── Back to home ── */}
       <div className="absolute top-7 left-6 md:left-10 z-20">
         <button
           onClick={() => onNavigate('landing')}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-white transition-colors duration-200 group cursor-pointer"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-red-500 transition-colors duration-200 group cursor-pointer bg-transparent border-none"
         >
           <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform duration-200" />
           <span>Back to home</span>
@@ -327,39 +327,39 @@ function SignupPage({ onNavigate }) {
         <div className="flex flex-col items-center mb-7">
           <button
             onClick={() => onNavigate('landing')}
-            className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer"
-            aria-label="FreelanceAI — home"
+            className="inline-flex items-center gap-2.5 group mb-4 cursor-pointer bg-transparent border-none"
+            aria-label="TalentStage — home"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform duration-200">
+            <div className="w-9 h-9 rounded-xl bg-[#e50914] flex items-center justify-center shadow-lg shadow-red-500/10 group-hover:scale-105 transition-transform duration-200">
               <Cpu className="w-4.5 h-4.5 text-white" />
             </div>
-            <span className="text-[1.15rem] font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
-              Freelance<span className="text-violet-400 font-extrabold">AI</span>
+            <span className="text-[1.15rem] font-bold tracking-tight text-slate-100">
+              Talent<span className="text-red-500 font-extrabold">Stage</span>
             </span>
           </button>
 
-          <h2 className="text-2xl font-extrabold tracking-tight text-white leading-tight">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-100 leading-tight">
             Create your account
           </h2>
-          <p className="text-sm text-slate-500 mt-1.5 text-center">
-            Join the AI-powered freelance network in under 60 seconds.
+          <p className="text-sm text-slate-400 mt-1.5 text-center">
+            Join the AI-powered talent network in under 60 seconds.
           </p>
         </div>
 
         {/* ── Glass card ── */}
-        <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-slate-900/50 border border-slate-800 shadow-2xl shadow-black/70">
+        <div className="relative rounded-2xl overflow-hidden backdrop-blur-xl bg-[#121216]/50 border border-[#22222a] shadow-2xl shadow-black/60">
 
           {/* Violet hairline top accent */}
-          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
+          <div className="absolute -top-px left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-[#e50914]/50 to-transparent" />
           {/* Inner sheen */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.025] to-transparent pointer-events-none" />
+          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/[0.012] to-transparent pointer-events-none" />
 
           <div className="relative p-7 sm:p-8">
 
             {/* Error banner */}
             {error && (
-              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/25 text-xs text-rose-300 leading-relaxed">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/25 text-xs text-rose-350 leading-relaxed animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-455" />
                 <span>{error}</span>
               </div>
             )}
@@ -368,7 +368,7 @@ function SignupPage({ onNavigate }) {
 
               {/* ══ ROLE SELECTOR ════════════════════════════════════════════════ */}
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-500 mb-3 select-none">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-3 select-none">
                   I am joining as
                 </p>
                 <div className="grid grid-cols-3 gap-2.5">
@@ -384,7 +384,7 @@ function SignupPage({ onNavigate }) {
               </div>
 
               {/* Soft separator */}
-              <div className="h-px bg-slate-800/60" />
+              <div className="h-px bg-slate-900" />
 
               {/* ── Full Name ── */}
               <AuthInput
@@ -415,16 +415,16 @@ function SignupPage({ onNavigate }) {
                 <div className="flex items-center justify-between">
                   <label
                     htmlFor="signup-password"
-                    className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+                    className="text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none"
                   >
                     Password
                   </label>
                   {password && (
                     <span
-                      className={`text-[10px] font-bold tracking-wide transition-colors duration-300 ${
-                        strength.score <= 1 ? 'text-rose-400'
-                        : strength.score <= 2 ? 'text-amber-400'
-                        : strength.score <= 3 ? 'text-yellow-400'
+                      className={`text-xs font-bold tracking-wide transition-colors duration-300 ${
+                        strength.score <= 1 ? 'text-red-400'
+                        : strength.score <= 2 ? 'text-red-450'
+                        : strength.score <= 3 ? 'text-amber-500'
                         : 'text-emerald-400'
                       }`}
                     >
@@ -434,7 +434,7 @@ function SignupPage({ onNavigate }) {
                 </div>
 
                 <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-red-500 transition-colors duration-200 pointer-events-none">
                     <Lock className="w-4 h-4" />
                   </span>
                   <input
@@ -447,10 +447,10 @@ function SignupPage({ onNavigate }) {
                     required
                     className="
                       w-full pl-10 pr-10 py-3 rounded-xl
-                      bg-slate-950 border border-slate-800
-                      text-sm text-white placeholder:text-slate-700
-                      focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60
-                      hover:border-slate-700
+                      bg-slate-955 border border-[#22222a]
+                      text-sm text-white placeholder:text-slate-600
+                      focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30
+                      hover:border-slate-800
                       transition-all duration-200
                     "
                   />
@@ -458,7 +458,7 @@ function SignupPage({ onNavigate }) {
                     <button
                       type="button"
                       onClick={() => setShowPassword((v) => !v)}
-                      className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                      className="text-slate-500 hover:text-slate-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -473,7 +473,7 @@ function SignupPage({ onNavigate }) {
                       <div
                         key={seg}
                         className={`h-0.5 flex-1 rounded-full transition-all duration-300 ${
-                          seg <= strength.score ? strength.color : 'bg-slate-800'
+                          seg <= strength.score ? strength.color : 'bg-slate-900'
                         }`}
                       />
                     ))}
@@ -485,12 +485,12 @@ function SignupPage({ onNavigate }) {
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="signup-confirm-password"
-                  className="text-[10px] font-bold uppercase tracking-[0.12em] text-slate-500 select-none"
+                  className="text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none"
                 >
                   Confirm Password
                 </label>
                 <div className="relative group">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-indigo-400 transition-colors duration-200 pointer-events-none">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-600 group-focus-within:text-red-500 transition-colors duration-200 pointer-events-none">
                     <Lock className="w-4 h-4" />
                   </span>
                   <input
@@ -503,21 +503,20 @@ function SignupPage({ onNavigate }) {
                     required
                     className={`
                       w-full pl-10 pr-10 py-3 rounded-xl
-                      bg-slate-950 border
-                      text-sm text-white placeholder:text-slate-700
+                      bg-slate-955 border
+                      text-sm text-white placeholder:text-slate-600
                       focus:outline-none focus:ring-1
-                      hover:border-slate-700
+                      hover:border-slate-800
                       transition-all duration-200
                       ${confirmPassword && password !== confirmPassword
                         ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/40'
                         : confirmPassword && password === confirmPassword
                           ? 'border-emerald-500/60 focus:border-emerald-500 focus:ring-emerald-500/40'
-                          : 'border-slate-800 focus:border-indigo-500 focus:ring-indigo-500/60'
+                          : 'border-[#22222a] focus:border-red-500 focus:ring-red-500/30'
                       }
                     `}
                   />
                   <span className="absolute inset-y-0 right-0 pr-3.5 flex items-center">
-                    {/* Show match indicator if typed, else eye toggle */}
                     {confirmPassword ? (
                       password === confirmPassword ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-500" />
@@ -525,7 +524,7 @@ function SignupPage({ onNavigate }) {
                         <button
                           type="button"
                           onClick={() => setShowConfirm((v) => !v)}
-                          className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                          className="text-slate-500 hover:text-slate-350 transition-colors duration-200 cursor-pointer bg-transparent border-none"
                           aria-label={showConfirm ? 'Hide password' : 'Show password'}
                         >
                           {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -535,7 +534,7 @@ function SignupPage({ onNavigate }) {
                       <button
                         type="button"
                         onClick={() => setShowConfirm((v) => !v)}
-                        className="text-slate-600 hover:text-slate-300 transition-colors duration-200 cursor-pointer"
+                        className="text-slate-500 hover:text-slate-350 transition-colors duration-200 cursor-pointer bg-transparent border-none"
                         aria-label={showConfirm ? 'Hide password' : 'Show password'}
                       >
                         {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -544,8 +543,8 @@ function SignupPage({ onNavigate }) {
                   </span>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
-                  <p className="text-[10px] text-rose-400 font-medium mt-0.5">
-                    Passwords don't match.
+                  <p className="text-xs text-rose-455 font-medium mt-0.5">
+                    Passwords don\'t match.
                   </p>
                 )}
               </div>
@@ -559,8 +558,8 @@ function SignupPage({ onNavigate }) {
                     mt-0.5 w-4 h-4 rounded-[5px] flex items-center justify-center flex-shrink-0
                     border transition-all duration-200 cursor-pointer
                     ${agreed
-                      ? 'bg-indigo-600 border-indigo-600 shadow-md shadow-indigo-500/20'
-                      : 'bg-slate-950 border-slate-700 hover:border-slate-500'
+                      ? 'bg-[#e50914] border-red-500 shadow-md shadow-red-550/10'
+                      : 'bg-slate-955 border-slate-800 hover:border-slate-700'
                     }
                   `}
                   aria-checked={agreed}
@@ -569,12 +568,12 @@ function SignupPage({ onNavigate }) {
                 >
                   {agreed && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                 </button>
-                <span className="text-[11px] text-slate-500 leading-relaxed">
+                <span className="text-xs text-slate-400 leading-relaxed">
                   I agree to the{' '}
                   <button
                     type="button"
                     onClick={(e) => e.preventDefault()}
-                    className="text-violet-400 hover:text-violet-300 font-semibold transition-colors cursor-pointer"
+                    className="text-red-400 hover:text-red-300 font-semibold transition-colors cursor-pointer bg-transparent border-none"
                   >
                     Terms of Service
                   </button>
@@ -582,7 +581,7 @@ function SignupPage({ onNavigate }) {
                   <button
                     type="button"
                     onClick={(e) => e.preventDefault()}
-                    className="text-violet-400 hover:text-violet-300 font-semibold transition-colors cursor-pointer"
+                    className="text-red-400 hover:text-red-300 font-semibold transition-colors cursor-pointer bg-transparent border-none"
                   >
                     Privacy Policy
                   </button>
@@ -596,13 +595,13 @@ function SignupPage({ onNavigate }) {
                 disabled={isLoading}
                 className="
                   w-full py-3.5 mt-1 rounded-xl
-                  bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-600
+                  bg-[#e50914] hover:bg-[#b80710]
                   hover:brightness-110 active:scale-[0.98]
                   disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed
                   text-white text-sm font-bold tracking-tight
-                  shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30
+                  shadow-lg shadow-red-950/20 hover:shadow-red-950/30
                   flex items-center justify-center gap-2.5
-                  transition-all duration-200 cursor-pointer
+                  transition-all duration-200 cursor-pointer border-none
                 "
               >
                 {isLoading ? (
@@ -621,11 +620,11 @@ function SignupPage({ onNavigate }) {
 
             {/* ── Divider ── */}
             <div className="relative my-6 flex items-center gap-3">
-              <div className="flex-1 h-px bg-slate-800" />
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-slate-600 shrink-0">
+              <div className="flex-1 h-px bg-slate-900" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 shrink-0">
                 or sign up with
               </span>
-              <div className="flex-1 h-px bg-slate-800" />
+              <div className="flex-1 h-px bg-slate-900" />
             </div>
 
             {/* ── OAuth buttons ── */}
@@ -637,8 +636,8 @@ function SignupPage({ onNavigate }) {
                 className="
                   relative flex items-center justify-center gap-2.5
                   py-2.5 px-4 rounded-xl
-                  bg-white/[0.04] border border-slate-800
-                  hover:bg-white/[0.08] hover:border-slate-700
+                  bg-slate-955 border border-[#22222a]
+                  hover:bg-slate-900 hover:border-slate-800
                   active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
                   text-slate-300 hover:text-white
                   text-xs font-semibold tracking-tight
@@ -649,7 +648,7 @@ function SignupPage({ onNavigate }) {
               >
                 <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
                 {oauthLoading === 'google'
-                  ? <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                  ? <span className="w-4 h-4 rounded-full border-2 border-slate-650 border-t-slate-200 animate-spin" />
                   : <GoogleIcon />}
                 <span>Google</span>
               </button>
@@ -661,8 +660,8 @@ function SignupPage({ onNavigate }) {
                 className="
                   relative flex items-center justify-center gap-2.5
                   py-2.5 px-4 rounded-xl
-                  bg-white/[0.04] border border-slate-800
-                  hover:bg-white/[0.08] hover:border-slate-700
+                  bg-slate-955 border border-[#22222a]
+                  hover:bg-slate-900 hover:border-slate-800
                   active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed
                   text-slate-300 hover:text-white
                   text-xs font-semibold tracking-tight
@@ -673,19 +672,19 @@ function SignupPage({ onNavigate }) {
               >
                 <span className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-xl pointer-events-none" />
                 {oauthLoading === 'github'
-                  ? <span className="w-4 h-4 rounded-full border-2 border-slate-600 border-t-slate-200 animate-spin" />
+                  ? <span className="w-4 h-4 rounded-full border-2 border-slate-650 border-t-slate-200 animate-spin" />
                   : <GithubIcon />}
                 <span>GitHub</span>
               </button>
             </div>
 
             {/* ── Login nudge ── */}
-            <p className="text-center text-[12px] text-slate-600 mt-6 leading-relaxed">
+            <p className="text-center text-sm text-slate-400 mt-6 leading-relaxed">
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => onNavigate('login')}
-                className="font-bold text-violet-400 hover:text-violet-300 transition-colors duration-200 cursor-pointer"
+                className="font-bold text-red-400 hover:text-red-300 transition-colors duration-200 cursor-pointer bg-transparent border-none"
               >
                 Sign in
               </button>
@@ -694,7 +693,7 @@ function SignupPage({ onNavigate }) {
         </div>
 
         {/* Trust micro-copy */}
-        <p className="mt-5 text-center text-[10px] font-medium text-slate-700 tracking-wide">
+        <p className="mt-5 text-center text-xs font-medium text-slate-500 tracking-wide">
           Protected by end-to-end encryption &middot; SOC 2 Type II compliant
         </p>
       </div>
