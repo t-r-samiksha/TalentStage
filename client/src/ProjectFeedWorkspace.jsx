@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import {
   Cpu, ArrowLeft, Search, Filter, Sparkles, CheckCircle2, Star,
-  Clock, DollarSign, Calendar, Briefcase, ChevronDown, Code2,
-  Globe, ArrowRight, Check, ShieldCheck, Award, ExternalLink,
-  TrendingUp, Zap, MessageSquare, Send, User, AlertCircle
+  Clock, DollarSign, Calendar, ChevronDown, Code2,
+  Check, ShieldCheck, ExternalLink,
+  Zap, Send, AlertCircle
 } from 'lucide-react';
-import { projectService, dashboardService } from './api';
+import { projectService, dashboardService, aiService } from './api';
 
 // ─── Time Ago Helper ────────────────────────────────────────────────────────
 function timeAgo(dateString) {
@@ -87,7 +87,7 @@ function extractSkills(title, description) {
   
   const matched = [];
   availableSkills.forEach(skill => {
-    const escaped = skill.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const escaped = skill.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
     const regex = new RegExp(`\\b${escaped}\\b`, 'i');
     if (regex.test(text)) {
       matched.push(skill);
@@ -105,7 +105,7 @@ function extractSkills(title, description) {
 }
 
 // ─── Stable Match Score Generator ──────────────────────────────────────────
-function calculateMatch(title, description) {
+function calculateMatch(title) {
   const sum = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   return 85 + (sum % 14);
 }
@@ -296,6 +296,11 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
   const [hiring, setHiring] = useState(false);
   const [hired, setHired] = useState(null);
 
+  // AI Matching states
+  const [aiMatches, setAiMatches] = useState([]);
+  const [aiMatchLatency, setAiMatchLatency] = useState(0);
+  const [isAiMatching, setIsAiMatching] = useState(false);
+
   // Live database project states
   const [dbProjects, setDbProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -307,7 +312,6 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
 
   // Details loader
   const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState(null);
 
   // Fetch all projects on mount
   useEffect(() => {
@@ -376,7 +380,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
         budgetMaxVal: p.budgetMax,
         deadline: deadlineStr,
         category: cat,
-        match: calculateMatch(p.title, p.description),
+        match: calculateMatch(p.title),
         proposals: p.proposals?.length || 0,
         budgetRange: budgetRange,
         status: p.status
@@ -488,7 +492,9 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
     setAcceptedProposal(null);
     setHired(null);
     setDetailsLoading(true);
-    setDetailsError(null);
+    setAiMatches([]);
+    setAiMatchLatency(0);
+    setIsAiMatching(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     try {
@@ -502,12 +508,96 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
           };
         });
       } else {
-        setDetailsError(res.error?.message || 'Failed to load project details.');
+        console.error(res.error?.message || 'Failed to load project details.');
+      }
+
+      // ── AI Matcher Integration ──
+      const candidatesToScore = [
+        {
+          id: 'cand-1',
+          name: 'Dr. Evelyn Vance',
+          role: 'AI & Agentic NLP Specialist',
+          bio: 'Specialist in LangChain, Python, and agentic workflows. Built 5 production LLM systems.',
+          skills: ['Python', 'LangChain', 'FastAPI', 'Docker', 'Machine Learning'],
+          verifiedSkills: ['Python', 'LangChain', 'FastAPI'],
+          hourlyRate: 150,
+          rating: 5.0,
+          portfolioSummary: 'Production LLM workflows and LangChain agents.',
+          initials: 'EV',
+          gradient: 'from-violet-600/40 to-indigo-500/30',
+          borderColor: 'border-violet-500/30',
+          matchColor: 'text-violet-400',
+          barColor: 'from-violet-600 to-indigo-500',
+          jobs: 28
+        },
+        {
+          id: 'cand-2',
+          name: 'Elena Rostova',
+          role: 'Rust & Solidity Protocol Engineer',
+          bio: 'Smart contract auditor and protocol engineer. Delivered Aave v3 bridge contract suite.',
+          skills: ['Rust', 'Solidity', 'LayerZero', 'Go', 'Chainlink'],
+          verifiedSkills: ['Rust', 'Solidity', 'LayerZero'],
+          hourlyRate: 130,
+          rating: 4.95,
+          portfolioSummary: 'Defi bridges, Solidity smart contracts, Rust backend.',
+          initials: 'ER',
+          gradient: 'from-indigo-600/40 to-violet-500/30',
+          borderColor: 'border-indigo-500/30',
+          matchColor: 'text-indigo-400',
+          barColor: 'from-indigo-600 to-violet-500',
+          jobs: 37
+        },
+        {
+          id: 'cand-3',
+          name: 'Marcus Chen',
+          role: 'ML Platform & GPU Engineer',
+          bio: 'MLOps engineer focusing on GPU acceleration, Redis, and Celery queues.',
+          skills: ['Python', 'Docker', 'Celery', 'PostgreSQL', 'Redis'],
+          verifiedSkills: ['Python', 'Docker', 'Redis'],
+          hourlyRate: 110,
+          rating: 4.8,
+          portfolioSummary: 'High-throughput data pipelines and MLOps.',
+          initials: 'MC',
+          gradient: 'from-fuchsia-600/30 to-indigo-600/20',
+          borderColor: 'border-fuchsia-500/30',
+          matchColor: 'text-fuchsia-400',
+          barColor: 'from-fuchsia-600 to-violet-600',
+          jobs: 19
+        }
+      ];
+
+      const matchReq = await aiService.matchFreelancers({
+        projectDescription: project.description,
+        projectSkills: project.skills,
+        projectBudgetMin: project.budgetMinVal || 50000,
+        projectBudgetMax: project.budgetMaxVal || 150000,
+        freelancers: candidatesToScore
+      });
+
+      if (matchReq.success && matchReq.data) {
+        const scored = matchReq.data.matches.map((apiMatch, index) => {
+          const original = candidatesToScore.find(c => c.id === apiMatch.freelancerId) || candidatesToScore[index];
+          return {
+            ...original,
+            match: apiMatch.matchPercent,
+            aiReason: apiMatch.aiReason,
+            isTopPick: false // assigned later
+          };
+        });
+        scored.sort((a, b) => b.match - a.match);
+        scored.forEach((s, idx) => s.isTopPick = idx === 0);
+        
+        setAiMatches(scored);
+        setAiMatchLatency(matchReq.data.latencyMs);
+      } else {
+        setAiMatches(AI_CANDIDATE_MATCHES);
       }
     } catch (err) {
-      setDetailsError(err.message || 'An error occurred.');
+      console.error(err);
+      setAiMatches(AI_CANDIDATE_MATCHES);
     } finally {
       setDetailsLoading(false);
+      setIsAiMatching(false);
     }
   };
 
@@ -1150,19 +1240,38 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-cyan-400/10 to-transparent pointer-events-none" />
 
                   <div className="flex items-center justify-between mb-5 select-none">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-                      <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-700">
-                        Top AI Freelancer Fits
-                      </h3>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
+                        <h3 className="text-xs font-extrabold uppercase tracking-widest text-indigo-700">
+                          Top AI Freelancer Fits
+                        </h3>
+                      </div>
+                      {aiMatchLatency > 0 && !isAiMatching && (
+                        <p className="text-[10px] text-slate-500 font-medium mt-1">
+                          Evaluated in {aiMatchLatency}ms via Gemini Flash
+                        </p>
+                      )}
                     </div>
-                    <span className="text-xs font-extrabold uppercase tracking-wide px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 select-none">
-                      Live Match
-                    </span>
+                    {isAiMatching ? (
+                      <span className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wide px-2.5 py-1 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 select-none animate-pulse">
+                        <span className="w-2.5 h-2.5 rounded-full border border-indigo-500 border-t-transparent animate-spin" />
+                        Scoring...
+                      </span>
+                    ) : (
+                      <span className="text-xs font-extrabold uppercase tracking-wide px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300 select-none">
+                        Live Match
+                      </span>
+                    )}
                   </div>
 
                   <div className="space-y-4">
-                    {AI_CANDIDATE_MATCHES.map((c) => (
+                    {isAiMatching && aiMatches.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-10 space-y-4">
+                        <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-indigo-500 animate-spin" />
+                        <p className="text-sm font-semibold text-slate-400 animate-pulse">Running semantic compatibility engine...</p>
+                      </div>
+                    ) : aiMatches.map((c) => (
                       <div
                         key={c.id}
                         className={`relative rounded-xl border p-4 bg-slate-900 transition-all duration-200 ${c.isTopPick ? `${c.borderColor} shadow-sm` : 'border-slate-700'}`}
@@ -1217,6 +1326,18 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                                 />
                               </div>
                             </div>
+                            
+                            {/* Dynamic AI Reasoning */}
+                            {c.aiReason && (
+                              <div className="mt-3 p-2.5 rounded bg-slate-950/50 border border-slate-800 border-l-2 border-l-violet-500 relative">
+                                <div className="absolute top-2.5 left-2.5">
+                                  <Sparkles className="w-3 h-3 text-violet-400" />
+                                </div>
+                                <p className="text-xs font-medium text-slate-400 pl-5 leading-relaxed">
+                                  {c.aiReason}
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </div>
 

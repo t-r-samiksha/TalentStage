@@ -7,11 +7,11 @@ import { request } from '../requestWrapper';
 export const skillTestService = {
   /**
    * Initializes a skill verification test room
-   * @param {string} skillId - Core skill UUID
+   * @param {string} skillName - Core skill name (e.g. 'React', 'Node')
    * @returns {Promise<{success: boolean, data: *, error: Object|null}>}
    */
-  async startTest(skillId) {
-    return request.post('/skills/test/start', { skillId });
+  async startTest(skillName) {
+    return request.post('/skills/test/start', { skillName });
   },
 
   /**

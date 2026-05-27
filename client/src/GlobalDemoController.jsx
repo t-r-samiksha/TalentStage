@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   X, Layers, Sparkles, ShieldCheck, BarChart2, Cpu,
   Home, LogIn, UserPlus, FileText, List, Eye, PlusCircle,

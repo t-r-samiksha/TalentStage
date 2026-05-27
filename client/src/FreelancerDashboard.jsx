@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  Cpu, Briefcase, Sparkles, TrendingUp, DollarSign, CheckCircle2,
-  Clock, Globe, Code2, LogOut, LayoutDashboard, FolderGit2,
+  Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
+  Clock, LogOut, LayoutDashboard, FolderGit2,
   ShieldCheck, Send, MessageSquare, User, Calendar, Plus,
-  ChevronRight, ArrowUpRight, Award, HelpCircle, AlertCircle
+  ChevronRight, ArrowUpRight, Award, AlertCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
-import { authService, dashboardService, projectService } from './api';
+import { authService, dashboardService, projectService, aiService } from './api';
 
 function FreelancerDashboard({ onNavigate }) {
   // Navigation tabs state
@@ -23,6 +23,15 @@ function FreelancerDashboard({ onNavigate }) {
   const [proposalsLoading, setProposalsLoading] = useState(false);
   const [proposalsError, setProposalsError] = useState('');
   
+  // AI Portfolio Audit states
+  const [portfolioText, setPortfolioText] = useState('');
+  const [isAuditing, setIsAuditing] = useState(false);
+  const [auditResult, setAuditResult] = useState(null);
+  const [streamedSuggestions, setStreamedSuggestions] = useState([]);
+  const [auditPhase, setAuditPhase] = useState('');
+  const [applySuccess, setApplySuccess] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+
   // Simulated dynamic dates
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -48,6 +57,7 @@ function FreelancerDashboard({ onNavigate }) {
       if (profileResult.success && dashboardResult.success) {
         setProfile(profileResult.data);
         setDashboardData(dashboardResult.data);
+        setPortfolioText(profileResult.data?.freelancerProfile?.bio || '');
       } else {
         setError('Failed to fetch dashboard data. Please try again later.');
       }
@@ -56,6 +66,107 @@ function FreelancerDashboard({ onNavigate }) {
     fetchDashboardData();
     return () => { active = false; };
   }, []);
+
+  const handleAuditPortfolio = async () => {
+    if (!portfolioText.trim() || portfolioText.length < 5) return;
+    setIsAuditing(true);
+    setAuditResult(null);
+    setStreamedSuggestions([]);
+    setApplySuccess(false);
+    
+    // Beautiful typewriter-style state progression logs
+    const phases = [
+      'Establishing connection to Gemini secure nodes...',
+      'Deconstructing biography vocabulary...',
+      'Checking alignment with decentralized skill networks...',
+      'Compiling optimization recommendation matrix...',
+      'Structuring improved profile copy...'
+    ];
+    
+    let phaseIdx = 0;
+    setAuditPhase(phases[0]);
+    const phaseInterval = setInterval(() => {
+      if (phaseIdx < phases.length - 1) {
+        phaseIdx++;
+        setAuditPhase(phases[phaseIdx]);
+      }
+    }, 900);
+    
+    try {
+      const res = await aiService.reviewPortfolio(portfolioText);
+      clearInterval(phaseInterval);
+      
+      if (res.success && res.data) {
+        setAuditPhase('Structuring review suggestions...');
+        setAuditResult(res.data);
+        
+        // Typewriter streaming effect for suggestions
+        const suggestions = res.data.suggestions || [];
+        let suggestionIdx = 0;
+        
+        const streamInterval = setInterval(() => {
+          if (suggestionIdx < suggestions.length) {
+            setStreamedSuggestions(prev => [...prev, suggestions[suggestionIdx]]);
+            suggestionIdx++;
+          } else {
+            clearInterval(streamInterval);
+            setAuditPhase('');
+            setIsAuditing(false);
+          }
+        }, 1000);
+      } else {
+        clearInterval(phaseInterval);
+        setAuditPhase('');
+        setIsAuditing(false);
+        alert(res.error?.message || 'Failed to audit portfolio. Please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      clearInterval(phaseInterval);
+      setAuditPhase('');
+      setIsAuditing(false);
+      alert('An unexpected error occurred during the portfolio audit.');
+    }
+  };
+
+  const handleApplyOptimizedBio = async () => {
+    if (!auditResult?.improved) return;
+    try {
+      const res = await authService.updateFreelancerProfile({ bio: auditResult.improved });
+      if (res.success) {
+        setApplySuccess(true);
+        // Refresh local dashboard states in real-time
+        setProfile(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            freelancerProfile: {
+              ...prev.freelancerProfile,
+              bio: auditResult.improved
+            }
+          };
+        });
+        setPortfolioText(auditResult.improved);
+        setTimeout(() => {
+          setApplySuccess(false);
+          setAuditResult(null);
+          setStreamedSuggestions([]);
+        }, 3000);
+      } else {
+        alert(res.error?.message || 'Failed to update biography in database.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('An error occurred while saving biography.');
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (!auditResult?.improved) return;
+    navigator.clipboard.writeText(auditResult.improved);
+    setCopySuccess(true);
+    setTimeout(() => setCopySuccess(false), 2000);
+  };
 
   // Fetch proposals when proposals tab is active
   useEffect(() => {
@@ -611,64 +722,175 @@ function FreelancerDashboard({ onNavigate }) {
             </div>
           </div>
 
-          {/* Right Panel: AI Optimization Feedback Card */}
-          <div className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-6 md:p-7 shadow-sm flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
+          {/* Right Panel: Interactive AI Portfolio Audit & Optimizer */}
+          <div className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-6 md:p-7 shadow-sm flex flex-col justify-between relative overflow-hidden transition-all duration-300">
+            {/* Ambient visual overlay */}
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-500 via-indigo-500 to-fuchsia-500" />
             
-            <div className="space-y-4 select-none">
-              <h3 className="text-sm font-bold text-indigo-600 uppercase tracking-wider">AI Optimization Feed</h3>
-              <p className="text-sm text-slate-500 leading-normal font-medium">
-                Your portfolio, skills, and escrows have been audited. Here are recommendations to maximize contract match rates.
-              </p>
-
-              <div className="space-y-3 pt-2">
-                
-                {/* Optimization Row 1 */}
-                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0">
-                    <Code2 className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">GitHub Sync Active</h4>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
-                      Synced 4 codebases. React and Solidity smart contracts mapped to your verified credentials.
-                    </p>
-                  </div>
+            <div className="space-y-5">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-5 h-5 text-indigo-600 animate-pulse" />
+                  <h3 className="text-base font-bold text-slate-800 tracking-tight">AI Portfolio Auditing</h3>
                 </div>
-
-                {/* Optimization Row 2 */}
-                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="w-8 h-8 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center text-violet-600 shrink-0">
-                    <Sparkles className="w-4 h-4 text-violet-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Proposal Scoring Alert</h4>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
-                      AI Proposal Helper active. Bids optimized for Aave and ConsenSys projects with a <span className="text-emerald-600 font-bold">96% success probability</span>.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Optimization Row 3 */}
-                <div className="flex gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="w-8 h-8 rounded-lg bg-fuchsia-50 border border-fuchsia-200 flex items-center justify-center text-fuchsia-600 shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Escrow Safeguard Enabled</h4>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">
-                      Smart contract escrow is active on all contracts. Secure deposits guaranteed on Aave projects.
-                    </p>
-                  </div>
-                </div>
-
+                <span className="inline-flex items-center gap-1 py-0.5 px-2 rounded-full bg-violet-50 border border-violet-100 text-[10px] font-extrabold uppercase text-violet-600 tracking-wide">
+                  <Sparkles className="w-3 h-3 animate-spin-slow" />
+                  Gemini Optimizer
+                </span>
               </div>
+
+              {/* Dynamic audit views */}
+              {!isAuditing && !auditResult && (
+                <div className="space-y-4 animate-fade-in">
+                  <p className="text-xs text-slate-500 leading-normal font-semibold">
+                    Optimize your professional profile summary below. The expert technical reviewer will analyze your stack, suggest strategic modifications, and construct a polished, high-impact biography.
+                  </p>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Professional Bio Summary</label>
+                    <textarea
+                      value={portfolioText}
+                      onChange={(e) => setPortfolioText(e.target.value.slice(0, 500))}
+                      placeholder="Detail your technology stacks, smart contract verifications, React architectures, or team leadership accomplishments..."
+                      className="w-full h-36 rounded-xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 font-medium placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none leading-relaxed"
+                    />
+                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-500">
+                      <span>⚡ AI recommendations adapt automatically</span>
+                      <span className={portfolioText.length >= 450 ? 'text-amber-500' : 'text-slate-450'}>
+                        {portfolioText.length} / 500 chars
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleAuditPortfolio}
+                    disabled={portfolioText.trim().length < 5}
+                    className={`w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-xs font-bold tracking-wider uppercase shadow-md shadow-violet-500/10 transition-all cursor-pointer flex items-center justify-center gap-2 ${portfolioText.trim().length < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Deconstruct & Optimize Bio</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Streaming loading screen */}
+              {isAuditing && (
+                <div className="py-8 flex flex-col items-center justify-center space-y-5 text-center min-h-[300px] animate-pulse">
+                  {/* Glowing spinner */}
+                  <div className="relative w-16 h-16 flex items-center justify-center">
+                    <div className="absolute inset-0 rounded-full border-4 border-indigo-100 animate-pulse" />
+                    <div className="absolute inset-0 rounded-full border-4 border-t-indigo-600 border-r-indigo-500 animate-spin" />
+                    <Cpu className="w-6 h-6 text-indigo-600 animate-bounce" />
+                  </div>
+                  
+                  <div className="space-y-2 max-w-xs">
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-widest">Generating Audit Schema</h4>
+                    <p className="text-[11px] text-indigo-600 font-bold font-mono tracking-wide">{auditPhase}</p>
+                  </div>
+
+                  {/* Display suggestions as they stream in */}
+                  {streamedSuggestions.length > 0 && (
+                    <div className="w-full text-left bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2 animate-fade-in">
+                      <span className="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">Incoming Suggestions</span>
+                      <div className="space-y-1.5">
+                        {streamedSuggestions.map((s, idx) => (
+                          <div key={idx} className="flex gap-2 text-[10px] text-slate-600 leading-normal font-semibold animate-slide-in">
+                            <span className="text-indigo-500">✦</span>
+                            <span>{s}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Audit results view */}
+              {!isAuditing && auditResult && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="space-y-2.5">
+                    <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Expert Optimization Suggestions
+                    </h4>
+                    <div className="space-y-2">
+                      {auditResult.suggestions?.map((suggestion, idx) => (
+                        <div 
+                          key={idx} 
+                          className="flex gap-2.5 p-3 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-all duration-200"
+                        >
+                          <span className="w-5 h-5 rounded bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xs text-indigo-500 font-bold shrink-0">
+                            {idx + 1}
+                          </span>
+                          <p className="text-xs text-slate-650 font-semibold leading-relaxed">
+                            {suggestion}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <h4 className="text-[10px] font-black text-violet-600 uppercase tracking-widest">Optimized Biography Draft</h4>
+                      <button
+                        onClick={copyToClipboard}
+                        className="text-[9.5px] font-extrabold text-slate-500 hover:text-indigo-600 hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        {copySuccess ? 'Copied ✓' : 'Copy Text'}
+                      </button>
+                    </div>
+                    <div className="w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs font-medium text-slate-255 leading-relaxed max-h-36 overflow-y-auto select-text shadow-inner">
+                      {auditResult.improved}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      onClick={handleApplyOptimizedBio}
+                      className={`flex-1 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-xs font-bold tracking-wider uppercase shadow-md shadow-violet-500/15 transition-all cursor-pointer flex items-center justify-center gap-1.5 ${applySuccess ? 'from-emerald-600 to-teal-600 shadow-emerald-500/15' : ''}`}
+                    >
+                      {applySuccess ? (
+                        <>
+                          <CheckCircle2 className="w-4 h-4 animate-bounce" />
+                          <span>Applied Successfully! ✓</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Apply Optimized Bio</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setAuditResult(null);
+                        setStreamedSuggestions([]);
+                      }}
+                      className="py-3 px-4 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 text-xs font-bold uppercase transition-all cursor-pointer"
+                    >
+                      Edit Original
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Quick action button */}
-            <button className="w-full mt-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-white text-sm font-bold tracking-wider uppercase shadow-md shadow-violet-500/10 transition-all cursor-pointer">
-              Launch Skill Verification Test
-            </button>
+            {/* Bottom persistent link to launch Skill Verification */}
+            <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-500 select-none">
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                Decentralized nodes active
+              </span>
+              <span 
+                onClick={() => onNavigate('skill-match')}
+                className="text-indigo-600 hover:underline cursor-pointer flex items-center gap-0.5"
+              >
+                Start Attestation Test
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
           </div>
 
         </section>

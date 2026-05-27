@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   Cpu, Sparkles, ShieldCheck, ArrowRight, Star,
-  CheckCircle2, Code, X, Menu, Check, Zap, Users,
-  TrendingUp, Lock, Globe, ChevronRight, Activity, Server, Database, Play
+  CheckCircle2, X, Menu, Zap, Users,
+  TrendingUp, Lock, Globe, ChevronRight, Database
 } from 'lucide-react';
 
 const FREELANCERS = [

@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
-  Clock, Globe, Code2, LogOut, LayoutDashboard, Plus,
-  ChevronRight, ArrowUpRight, Award, MessageSquare, Send,
-  Calendar, Trash2, Check, ArrowRight, ShieldCheck, HelpCircle,
-  TrendingUp, AlertCircle
+  LogOut, LayoutDashboard, Plus,
+  ChevronRight, Award, MessageSquare,
+  Calendar, Check, ArrowRight, ShieldCheck, AlertCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import { authService, dashboardService, projectService } from './api';
@@ -29,7 +28,6 @@ function ClientWorkspace({ onNavigate }) {
   const [projectType, setProjectType] = useState('fixed');
 
   // Simulated AI Diagnostics states
-  const [aiBriefGenerated, setAiBriefGenerated] = useState(false);
   const [generatingBrief, setGeneratingBrief] = useState(false);
 
   // ─── Real database-backed states ───────────────────────────────────────────
@@ -131,18 +129,30 @@ function ClientWorkspace({ onNavigate }) {
 
   // ─── Form Submission Handlers ──────────────────────────────────────────────
   const handleGenerateAiBrief = () => {
+    if (generatingBrief) return;
     setGeneratingBrief(true);
-    setTimeout(() => {
-      setGeneratingBrief(false);
-      setAiBriefGenerated(true);
-      setTitle('Automated Decentralized Vesting Vault Protocol');
-      setDescription(
-        'An AI-suggested project structure focusing on secure smart contracts. It implements custom multi-token lockup schedules, gas-optimized ERC-20 staking vaults, and on-chain oracle verification models. Includes comprehensive unit tests using Hardhat and Slither static code auditing analysis.'
-      );
-      if (!skills.includes('Solidity')) setSkills(prev => [...prev, 'Solidity']);
-      if (!skills.includes('Hardhat')) setSkills(prev => [...prev, 'Hardhat']);
-      if (!skills.includes('ERC-20')) setSkills(prev => [...prev, 'ERC-20']);
-    }, 1200);
+    setTitle('');
+    setDescription('');
+    
+    const targetTitle = 'Automated Decentralized Vesting Vault Protocol';
+    const targetDesc = 'An AI-suggested project structure focusing on secure smart contracts. It implements custom multi-token lockup schedules, gas-optimized ERC-20 staking vaults, and on-chain oracle verification models. Includes comprehensive unit tests using Hardhat and Slither static code auditing analysis.';
+    
+    let i = 0;
+    const speed = 15; // ms per frame
+    
+    const streamInterval = setInterval(() => {
+      i++;
+      setTitle(targetTitle.substring(0, Math.floor(i / 2)));
+      setDescription(targetDesc.substring(0, i));
+      
+      if (i >= targetDesc.length) {
+        clearInterval(streamInterval);
+        setTitle(targetTitle);
+        setDescription(targetDesc);
+        setGeneratingBrief(false);
+        setSkills(prev => Array.from(new Set([...prev, 'Solidity', 'Hardhat', 'ERC-20'])));
+      }
+    }, speed);
   };
 
   const handlePostProject = async (e) => {
@@ -213,7 +223,6 @@ function ClientWorkspace({ onNavigate }) {
         setSkills(['Solidity', 'Web3.js']);
         setBudgetMin('80000');
         setBudgetMax('120000');
-        setAiBriefGenerated(false);
         // Navigate back to listings
         setActiveTab('dashboard');
       }, 2000);

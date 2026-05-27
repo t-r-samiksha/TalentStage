@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import {
-  Cpu, ArrowLeft, Camera, User, Globe, Code2, Plus, UploadCloud,
+  Cpu, ArrowLeft, Camera, Globe, Code2, Plus, UploadCloud,
   Trash2, CheckCircle2, ChevronDown, ChevronRight, ChevronLeft,
   Calendar, GraduationCap, Check, ExternalLink, Sparkles, AlertCircle
 } from 'lucide-react';

@@ -18,13 +18,15 @@ function App() {
     // 1. Auto-login and route check on startup
     if (authStorage.isAuthenticated()) {
       const user = authStorage.getUser();
-      if (user?.role === 'CLIENT') {
-        setView('client-dashboard');
-      } else {
-        setView('dashboard');
-      }
+      setTimeout(() => {
+        if (user?.role === 'CLIENT') {
+          setView('client-dashboard');
+        } else {
+          setView('dashboard');
+        }
+      }, 0);
     } else {
-      setView('landing');
+      setTimeout(() => setView('landing'), 0);
     }
 
     // 2. Global event listener to capture session expirations (e.g. 401 response interceptors)
@@ -46,24 +48,15 @@ function App() {
     };
   }, []);
 
-  let activeComponent = null;
-
-  if (view === 'login') {
-    activeComponent = <LoginPage onNavigate={setView} />;
-  } else if (view === 'signup') {
-    activeComponent = <SignupPage onNavigate={setView} />;
-  } else if (view === 'onboarding') {
-    activeComponent = <FreelancerOnboarding onNavigate={setView} />;
-  } else if (view === 'dashboard') {
-    activeComponent = <FreelancerDashboard onNavigate={setView} />;
-  } else if (view === 'client-dashboard') {
-    activeComponent = <ClientWorkspace onNavigate={setView} />;
-  } else if (view === 'project-feed') {
-    activeComponent = <ProjectFeedWorkspace onNavigate={setView} />;
-  } else if (view === 'skill-match') {
-    activeComponent = <SkillMatchWorkspace onNavigate={setView} />;
-  } else if (view === 'workspace') {
-    activeComponent = (
+  const getActiveComponent = () => {
+    if (view === 'login') return <LoginPage onNavigate={setView} />;
+    if (view === 'signup') return <SignupPage onNavigate={setView} />;
+    if (view === 'onboarding') return <FreelancerOnboarding onNavigate={setView} />;
+    if (view === 'dashboard') return <FreelancerDashboard onNavigate={setView} />;
+    if (view === 'client-dashboard') return <ClientWorkspace onNavigate={setView} />;
+    if (view === 'project-feed') return <ProjectFeedWorkspace onNavigate={setView} />;
+    if (view === 'skill-match') return <SkillMatchWorkspace onNavigate={setView} />;
+    if (view === 'workspace') return (
       <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col">
         {/* Glowing background highlights */}
         <div className="pointer-events-none absolute inset-0 z-0">
@@ -89,15 +82,14 @@ function App() {
         </div>
       </div>
     );
-  } else {
-    activeComponent = <LandingPage onNavigate={setView} />;
-  }
+    return <LandingPage onNavigate={setView} />;
+  };
 
   const isDashboardView = ['dashboard', 'client-dashboard', 'project-feed', 'skill-match', 'workspace', 'onboarding'].includes(view);
 
   return (
     <div className={isDashboardView ? 'dashboard-theme text-slate-100 bg-slate-950 min-h-screen' : 'bg-slate-955 text-slate-100 min-h-screen'}>
-      {activeComponent}
+      {getActiveComponent()}
       <GlobalDemoController setView={setView} currentView={view} />
     </div>
   );
