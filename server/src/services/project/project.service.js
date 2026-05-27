@@ -27,6 +27,24 @@ export const getAllProjectsService = async () => {
     orderBy: {
       createdAt: "desc",
     },
+    include: {
+      client: {
+        select: {
+          id: true,
+          email: true,
+          profile: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      },
+      proposals: {
+        select: {
+          id: true,
+        },
+      },
+    },
   });
 
   return projects;
@@ -47,6 +65,11 @@ export const getProjectByIdService = async (
           select: {
             id: true,
             email: true,
+            profile: {
+              select: {
+                fullName: true,
+              },
+            },
           },
         },
 
@@ -56,6 +79,11 @@ export const getProjectByIdService = async (
               select: {
                 id: true,
                 email: true,
+                profile: {
+                  select: {
+                    fullName: true,
+                  },
+                },
               },
             },
           },

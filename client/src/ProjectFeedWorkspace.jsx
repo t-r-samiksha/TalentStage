@@ -1,12 +1,116 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Cpu, ArrowLeft, Search, Filter, Sparkles, CheckCircle2, Star,
   Clock, DollarSign, Calendar, Briefcase, ChevronDown, Code2,
   Globe, ArrowRight, Check, ShieldCheck, Award, ExternalLink,
-  TrendingUp, Zap, MessageSquare, Send, User
+  TrendingUp, Zap, MessageSquare, Send, User, AlertCircle
 } from 'lucide-react';
+import { projectService, dashboardService } from './api';
 
-// ─── Project Feed Data ─────────────────────────────────────────────────────
+// ─── Time Ago Helper ────────────────────────────────────────────────────────
+function timeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMins < 60) {
+    return `${diffMins || 1} minute${diffMins > 1 ? 's' : ''} ago`;
+  }
+  if (diffHours < 24) {
+    return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  }
+  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+}
+
+// ─── Dynamic Category Resolver ──────────────────────────────────────────────
+function determineCategory(title, description) {
+  const text = `${title} ${description}`.toLowerCase();
+  if (
+    text.includes('solidity') ||
+    text.includes('smart contract') ||
+    text.includes('erc-') ||
+    text.includes('eip-') ||
+    text.includes('layerzero') ||
+    text.includes('escrow') ||
+    text.includes('blockchain') ||
+    text.includes('web3') ||
+    text.includes('ethereum') ||
+    text.includes('ether') ||
+    text.includes('vyper') ||
+    text.includes('evm')
+  ) {
+    return 'Smart Contracts';
+  }
+  if (
+    text.includes('python') ||
+    text.includes('langchain') ||
+    text.includes('llm') ||
+    text.includes('ai') ||
+    text.includes('ml') ||
+    text.includes('machine learning') ||
+    text.includes('celery') ||
+    text.includes('observability') ||
+    text.includes('openai')
+  ) {
+    return 'AI / ML';
+  }
+  if (
+    text.includes('css') ||
+    text.includes('tailwind') ||
+    text.includes('storybook') ||
+    text.includes('design system') ||
+    text.includes('component library') ||
+    text.includes('radix') ||
+    text.includes('frontend') ||
+    text.includes('ui/ux') ||
+    text.includes('ui')
+  ) {
+    return 'Frontend';
+  }
+  return 'Full-Stack';
+}
+
+// ─── Dynamic Skill Extractor ───────────────────────────────────────────────
+function extractSkills(title, description) {
+  const text = `${title} ${description}`.toLowerCase();
+  const availableSkills = [
+    'Solidity', 'TypeScript', 'ERC-4337', 'Hardhat', 'Polygon zkEVM',
+    'Next.js', 'FastAPI', 'WebSockets', 'Monaco Editor', 'Redis',
+    'Python', 'LangChain', 'Docker', 'Celery', 'PostgreSQL',
+    'Rust', 'LayerZero', 'Go', 'Chainlink', 'React', 'Tailwind CSS',
+    'Radix UI', 'Storybook', 'Web3.js', 'Ethers.js', 'Node.js',
+    'Express', 'Fastify', 'MongoDB', 'GraphQL'
+  ];
+  
+  const matched = [];
+  availableSkills.forEach(skill => {
+    const escaped = skill.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+    if (regex.test(text)) {
+      matched.push(skill);
+    }
+  });
+
+  if (matched.length === 0) {
+    const category = determineCategory(title, description);
+    if (category === 'Smart Contracts') return ['Solidity', 'Hardhat', 'Web3.js'];
+    if (category === 'AI / ML') return ['Python', 'FastAPI', 'Docker'];
+    if (category === 'Frontend') return ['React', 'TypeScript', 'Tailwind CSS'];
+    return ['React', 'Node.js', 'PostgreSQL'];
+  }
+  return matched.slice(0, 5);
+}
+
+// ─── Stable Match Score Generator ──────────────────────────────────────────
+function calculateMatch(title, description) {
+  const sum = title.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return 85 + (sum % 14);
+}
+
+// ─── Project Feed Data (Fallback only) ──────────────────────────────────────
 const ALL_PROJECTS = [
   {
     id: 1,
@@ -134,46 +238,6 @@ const AI_CANDIDATE_MATCHES = [
   },
 ];
 
-// ─── Proposal Queue entries (for detail view) ──────────────────────────────
-const PROPOSALS = [
-  {
-    id: 1,
-    name: 'Dr. Evelyn Vance',
-    initials: 'EV',
-    bid: '₹1,35,000',
-    timeline: '18 days',
-    coverSnippet:
-      'I have architected five production-grade ERC-4337 bundler infrastructures for leading Web3 protocols. My approach leverages gas-optimised entry-point factories, modular paymaster strategies, and a layered TypeScript SDK that achieves 3× faster developer onboarding.',
-    aiScore: 98,
-    aiLabel: 'Clarity Fit',
-    gradient: 'from-violet-600/40 to-indigo-500/30',
-  },
-  {
-    id: 2,
-    name: 'Elena Rostova',
-    initials: 'ER',
-    bid: '₹1,28,000',
-    timeline: '21 days',
-    coverSnippet:
-      'Specialist in Solidity protocol engineering and formal verification using Certora. Delivered the Aave v3 bridge contract suite reviewed by OpenZeppelin. My SDK design pattern uses discriminated union types for zero-runtime errors at the paymaster boundary.',
-    aiScore: 95,
-    aiLabel: 'Technical Depth',
-    gradient: 'from-indigo-600/40 to-violet-500/30',
-  },
-  {
-    id: 3,
-    name: 'Arjun Patel',
-    initials: 'AP',
-    bid: '₹98,000',
-    timeline: '24 days',
-    coverSnippet:
-      'Full-stack blockchain engineer with 4 years on Polygon zkEVM tooling. Built an open-source ERC-4337 relayer service with 99.97% uptime. Comfortable leading both the Hardhat test harness design and the TypeScript public API surface alignment.',
-    aiScore: 88,
-    aiLabel: 'Budget Fit',
-    gradient: 'from-emerald-600/30 to-indigo-600/20',
-  },
-];
-
 // ─── Star Rating helper ────────────────────────────────────────────────────
 function StarRating({ rating }) {
   const full = Math.floor(rating);
@@ -232,9 +296,98 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
   const [hiring, setHiring] = useState(false);
   const [hired, setHired] = useState(null);
 
+  // Live database project states
+  const [dbProjects, setDbProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Details loader
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
+
+  // Fetch all projects on mount
+  useEffect(() => {
+    let active = true;
+    const fetchProjects = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await projectService.getProjects();
+        if (active) {
+          if (res.success) {
+            setDbProjects(res.data || []);
+          } else {
+            setError(res.error?.message || 'Failed to load projects.');
+          }
+        }
+      } catch (err) {
+        if (active) {
+          setError(err.message || 'An error occurred while fetching projects.');
+        }
+      } finally {
+        if (active) {
+          setIsLoading(false);
+        }
+      }
+    };
+    fetchProjects();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Map raw DB projects to feed project shape
+  const projects = useMemo(() => {
+    if (dbProjects.length === 0) return [];
+    return dbProjects.map((p) => {
+      const clientName = p.client?.profile?.fullName || p.client?.email || 'Anonymous Client';
+      const cat = determineCategory(p.title, p.description);
+      const sk = extractSkills(p.title, p.description);
+      const budgetVal = p.budgetMax || 0;
+      
+      let budgetRange = 'low';
+      if (budgetVal >= 150000) {
+        budgetRange = 'high';
+      } else if (budgetVal >= 80000) {
+        budgetRange = 'mid';
+      }
+
+      const createDate = new Date(p.createdAt);
+      const deadlineDate = new Date(createDate.getTime() + 14 * 24 * 60 * 60 * 1000);
+      const deadlineStr = deadlineDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      return {
+        id: p.id,
+        title: p.title,
+        client: clientName,
+        postedAgo: timeAgo(p.createdAt),
+        description: p.description,
+        skills: sk,
+        budget: `₹${budgetVal.toLocaleString('en-IN')}`,
+        budgetMinVal: p.budgetMin,
+        budgetMaxVal: p.budgetMax,
+        deadline: deadlineStr,
+        category: cat,
+        match: calculateMatch(p.title, p.description),
+        proposals: p.proposals?.length || 0,
+        budgetRange: budgetRange,
+        status: p.status
+      };
+    });
+  }, [dbProjects]);
+
   // Computed filtered feed
   const filteredProjects = useMemo(() => {
-    return ALL_PROJECTS.filter((p) => {
+    const list = projects.length > 0 ? projects : ALL_PROJECTS;
+    return list.filter((p) => {
       const q = searchQuery.toLowerCase();
       const matchesSearch =
         !q ||
@@ -245,25 +398,225 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
         filterSkill === 'all' || p.skills.some((s) => s.toLowerCase().includes(filterSkill.toLowerCase()));
       const matchesBudget = filterBudget === 'all' || p.budgetRange === filterBudget;
       const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
-      return matchesSearch && matchesSkill && matchesBudget && matchesCategory;
+      // If live projects are loaded, filter out non-OPEN projects
+      const isOpen = projects.length === 0 || p.status === 'OPEN';
+      return matchesSearch && matchesSkill && matchesBudget && matchesCategory && isOpen;
     });
-  }, [searchQuery, filterSkill, filterBudget, filterCategory]);
+  }, [projects, searchQuery, filterSkill, filterBudget, filterCategory]);
 
-  const openDetails = (project) => {
-    setSelectedProject(project);
+  // Paginated subset of filtered projects
+  const displayedProjects = useMemo(() => {
+    return filteredProjects.slice(0, page * itemsPerPage);
+  }, [filteredProjects, page]);
+
+  // Live Proposals mapper
+  const activeProposals = useMemo(() => {
+    if (!selectedProject?.proposalsList || selectedProject.proposalsList.length === 0) {
+      // Fallback mock proposals for design premiumness if no DB proposals yet
+      return [
+        {
+          id: 'mock-1',
+          name: 'Dr. Evelyn Vance',
+          initials: 'EV',
+          bid: '₹1,35,000',
+          timeline: '18 days',
+          coverSnippet: 'I have architected five production-grade ERC-4337 bundler infrastructures for leading Web3 protocols. My approach leverages gas-optimised entry-point factories, modular paymaster strategies, and a layered TypeScript SDK that achieves 3× faster developer onboarding.',
+          aiScore: 98,
+          aiLabel: 'Clarity Fit',
+          gradient: 'from-violet-600/40 to-indigo-500/30',
+          status: 'PENDING'
+        },
+        {
+          id: 'mock-2',
+          name: 'Elena Rostova',
+          initials: 'ER',
+          bid: '₹1,28,000',
+          timeline: '21 days',
+          coverSnippet: 'Specialist in Solidity protocol engineering and formal verification using Certora. Delivered the Aave v3 bridge contract suite reviewed by OpenZeppelin. My SDK design pattern uses discriminated union types for zero-runtime errors at the paymaster boundary.',
+          aiScore: 95,
+          aiLabel: 'Technical Depth',
+          gradient: 'from-indigo-600/40 to-violet-500/30',
+          status: 'PENDING'
+        },
+        {
+          id: 'mock-3',
+          name: 'Arjun Patel',
+          initials: 'AP',
+          bid: '₹98,000',
+          timeline: '24 days',
+          coverSnippet: 'Full-stack blockchain engineer with 4 years on Polygon zkEVM tooling. Built an open-source ERC-4337 relayer service with 99.97% uptime. Comfortable leading both the Hardhat test harness design and the TypeScript public API surface alignment.',
+          aiScore: 88,
+          aiLabel: 'Budget Fit',
+          gradient: 'from-emerald-600/30 to-indigo-600/20',
+          status: 'PENDING'
+        }
+      ];
+    }
+
+    return selectedProject.proposalsList.map((p, idx) => {
+      const freelancerName = p.freelancer?.profile?.fullName || p.freelancer?.email || 'Anonymous Freelancer';
+      const initials = freelancerName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'FL';
+      
+      const gradients = [
+        'from-violet-600/40 to-indigo-500/30',
+        'from-indigo-600/40 to-violet-500/30',
+        'from-emerald-600/30 to-indigo-600/20'
+      ];
+      const aiLabels = ['Clarity Fit', 'Technical Depth', 'Budget Fit'];
+      
+      return {
+        id: p.id,
+        name: freelancerName,
+        initials,
+        bid: `₹${p.bidAmount.toLocaleString('en-IN')}`,
+        timeline: `${p.timelineDays} days`,
+        coverSnippet: p.coverLetter,
+        aiScore: 82 + ((idx * 7) % 18),
+        aiLabel: aiLabels[idx % aiLabels.length],
+        gradient: gradients[idx % gradients.length],
+        status: p.status
+      };
+    });
+  }, [selectedProject]);
+
+  const openDetails = async (project) => {
+    setView('details');
+    setSelectedProject({
+      ...project,
+      proposalsList: []
+    });
     setAcceptedProposal(null);
     setHired(null);
-    setView('details');
+    setDetailsLoading(true);
+    setDetailsError(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    try {
+      const res = await projectService.getProjectDetails(project.id);
+      if (res.success) {
+        setSelectedProject((prev) => {
+          if (!prev || prev.id !== project.id) return prev;
+          return {
+            ...prev,
+            proposalsList: res.data?.proposals || []
+          };
+        });
+      } else {
+        setDetailsError(res.error?.message || 'Failed to load project details.');
+      }
+    } catch (err) {
+      setDetailsError(err.message || 'An error occurred.');
+    } finally {
+      setDetailsLoading(false);
+    }
   };
 
-  const handleSubmitProposal = (projectId) => {
+  const handleSubmitProposal = async (projectId) => {
     setSubmitting(projectId);
-    setTimeout(() => {
+    
+    // Save previous state for rollback if needed
+    const previousDbProjects = [...dbProjects];
+    const previousSelectedProject = selectedProject ? { ...selectedProject } : null;
+
+    // Optimistically update the project feed counts
+    setDbProjects((prev) => 
+      prev.map((p) => {
+        if (p.id === projectId) {
+          return {
+            ...p,
+            proposals: [...(p.proposals || []), { id: 'optimistic-temp-id' }]
+          };
+        }
+        return p;
+      })
+    );
+
+    // Optimistically update the detail view bids list if currently opened
+    if (selectedProject && selectedProject.id === projectId) {
+      setSelectedProject((prev) => {
+        if (!prev) return prev;
+        const tempProposal = {
+          id: 'optimistic-temp-id',
+          projectId,
+          freelancerId: 'my-freelancer-id',
+          coverLetter: `I am interested in working on "${prev.title || 'this project'}". I have verified skills in the required stack and can start immediately.`,
+          bidAmount: Math.floor((prev.budgetMinVal + prev.budgetMaxVal) / 2) || 10000,
+          timelineDays: 14,
+          status: 'PENDING',
+          freelancer: {
+            id: 'my-freelancer-id',
+            email: 'me@freelancer.com',
+            profile: {
+              fullName: 'Me (Optimistic Attestation)'
+            }
+          }
+        };
+        return {
+          ...prev,
+          proposalsList: [...(prev.proposalsList || []), tempProposal],
+          proposals: (prev.proposals || 0) + 1
+        };
+      });
+    }
+
+    try {
+      const project = (projects.length > 0 ? projects : ALL_PROJECTS).find(p => p.id === projectId);
+      const budgetMin = project ? project.budgetMinVal : 10000;
+      const budgetMax = project ? project.budgetMaxVal : 30000;
+      const bidAmount = Math.floor((budgetMin + budgetMax) / 2) || 10000;
+
+      const res = await projectService.submitProposal({
+        projectId,
+        coverLetter: `I am interested in working on "${project?.title || 'this project'}". I have verified skills in the required stack and can start immediately.`,
+        bidAmount,
+        timelineDays: 14
+      });
+
+      if (res.success) {
+        setSubmitted(projectId);
+        setTimeout(() => setSubmitted(null), 3000);
+
+        // Re-fetch project details to sync the actual database record
+        if (view === 'details' && selectedProject?.id === projectId) {
+          const detailRes = await projectService.getProjectDetails(projectId);
+          if (detailRes.success) {
+            setSelectedProject((prev) => {
+              if (!prev || prev.id !== projectId) return prev;
+              return {
+                ...prev,
+                proposalsList: detailRes.data?.proposals || [],
+                proposals: detailRes.data?.proposals?.length || prev.proposals
+              };
+            });
+            setDbProjects((prev) =>
+              prev.map((p) => (p.id === projectId ? detailRes.data : p))
+            );
+          }
+        } else {
+          // If in feed view, refresh projects list to replace optimistic token
+          const refreshRes = await projectService.getProjects();
+          if (refreshRes.success) {
+            setDbProjects(refreshRes.data || []);
+          }
+        }
+      } else {
+        // Rollback
+        setDbProjects(previousDbProjects);
+        if (previousSelectedProject) {
+          setSelectedProject(previousSelectedProject);
+        }
+        alert(res.error?.message || 'Failed to submit proposal. Note: Only accounts with the FREELANCER role can submit proposals.');
+      }
+    } catch (err) {
+      // Rollback
+      setDbProjects(previousDbProjects);
+      if (previousSelectedProject) {
+        setSelectedProject(previousSelectedProject);
+      }
+      alert(err.message || 'An error occurred while submitting proposal.');
+    } finally {
       setSubmitting(null);
-      setSubmitted(projectId);
-      setTimeout(() => setSubmitted(null), 3000);
-    }, 1400);
+    }
   };
 
   const handleHire = (candidate) => {
@@ -274,8 +627,22 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
     }, 1200);
   };
 
-  const handleAcceptProposal = (proposalId) => {
-    setAcceptedProposal(proposalId);
+  const handleAcceptProposal = async (proposalId) => {
+    if (typeof proposalId === 'string' && proposalId.startsWith('mock-')) {
+      setAcceptedProposal(proposalId);
+      return;
+    }
+
+    try {
+      const res = await dashboardService.hireFreelancer({ proposalId });
+      if (res.success) {
+        setAcceptedProposal(proposalId);
+      } else {
+        alert(res.error?.message || 'Failed to hire freelancer.');
+      }
+    } catch (err) {
+      alert(err.message || 'An error occurred while hiring.');
+    }
   };
 
   return (
@@ -460,7 +827,24 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
             </div>
 
             {/* ── Project Card Grid ── */}
-            {filteredProjects.length === 0 ? (
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+                <p className="text-xs font-bold text-slate-500 tracking-wider uppercase">Loading Open Contracts...</p>
+              </div>
+            ) : error ? (
+              <div className="text-center py-24 space-y-4 border border-red-500/20 bg-red-950/10 rounded-2xl max-w-xl mx-auto">
+                <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
+                <p className="text-sm font-bold text-red-400">Failed to Load Contracts</p>
+                <p className="text-xs text-slate-500 px-6">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="py-2 px-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-xs font-bold text-red-300 border border-red-500/30 transition-all cursor-pointer"
+                >
+                  Retry Connection
+                </button>
+              </div>
+            ) : filteredProjects.length === 0 ? (
               <div className="text-center py-24 space-y-3">
                 <Search className="w-10 h-10 text-slate-700 mx-auto" />
                 <p className="text-sm font-bold text-slate-500">No contracts match your active filters.</p>
@@ -468,7 +852,7 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
               </div>
             ) : (
               <div className="space-y-5">
-                {filteredProjects.map((project) => (
+                {displayedProjects.map((project) => (
                   <div
                     key={project.id}
                     className="
@@ -587,6 +971,20 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                     </div>
                   </div>
                 ))}
+                {filteredProjects.length > displayedProjects.length && (
+                  <div className="flex justify-center pt-6">
+                    <button
+                      onClick={() => setPage(prev => prev + 1)}
+                      className="
+                        py-2.5 px-6 rounded-xl border border-slate-800 text-xs font-bold text-slate-400
+                        hover:bg-slate-900 hover:text-white hover:border-slate-700
+                        active:scale-[0.98] transition-all duration-200 cursor-pointer select-none
+                      "
+                    >
+                      Load More Projects
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -867,14 +1265,21 @@ export default function ProjectFeedWorkspace({ onNavigate }) {
                   </h3>
                   <p className="text-[10px] text-slate-600 mt-0.5">AI-ranked by bid optimality, clarity score, and technical depth.</p>
                 </div>
-                <span className="text-[9px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full bg-violet-600/10 border border-violet-500/20 text-violet-400 select-none">
-                  {PROPOSALS.length} Bids Received
-                </span>
+                {detailsLoading ? (
+                  <span className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-widest animate-pulse">
+                    <span className="w-2.5 h-2.5 rounded-full border border-slate-600 border-t-slate-400 animate-spin" />
+                    Syncing Bids...
+                  </span>
+                ) : (
+                  <span className="text-[9px] font-extrabold uppercase tracking-wide px-2.5 py-1 rounded-full bg-violet-600/10 border border-violet-500/20 text-violet-400 select-none">
+                    {activeProposals.length} Bids Received
+                  </span>
+                )}
               </div>
 
               <div className="space-y-5">
-                {PROPOSALS.map((proposal, idx) => {
-                  const isAccepted = acceptedProposal === proposal.id;
+                {activeProposals.map((proposal, idx) => {
+                  const isAccepted = acceptedProposal === proposal.id || proposal.status === 'ACCEPTED';
                   return (
                     <div
                       key={proposal.id}

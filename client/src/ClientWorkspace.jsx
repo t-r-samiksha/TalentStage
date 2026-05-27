@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   Clock, Globe, Code2, LogOut, LayoutDashboard, Plus,
@@ -7,7 +7,7 @@ import {
   TrendingUp, AlertCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
-import { authService } from './api';
+import { authService, dashboardService, projectService } from './api';
 
 function ClientWorkspace({ onNavigate }) {
   // Navigation state between view 1 ('dashboard') and view 2 ('post-project')
@@ -32,36 +32,72 @@ function ClientWorkspace({ onNavigate }) {
   const [aiBriefGenerated, setAiBriefGenerated] = useState(false);
   const [generatingBrief, setGeneratingBrief] = useState(false);
 
-  // ─── Active Client Projects Registry ───────────────────────────────────────
-  const [clientProjects, setClientProjects] = useState([
-    {
-      id: 1,
-      title: 'EVM Smart Contract Escrow Audit',
-      budget: '₹1,20,000',
-      deadline: 'June 15, 2026',
-      skills: ['Solidity', 'Hardhat', 'Auditing'],
-      proposals: 18,
-      status: 'Active'
-    },
-    {
-      id: 2,
-      title: 'Cross-chain Liquidity Staking Bridge',
-      budget: '₹95,000',
-      deadline: 'June 28, 2026',
-      skills: ['Rust', 'Go', 'Web3.js'],
-      proposals: 24,
-      status: 'Active'
-    },
-    {
-      id: 3,
-      title: 'Next.js Multi-Tenant SaaS Interface',
-      budget: '₹65,000',
-      deadline: 'July 02, 2026',
-      skills: ['Next.js', 'TypeScript', 'Tailwind CSS'],
-      proposals: 9,
-      status: 'Under Review'
-    }
-  ]);
+  // ─── Real database-backed states ───────────────────────────────────────────
+  const [profile, setProfile] = useState(null);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [clientProjects, setClientProjects] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      setError('');
+      
+      const [profileResult, dashboardResult] = await Promise.all([
+        authService.getProfile(),
+        dashboardService.getClientDashboard()
+      ]);
+      
+      if (!active) return;
+      setIsLoading(false);
+      
+      if (profileResult.success && dashboardResult.success) {
+        setProfile(profileResult.data);
+        setDashboardData(dashboardResult.data);
+        
+        // Map database projects to clientProjects state
+        const mapped = (dashboardResult.data?.projects || []).map(p => ({
+          id: p.id,
+          title: p.title,
+          budget: `₹${p.budgetMin.toLocaleString('en-IN')} - ₹${p.budgetMax.toLocaleString('en-IN')}`,
+          deadline: new Date(p.createdAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          }),
+          skills: ['Solidity', 'Hardhat', 'Web3.js'],
+          proposals: p.proposals?.length || 0,
+          status: p.status === 'OPEN' ? 'Active' : p.status === 'IN_PROGRESS' ? 'In Progress' : p.status
+        }));
+        setClientProjects(mapped);
+      } else {
+        setError('Failed to fetch client workspace data. Please try again later.');
+      }
+    };
+    
+    fetchDashboardData();
+    return () => { active = false; };
+  }, []);
+
+  const totalBudget = useMemo(() => {
+    if (!dashboardData?.projects) return 0;
+    return dashboardData.projects.reduce((acc, p) => acc + (p.budgetMax || 0), 0);
+  }, [dashboardData]);
+
+  const totalProposalsCount = useMemo(() => {
+    if (!dashboardData?.projects) return 0;
+    return dashboardData.projects.reduce((acc, p) => acc + (p.proposals?.length || 0), 0);
+  }, [dashboardData]);
+
+  const pendingMilestonesCount = useMemo(() => {
+    if (!dashboardData?.contracts) return 0;
+    return dashboardData.contracts.reduce((acc, c) => {
+      const submitted = c.milestones?.filter(m => m.status === 'SUBMITTED') || [];
+      return acc + submitted.length;
+    }, 0);
+  }, [dashboardData]);
 
   // Simulated dynamic dates
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -109,7 +145,7 @@ function ClientWorkspace({ onNavigate }) {
     }, 1200);
   };
 
-  const handlePostProject = (e) => {
+  const handlePostProject = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -131,19 +167,21 @@ function ClientWorkspace({ onNavigate }) {
     }
 
     setIsPosting(true);
-    setTimeout(() => {
-      setIsPosting(false);
-      
-      const formatCurrency = (val) => {
-        const num = parseFloat(val);
-        return isNaN(num) ? '₹50,000' : '₹' + num.toLocaleString('en-IN');
-      };
+    const result = await projectService.createProject({
+      title: title.trim(),
+      description: description.trim(),
+      budgetMin: parseInt(budgetMin, 10),
+      budgetMax: parseInt(budgetMax, 10)
+    });
+    setIsPosting(false);
 
-      const newListing = {
-        id: Date.now(),
-        title: title.trim(),
-        budget: `${formatCurrency(budgetMin)} - ${formatCurrency(budgetMax)}`,
-        deadline: new Date(deadline).toLocaleDateString('en-US', {
+    if (result.success) {
+      const newProj = result.data;
+      const formattedNewProj = {
+        id: newProj.id,
+        title: newProj.title,
+        budget: `₹${newProj.budgetMin.toLocaleString('en-IN')} - ₹${newProj.budgetMax.toLocaleString('en-IN')}`,
+        deadline: new Date(newProj.createdAt).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
           year: 'numeric'
@@ -153,7 +191,18 @@ function ClientWorkspace({ onNavigate }) {
         status: 'Active'
       };
 
-      setClientProjects([newListing, ...clientProjects]);
+      setClientProjects(prev => [formattedNewProj, ...prev]);
+      
+      // Update dashboardData projects as well
+      setDashboardData(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          projects: [newProj, ...(prev.projects || [])],
+          totalProjects: (prev.totalProjects || 0) + 1
+        };
+      });
+
       setShowPostSuccess(true);
 
       setTimeout(() => {
@@ -168,8 +217,49 @@ function ClientWorkspace({ onNavigate }) {
         // Navigate back to listings
         setActiveTab('dashboard');
       }, 2000);
-    }, 1500);
+    } else {
+      setFormError(result.error?.response?.data?.message || result.error?.message || 'Failed to create project listing.');
+    }
   };
+
+  // Loading Screen Layout
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-700/5 blur-[120px] animate-pulse-glow" />
+        </div>
+        <div className="text-center relative z-10 space-y-4 select-none">
+          <div className="w-10 h-10 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin mx-auto" />
+          <p className="text-xs font-mono text-slate-500 uppercase tracking-widest">Configuring Client Workspace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error Screen Layout
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-rose-700/5 blur-[120px] animate-pulse-glow" />
+        </div>
+        <div className="text-center relative z-10 space-y-4 max-w-md px-6 select-none">
+          <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto animate-pulse">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Sync Error</h3>
+          <p className="text-xs text-slate-400 leading-relaxed">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition-all cursor-pointer"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans flex relative overflow-hidden select-none">
@@ -308,16 +398,16 @@ function ClientWorkspace({ onNavigate }) {
           <div className="flex items-center gap-3 px-1.5">
             <div className="relative w-8 h-8 rounded-full border border-indigo-500/30 overflow-hidden bg-slate-950 shrink-0">
               <div className="w-full h-full bg-gradient-to-tr from-indigo-600/40 to-violet-500/30 flex items-center justify-center text-xs font-bold text-indigo-300">
-                P
+                {(profile?.profile?.fullName || 'Client').charAt(0).toUpperCase()}
               </div>
               <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-slate-900" />
             </div>
             <div className="flex-1 min-w-0">
               <h4 className="text-[11px] font-bold text-white tracking-tight leading-none truncate">
-                Prisha Iyer
+                {profile?.profile?.fullName || 'Client Profile'}
               </h4>
               <p className="text-[9.5px] font-medium text-slate-500 mt-1 truncate">
-                prisha.iyer@consensys.net
+                {profile?.email || 'client@talentstage.dev'}
               </p>
             </div>
           </div>
@@ -341,12 +431,12 @@ function ClientWorkspace({ onNavigate }) {
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-900 pb-6 select-none">
           <div>
             <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
-              {activeTab === 'dashboard' ? 'Client Workspace' : 'Post New Contract'}
+              {activeTab === 'dashboard' ? `Welcome back, ${profile?.profile?.fullName || 'Client'}` : 'Post New Contract'}
               <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
             </h1>
             <p className="text-xs text-slate-500 mt-1 leading-normal">
               {activeTab === 'dashboard'
-                ? 'Review bid proposals, secure contract escrows, and verify attested deliverables.'
+                ? `Review bid proposals, secure contract escrows, and verify deliverables for ${dashboardData?.totalProjects || 0} project listings.`
                 : 'Configure project parameters. Our AI diagnostics will evaluate budget optimization in real-time.'
               }
             </p>
@@ -373,7 +463,9 @@ function ClientWorkspace({ onNavigate }) {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">3 Active</h3>
+                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                      {dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length || 0} Active
+                    </h3>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm relative">
                     <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
@@ -382,7 +474,7 @@ function ClientWorkspace({ onNavigate }) {
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-1.5">
-                  <span className="text-[9.5px] text-slate-500 font-medium">All escrows fully funded</span>
+                  <span className="text-[9.5px] text-slate-500 font-medium">Escrow contracts active</span>
                 </div>
               </div>
 
@@ -391,7 +483,7 @@ function ClientWorkspace({ onNavigate }) {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Budget</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹2,80,000</h3>
+                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹{totalBudget.toLocaleString('en-IN')}</h3>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shadow-sm">
                     <DollarSign className="w-4 h-4" />
@@ -399,7 +491,7 @@ function ClientWorkspace({ onNavigate }) {
                 </div>
                 <div className="mt-3 flex items-center">
                   <span className="text-[9.5px] text-indigo-400/90 font-extrabold uppercase tracking-wider select-none">
-                    Allocated to Escrow Ledger
+                    Allocated to Listings
                   </span>
                 </div>
               </div>
@@ -409,7 +501,7 @@ function ClientWorkspace({ onNavigate }) {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Matches</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">42 Top Fits</h3>
+                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">{totalProposalsCount} Proposals</h3>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 shadow-sm">
                     <Sparkles className="w-4 h-4" />
@@ -417,7 +509,7 @@ function ClientWorkspace({ onNavigate }) {
                 </div>
                 <div className="mt-3 flex items-center">
                   <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-violet-600/20 to-indigo-600/20 border border-violet-500/30 text-[8.5px] font-bold text-violet-300 uppercase tracking-wider shadow-sm">
-                    94% Average Match Rate
+                    Active proposals count
                   </span>
                 </div>
               </div>
@@ -427,7 +519,9 @@ function ClientWorkspace({ onNavigate }) {
                 <div className="flex justify-between items-start">
                   <div>
                     <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Pending Payments</span>
-                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">1 Milestone</h3>
+                    <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                      {pendingMilestonesCount} Milestone{pendingMilestonesCount !== 1 ? 's' : ''}
+                    </h3>
                   </div>
                   <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -458,66 +552,73 @@ function ClientWorkspace({ onNavigate }) {
 
               {/* Grid of Listings */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {clientProjects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="
-                      relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl shadow-lg
-                      hover:translate-y-[-4px] hover:border-indigo-500/40 hover:shadow-[0_4px_25px_-5px_rgba(99,102,241,0.15)]
-                      transition-all duration-300 group cursor-pointer
-                    "
-                  >
-                    {/* Header line & status */}
-                    <div className="flex justify-between items-start mb-3 select-none">
-                      <span className="text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
-                        {project.status}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {project.deadline}
-                      </span>
-                    </div>
-
-                    {/* Title & Budget */}
-                    <div className="space-y-2 mb-4">
-                      <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
-                        {project.title}
-                      </h4>
-                      <div className="text-indigo-400 font-extrabold text-sm tracking-tight flex items-center gap-1 select-none">
-                        <DollarSign className="w-3.5 h-3.5" />
-                        <span>{project.budget}</span>
-                      </div>
-                    </div>
-
-                    {/* Skill Tags */}
-                    <div className="flex flex-wrap gap-1.5 mb-5 select-none">
-                      {project.skills.map((skill) => (
-                        <span 
-                          key={skill} 
-                          className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Action & Proposal count footer */}
-                    <div className="pt-4 border-t border-slate-900 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-1.5 select-none">
-                        <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-sm">
-                          {project.proposals}
-                        </span>
-                        <span className="text-[10px] font-semibold text-slate-500">Proposals received</span>
-                      </div>
-                      
-                      <button className="py-1.5 px-3 rounded-lg border border-slate-800 text-[10.5px] font-bold text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-950 transition-all flex items-center gap-1 cursor-pointer">
-                        <span>Details</span>
-                        <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </button>
-                    </div>
-
+                {!clientProjects.length ? (
+                  <div className="col-span-full py-12 text-center rounded-2xl border border-dashed border-slate-800/80 bg-slate-900/10 backdrop-blur-xl">
+                    <Briefcase className="w-8 h-8 text-slate-600 mx-auto mb-3" />
+                    <p className="text-xs text-slate-400">No projects posted yet. Click "Post New Project" to get started!</p>
                   </div>
-                ))}
+                ) : (
+                  clientProjects.map((project) => (
+                    <div
+                      key={project.id}
+                      className="
+                        relative overflow-hidden flex flex-col justify-between p-5 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl shadow-lg
+                        hover:translate-y-[-4px] hover:border-indigo-500/40 hover:shadow-[0_4px_25px_-5px_rgba(99,102,241,0.15)]
+                        transition-all duration-300 group cursor-pointer
+                      "
+                    >
+                      {/* Header line & status */}
+                      <div className="flex justify-between items-start mb-3 select-none">
+                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded bg-indigo-950/60 border border-indigo-900/50 text-indigo-400">
+                          {project.status}
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-500 flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {project.deadline}
+                        </span>
+                      </div>
+
+                      {/* Title & Budget */}
+                      <div className="space-y-2 mb-4">
+                        <h4 className="text-sm font-bold text-white group-hover:text-indigo-400 transition-colors leading-snug line-clamp-2">
+                          {project.title}
+                        </h4>
+                        <div className="text-indigo-400 font-extrabold text-sm tracking-tight flex items-center gap-1 select-none">
+                          <DollarSign className="w-3.5 h-3.5" />
+                          <span>{project.budget}</span>
+                        </div>
+                      </div>
+
+                      {/* Skill Tags */}
+                      <div className="flex flex-wrap gap-1.5 mb-5 select-none">
+                        {project.skills.map((skill) => (
+                          <span 
+                            key={skill} 
+                            className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-850 text-slate-400"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Action & Proposal count footer */}
+                      <div className="pt-4 border-t border-slate-900 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-1.5 select-none">
+                          <span className="w-5 h-5 rounded-md bg-indigo-950/60 border border-indigo-900/40 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-sm">
+                            {project.proposals}
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-500">Proposals received</span>
+                        </div>
+                        
+                        <button className="py-1.5 px-3 rounded-lg border border-slate-800 text-[10.5px] font-bold text-slate-300 hover:text-white hover:border-slate-700 hover:bg-slate-950 transition-all flex items-center gap-1 cursor-pointer">
+                          <span>Details</span>
+                          <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                        </button>
+                      </div>
+
+                    </div>
+                  ))
+                )}
               </div>
             </section>
 
