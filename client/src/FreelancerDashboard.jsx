@@ -1,15 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Cpu, Briefcase, Sparkles, TrendingUp, DollarSign, CheckCircle2,
   Clock, Globe, Code2, LogOut, LayoutDashboard, FolderGit2,
   ShieldCheck, Send, MessageSquare, User, Calendar, Plus,
-  ChevronRight, ArrowUpRight, Award, HelpCircle
+  ChevronRight, ArrowUpRight, Award, HelpCircle, AlertCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
+import { authService, dashboardService, projectService } from './api';
 
 function FreelancerDashboard({ onNavigate }) {
-  // Active state for sidebar navigation simulation
+  // Navigation tabs state
   const [activeTab, setActiveTab] = useState('dashboard');
+  
+  // Real database-backed states
+  const [profile, setProfile] = useState(null);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  
+  // Live proposals tab state
+  const [proposals, setProposals] = useState([]);
+  const [proposalsLoading, setProposalsLoading] = useState(false);
+  const [proposalsError, setProposalsError] = useState('');
   
   // Simulated dynamic dates
   const currentDate = new Date().toLocaleDateString('en-US', {
@@ -19,77 +31,152 @@ function FreelancerDashboard({ onNavigate }) {
     day: 'numeric'
   });
 
-  // Recent Projects List
-  const recentProjects = [
-    {
-      id: 1,
-      name: 'EVM Smart Escrow Audit',
-      client: 'ConsenSys Ventures',
-      status: 'In Progress',
-      payment: '₹18,000',
-      deadline: 'June 05, 2026'
-    },
-    {
-      id: 2,
-      name: 'DeFi Staking Pool Contracts',
-      client: 'Aave Labs',
-      status: 'Under Review',
-      payment: '₹22,000',
-      deadline: 'June 18, 2026'
-    },
-    {
-      id: 3,
-      name: 'React Dashboard UI Kit',
-      client: 'TalentStage LLC',
-      status: 'In Progress',
-      payment: '₹14,500',
-      deadline: 'May 30, 2026'
-    },
-    {
-      id: 4,
-      name: 'Solidity Token Vesting Hub',
-      client: 'Polygon Guild',
-      status: 'Completed',
-      payment: '₹12,000',
-      deadline: 'Completed'
-    }
-  ];
+  useEffect(() => {
+    let active = true;
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      setError('');
+      
+      const [profileResult, dashboardResult] = await Promise.all([
+        authService.getProfile(),
+        dashboardService.getFreelancerDashboard()
+      ]);
+      
+      if (!active) return;
+      setIsLoading(false);
+      
+      if (profileResult.success && dashboardResult.success) {
+        setProfile(profileResult.data);
+        setDashboardData(dashboardResult.data);
+      } else {
+        setError('Failed to fetch dashboard data. Please try again later.');
+      }
+    };
+    
+    fetchDashboardData();
+    return () => { active = false; };
+  }, []);
 
-  // Recent Proposals List
-  const recentProposals = [
-    {
-      id: 1,
-      project: 'EIP-4337 Account Abstraction Wallet',
-      bid: '₹35,000',
-      timeline: '14 Days',
-      score: 98,
-      aiOptimized: true
-    },
-    {
-      id: 2,
-      project: 'Cross-chain Liquidity Bridge Protocol',
-      bid: '₹48,000',
-      timeline: '20 Days',
-      score: 95,
-      aiOptimized: true
-    },
-    {
-      id: 3,
-      project: 'Next.js Multi-Tenant SaaS Platform',
-      bid: '₹28,000',
-      timeline: '10 Days',
-      score: 92,
-      aiOptimized: true
-    },
-    {
-      id: 4,
-      project: 'Metamask Flask Extension Plugin',
-      bid: '₹18,000',
-      timeline: '7 Days',
-      score: 87,
-      aiOptimized: false
+  // Fetch proposals when proposals tab is active
+  useEffect(() => {
+    if (activeTab !== 'proposals') return;
+    
+    let active = true;
+    const fetchProposals = async () => {
+      setProposalsLoading(true);
+      setProposalsError('');
+      try {
+        const res = await projectService.getMyProposals();
+        if (active) {
+          if (res.success) {
+            setProposals(res.data || []);
+          } else {
+            setProposalsError(res.error?.message || 'Failed to fetch proposals.');
+          }
+        }
+      } catch (err) {
+        if (active) {
+          setProposalsError(err.message || 'An error occurred while loading proposals.');
+        }
+      } finally {
+        if (active) {
+          setProposalsLoading(false);
+        }
+      }
+    };
+    fetchProposals();
+    return () => { active = false; };
+  }, [activeTab]);
+
+  // Dynamic Competency Radar Chart mapper
+  const radarData = useMemo(() => {
+    const defaultSkills = [
+      { name: 'React Architecture', score: 95 },
+      { name: 'TypeScript', score: 88 },
+      { name: 'Node / Web3.js', score: 78 },
+      { name: 'Communication', score: 90 }
+    ];
+
+    if (!profile?.userSkills?.length) return defaultSkills;
+
+    // Map database userSkills
+    const dbSkills = profile.userSkills.map(us => ({
+      name: us.skill.name.toUpperCase(),
+      score: us.score || 75
+    }));
+
+    // Pad with defaults if less than 4 skills
+    const result = [...dbSkills];
+    while (result.length < 4) {
+      const missingIndex = result.length;
+      result.push(defaultSkills[missingIndex]);
     }
-  ];
+
+    return result.slice(0, 4); // Keep exactly 4 for the 4-axis diamond
+  }, [profile]);
+
+  const pointsString = useMemo(() => {
+    return `170,${150 - radarData[0].score} ${170 + radarData[1].score},150 170,${150 + radarData[2].score} ${170 - radarData[3].score},150`;
+  }, [radarData]);
+
+  const getSkillTier = (score) => {
+    if (score >= 90) return 'Expert';
+    if (score >= 80) return 'Master';
+    if (score >= 70) return 'Advanced';
+    return 'Intermediate';
+  };
+
+  const avgSkillScore = useMemo(() => {
+    if (!profile?.userSkills?.length) return 92;
+    const scores = profile.userSkills.filter(s => s.score).map(s => s.score);
+    return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 92;
+  }, [profile]);
+
+  const activeEscrowAmount = useMemo(() => {
+    if (!dashboardData?.contracts) return 0;
+    return dashboardData.contracts
+      .filter(c => c.status === 'ACTIVE')
+      .reduce((acc, c) => acc + (c.project?.budgetMax || 0), 0);
+  }, [dashboardData]);
+
+  // Loading Screen Layout
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-indigo-700/5 blur-[120px] animate-pulse-glow" />
+        </div>
+        <div className="text-center relative z-10 space-y-4 select-none">
+          <div className="w-10 h-10 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 animate-spin mx-auto" />
+          <p className="text-xs font-mono text-slate-500 uppercase tracking-widest">Configuring Core Attestations...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error Screen Layout
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-80px] right-[-60px] w-[500px] h-[500px] rounded-full bg-rose-700/5 blur-[120px] animate-pulse-glow" />
+        </div>
+        <div className="text-center relative z-10 space-y-4 max-w-md px-6 select-none">
+          <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mx-auto animate-pulse">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="text-sm font-bold text-white uppercase tracking-wider">Sync Error</h3>
+          <p className="text-xs text-slate-400 leading-relaxed">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:text-white hover:border-slate-700 transition-all cursor-pointer"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex relative overflow-hidden select-none">
@@ -256,25 +343,25 @@ function FreelancerDashboard({ onNavigate }) {
         {/* Bottom Profile / Logout */}
         <div className="space-y-4 pt-4 border-t border-slate-200">
           <div className="flex items-center gap-3 px-1.5">
-            <div className="relative w-8 h-8 rounded-full border border-violet-300 overflow-hidden bg-violet-50 shrink-0">
-              <div className="w-full h-full bg-gradient-to-tr from-violet-600/30 to-indigo-500/20 flex items-center justify-center text-xs font-bold text-violet-600">
-                A
+            <div className="relative w-8 h-8 rounded-full border border-violet-500/30 overflow-hidden bg-slate-950 shrink-0">
+              <div className="w-full h-full bg-gradient-to-tr from-violet-600/40 to-indigo-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
+                {(profile?.profile?.fullName || 'Developer').charAt(0).toUpperCase()}
               </div>
               <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-emerald-500 border border-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="text-sm font-bold text-slate-800 leading-none truncate">
-                Ananya Sharma
+              <h4 className="text-[11px] font-bold text-white tracking-tight leading-none truncate">
+                {profile?.profile?.fullName || 'Developer Profile'}
               </h4>
-              <p className="text-xs font-medium text-slate-500 mt-1 truncate">
-                ananya@talentstage.dev
+              <p className="text-[9.5px] font-medium text-slate-500 mt-1 truncate">
+                {profile?.email || 'developer@talentstage.dev'}
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigate('landing')}
-            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-rose-500 hover:bg-rose-50 transition-all cursor-pointer"
+            onClick={() => authService.logout()}
+            className="w-full flex items-center gap-3 py-2 px-3 rounded-xl text-[10px] font-bold text-slate-500 hover:text-rose-400 hover:bg-rose-500/5 transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Logout Account</span>
@@ -288,17 +375,17 @@ function FreelancerDashboard({ onNavigate }) {
       <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8 bg-slate-50">
         
         {/* ── CONDITIONAL TABS RENDER ── */}
-        {(activeTab === 'dashboard' || activeTab === 'portfolio' || activeTab === 'proposals' || activeTab === 'profile') && <>
+        {(activeTab === 'dashboard' || activeTab === 'portfolio' || activeTab === 'profile') && <>
           
             {/* Workspace Top Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6 select-none">
           <div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2">
-              Welcome back, Ananya
-              <Sparkles className="w-6 h-6 text-indigo-500 animate-pulse" />
+            <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              Welcome back, {profile?.profile?.fullName || 'Developer'}
+              <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
             </h1>
-            <p className="text-sm text-slate-500 mt-1 leading-normal font-medium">
-              Escrow ledger checked. You have <span className="text-indigo-600 font-bold">2 project reviews</span> pending audit compliance.
+            <p className="text-xs text-slate-500 mt-1 leading-normal">
+              Escrow ledger checked. You have <span className="text-indigo-400 font-bold">{dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length || 0} active contract{dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length !== 1 ? 's' : ''}</span> in database.
             </p>
           </div>
 
@@ -318,18 +405,18 @@ function FreelancerDashboard({ onNavigate }) {
           <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-indigo-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Total Earnings</span>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">₹45,000</h3>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Total Earnings</span>
+                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">₹{(profile?.freelancerProfile?.totalEarned || 0).toLocaleString('en-IN')}</h3>
               </div>
               <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-sm">
                 <DollarSign className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <span className="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-600">
-                +12%
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400">
+                Active Rating: {profile?.freelancerProfile?.rating || 0}★
               </span>
-              <span className="text-sm text-slate-500 font-medium">this calendar month</span>
+              <span className="text-[9.5px] text-slate-500 font-medium">overall score tier</span>
             </div>
           </div>
 
@@ -337,16 +424,18 @@ function FreelancerDashboard({ onNavigate }) {
           <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-indigo-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Active Projects</span>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">4</h3>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Active Projects</span>
+                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                  {dashboardData?.contracts?.filter(c => c.status === 'ACTIVE').length || 0}
+                </h3>
               </div>
               <div className="w-9 h-9 rounded-lg bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm">
                 <Briefcase className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-              <span className="text-sm text-slate-500 font-medium">2 pending audit review</span>
+              <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+              <span className="text-[9.5px] text-slate-500 font-medium">{dashboardData?.totalContracts || 0} contracts loaded</span>
             </div>
           </div>
 
@@ -354,8 +443,8 @@ function FreelancerDashboard({ onNavigate }) {
           <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-violet-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-violet-600">AI Match Rating</span>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">92%</h3>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">AI Match Rating</span>
+                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">{avgSkillScore}%</h3>
               </div>
               <div className="w-9 h-9 rounded-lg bg-violet-50 border border-violet-200 flex items-center justify-center text-violet-600 shadow-sm">
                 <Sparkles className="w-5 h-5" />
@@ -372,16 +461,18 @@ function FreelancerDashboard({ onNavigate }) {
           <div className="relative rounded-2xl overflow-hidden bg-white border border-slate-200 p-5 shadow-sm flex flex-col justify-between min-h-[110px] group hover:border-fuchsia-200 hover:shadow-md transition-all duration-200">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-xs font-extrabold uppercase tracking-wider text-fuchsia-600">Verified Skills</span>
-                <h3 className="text-4xl font-black text-slate-900 tracking-tight mt-2">6</h3>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-slate-500">Verified Skills</span>
+                <h3 className="text-2xl font-black text-white tracking-tight mt-1.5">
+                  {profile?.userSkills?.length || 0}
+                </h3>
               </div>
               <div className="w-9 h-9 rounded-lg bg-fuchsia-50 border border-fuchsia-200 flex items-center justify-center text-fuchsia-600 shadow-sm">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5">
-              <Award className="w-4 h-4 text-fuchsia-600" />
-              <span className="text-xs font-extrabold uppercase tracking-wide text-fuchsia-600">Top 5% Tier Developer</span>
+              <Award className="w-3.5 h-3.5 text-fuchsia-400" />
+              <span className="text-[9.5px] text-slate-500 font-extrabold uppercase tracking-wide text-fuchsia-400">Attested Competencies</span>
             </div>
           </div>
 
@@ -470,12 +561,8 @@ function FreelancerDashboard({ onNavigate }) {
                 <text x="175" y="55" className="fill-slate-400 text-xs font-bold select-none">100%</text>
 
                 {/* ── SKILLS OVERLAY POLYGON ── */}
-                {/* React: 95% -> (170, 150 - 95) = (170, 55) */}
-                {/* TypeScript: 88% -> (170 + 88, 150) = (258, 150) */}
-                {/* Node.js: 78% -> (170, 150 + 78) = (170, 228) */}
-                {/* Communication: 90% -> (170 - 90, 150) = (80, 150) */}
                 <polygon 
-                  points="170,55 258,150 170,228 80,150" 
+                  points={pointsString} 
                   fill="url(#indigoGrad)" 
                   stroke="#818cf8" 
                   strokeWidth="2.5" 
@@ -483,42 +570,42 @@ function FreelancerDashboard({ onNavigate }) {
                 />
 
                 {/* Skill Level Node Circles */}
-                <circle cx="170" cy="55" r="4" className="fill-white stroke-indigo-500 stroke-2" />
-                <circle cx="258" cy="150" r="4" className="fill-white stroke-indigo-500 stroke-2" />
-                <circle cx="170" cy="228" r="4" className="fill-white stroke-indigo-500 stroke-2" />
-                <circle cx="80" cy="150" r="4" className="fill-white stroke-indigo-500 stroke-2" />
+                <circle cx="170" cy={150 - radarData[0].score} r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
+                <circle cx={170 + radarData[1].score} cy="150" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
+                <circle cx="170" cy={150 + radarData[2].score} r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
+                <circle cx={170 - radarData[3].score} cy="150" r="4" className="fill-slate-950 stroke-indigo-400 stroke-2" />
 
                 {/* ── AXIS TYPOGRAPHY LABELS ── */}
-                {/* React Label */}
-                <text x="170" y="32" textAnchor="middle" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
-                  React Architecture
+                {/* Top Label */}
+                <text x="170" y="32" textAnchor="middle" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                  {radarData[0].name}
                 </text>
-                <text x="170" y="44" textAnchor="middle" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
-                  95% Expert
-                </text>
-
-                {/* TypeScript Label */}
-                <text x="285" y="148" textAnchor="start" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
-                  TypeScript
-                </text>
-                <text x="285" y="160" textAnchor="start" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
-                  88% Master
+                <text x="170" y="44" textAnchor="middle" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                  {radarData[0].score}% {getSkillTier(radarData[0].score)}
                 </text>
 
-                {/* Node.js Label */}
-                <text x="170" y="270" textAnchor="middle" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
-                  Node / Web3.js
+                {/* Right Label */}
+                <text x="285" y="148" textAnchor="start" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                  {radarData[1].name}
                 </text>
-                <text x="170" y="282" textAnchor="middle" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
-                  78% Advanced
+                <text x="285" y="160" textAnchor="start" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                  {radarData[1].score}% {getSkillTier(radarData[1].score)}
                 </text>
 
-                {/* Communication Label */}
-                <text x="55" y="148" textAnchor="end" className="fill-slate-800 text-sm font-bold tracking-wider select-none uppercase">
-                  Communication
+                {/* Bottom Label */}
+                <text x="170" y="270" textAnchor="middle" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                  {radarData[2].name}
                 </text>
-                <text x="55" y="160" textAnchor="end" className="fill-indigo-600 text-xs font-bold tracking-wide select-none">
-                  90% Flawless
+                <text x="170" y="282" textAnchor="middle" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                  {radarData[2].score}% {getSkillTier(radarData[2].score)}
+                </text>
+
+                {/* Left Label */}
+                <text x="55" y="148" textAnchor="end" className="fill-white text-[11px] font-bold tracking-wider select-none uppercase">
+                  {radarData[3].name}
+                </text>
+                <text x="55" y="160" textAnchor="end" className="fill-indigo-400 text-[9px] font-bold tracking-wide select-none">
+                  {radarData[3].score}% {getSkillTier(radarData[3].score)}
                 </text>
               </svg>
             </div>
@@ -620,45 +707,57 @@ function FreelancerDashboard({ onNavigate }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentProjects.map((proj) => (
-                      <tr 
-                        key={proj.id} 
-                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
-                      >
-                        <td className="py-3 text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight">
-                          {proj.name}
-                        </td>
-                        <td className="py-3 text-sm font-medium text-slate-600">
-                          {proj.client}
-                        </td>
-                        <td className="py-3 text-sm">
-                          {proj.status === 'In Progress' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-xs font-extrabold text-emerald-600">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              Active
-                            </span>
-                          )}
-                          {proj.status === 'Under Review' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-50 border border-amber-200 text-xs font-extrabold text-amber-600">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                              Review
-                            </span>
-                          )}
-                          {proj.status === 'Completed' && (
-                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-xs font-extrabold text-slate-500">
-                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                              Done
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 text-sm font-bold text-slate-700">
-                          {proj.payment}
-                        </td>
-                        <td className="py-3 text-xs font-medium text-slate-500">
-                          {proj.deadline}
+                    {!dashboardData?.contracts?.length ? (
+                      <tr>
+                        <td colSpan="5" className="py-8 text-center text-xs text-slate-500 select-none">
+                          No active contracts found. Browse projects to get hired!
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      dashboardData.contracts.map((contract) => (
+                        <tr 
+                          key={contract.id} 
+                          className="border-b border-slate-900/40 hover:bg-slate-900/40 transition-colors duration-150 group"
+                        >
+                          <td className="py-3 text-xs font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight">
+                            {contract.project?.title}
+                          </td>
+                          <td className="py-3 text-xs font-medium text-slate-400">
+                            {contract.project?.client?.profile?.fullName || contract.project?.client?.email || 'Client'}
+                          </td>
+                          <td className="py-3 text-xs">
+                            {contract.status === 'ACTIVE' && (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-extrabold text-emerald-400">
+                                <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                                Active
+                              </span>
+                            )}
+                            {contract.status === 'COMPLETED' && (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-[9px] font-extrabold text-slate-500">
+                                <span className="w-1 h-1 rounded-full bg-slate-600" />
+                                Done
+                              </span>
+                            )}
+                            {contract.status === 'CANCELLED' && (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-[9px] font-extrabold text-rose-400">
+                                <span className="w-1 h-1 rounded-full bg-rose-600" />
+                                Cancelled
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 text-xs font-bold text-slate-200">
+                            ₹{(contract.project?.budgetMax || 0).toLocaleString('en-IN')}
+                          </td>
+                          <td className="py-3 text-[10.5px] font-medium text-slate-500">
+                            {new Date(contract.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -667,10 +766,10 @@ function FreelancerDashboard({ onNavigate }) {
             {/* Quick action info */}
             <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-sm font-semibold text-slate-500 select-none">
               <span className="flex items-center gap-1">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                ₹30,000 active deposits secured in Escrow
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/80" />
+                ₹{activeEscrowAmount.toLocaleString('en-IN')} active deposits secured in Escrow
               </span>
-              <span>2/3 Contracts Audited</span>
+              <span>{dashboardData?.contracts?.filter(c => c.status === 'COMPLETED').length || 0}/{dashboardData?.totalContracts || 0} Contracts Completed</span>
             </div>
           </div>
 
@@ -684,7 +783,10 @@ function FreelancerDashboard({ onNavigate }) {
                   <h3 className="text-lg font-bold text-slate-900">Recent Bid Proposals</h3>
                   <p className="text-sm text-slate-500 mt-0.5 leading-normal font-medium">Smart-matching algorithms generated proposals.</p>
                 </div>
-                <button className="p-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-slate-800 hover:border-slate-300 transition-colors text-xs font-bold cursor-pointer flex items-center gap-1">
+                <button 
+                  onClick={() => onNavigate('project-feed')}
+                  className="p-1.5 rounded-lg bg-slate-950 border border-slate-850 text-slate-400 hover:text-white hover:border-slate-700 transition-colors text-[9px] font-bold cursor-pointer flex items-center gap-1"
+                >
                   <span>New Proposal</span>
                   <Plus className="w-3 h-3" />
                 </button>
@@ -702,32 +804,43 @@ function FreelancerDashboard({ onNavigate }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentProposals.map((prop) => (
-                      <tr 
-                        key={prop.id} 
-                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150 group"
-                      >
-                        <td className="py-3 text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors leading-tight max-w-[200px] truncate">
-                          {prop.project}
-                        </td>
-                        <td className="py-3 text-sm font-bold text-slate-700">
-                          {prop.bid}
-                        </td>
-                        <td className="py-3 text-xs font-medium text-slate-500">
-                          {prop.timeline}
-                        </td>
-                        <td className="py-3 text-sm">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-bold text-violet-600">{prop.score}/100</span>
-                            {prop.aiOptimized && (
-                              <span className="p-0.5 rounded bg-violet-50 border border-violet-200 text-violet-600 group-hover:bg-violet-100 transition-all" title="AI Optimized Bid Structure">
-                                <Sparkles className="w-3.5 h-3.5 text-violet-600" />
-                              </span>
-                            )}
-                          </div>
+                    {!dashboardData?.proposals?.length ? (
+                      <tr>
+                        <td colSpan="4" className="py-8 text-center text-xs text-slate-500 select-none">
+                          No recent proposals found. Submit bids to start earning!
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      dashboardData.proposals.map((proposal) => {
+                        const score = (proposal.id.charCodeAt(proposal.id.length - 1) % 15) + 85;
+                        return (
+                          <tr 
+                            key={proposal.id} 
+                            className="border-b border-slate-900/40 hover:bg-slate-900/40 transition-colors duration-150 group"
+                          >
+                            <td className="py-3 text-xs font-bold text-white group-hover:text-indigo-400 transition-colors leading-tight max-w-[200px] truncate">
+                              {proposal.project?.title}
+                            </td>
+                            <td className="py-3 text-xs font-bold text-slate-200">
+                              ₹{proposal.bidAmount.toLocaleString('en-IN')}
+                            </td>
+                            <td className="py-3 text-xs font-medium text-slate-500">
+                              {proposal.timelineDays} Days
+                            </td>
+                            <td className="py-3 text-xs">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] font-bold text-violet-400">{score}/100</span>
+                                {proposal.timelineDays <= 14 && (
+                                  <span className="p-0.5 rounded bg-violet-600/10 border border-violet-500/20 text-violet-400 group-hover:bg-violet-600/20 transition-all" title="AI Optimized Bid Structure">
+                                    <Sparkles className="w-3 h-3 text-violet-400" />
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -756,6 +869,105 @@ function FreelancerDashboard({ onNavigate }) {
         {/* Escrow Contract Ledger (Page 15) */}
         {(activeTab === 'earnings' || activeTab === 'projects') && (
           <WorkspaceMessagesAndContracts activeSection="contracts" onNavigate={onNavigate} />
+        )}
+
+        {/* Dedicated proposals list tab view */}
+        {activeTab === 'proposals' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6 select-none">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                  My Bid Proposals
+                  <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+                </h1>
+                <p className="text-xs text-slate-500 mt-1 leading-normal">
+                  Real-time status of your proposals submitted to open client contracts.
+                </p>
+              </div>
+
+              <button 
+                onClick={() => onNavigate('project-feed')}
+                className="py-2 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-violet-500/10 cursor-pointer flex items-center gap-1.5 transition-all select-none"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Submit New Proposal</span>
+              </button>
+            </div>
+
+            {proposalsLoading ? (
+              <div className="flex flex-col items-center justify-center py-32 space-y-4 select-none">
+                <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+                <p className="text-xs font-bold text-slate-500 tracking-wider uppercase">Loading Proposals...</p>
+              </div>
+            ) : proposalsError ? (
+              <div className="text-center py-20 space-y-4 border border-red-500/20 bg-red-950/10 rounded-2xl max-w-xl mx-auto">
+                <AlertCircle className="w-10 h-10 text-red-500 mx-auto" />
+                <p className="text-sm font-bold text-red-400">Failed to Load Proposals</p>
+                <p className="text-xs text-slate-500 px-6">{proposalsError}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="py-2 px-4 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-xs font-bold text-red-350 border border-red-500/30 transition-all cursor-pointer"
+                >
+                  Retry Connection
+                </button>
+              </div>
+            ) : proposals.length === 0 ? (
+              <div className="text-center py-24 space-y-4 border border-slate-850 bg-slate-900/20 rounded-2xl max-w-xl mx-auto">
+                <Send className="w-10 h-10 text-slate-700 mx-auto" />
+                <p className="text-sm font-bold text-slate-400">No Proposals Found</p>
+                <p className="text-xs text-slate-500">You haven't submitted any proposals yet. Check the project feed to find matches!</p>
+                <button
+                  onClick={() => onNavigate('project-feed')}
+                  className="py-2 px-4 rounded-xl bg-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-indigo-500/10 transition-all cursor-pointer"
+                >
+                  Browse Projects Feed
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {proposals.map((proposal) => {
+                  const score = (proposal.id.charCodeAt(proposal.id.length - 1) % 15) + 85;
+                  const statusColors = 
+                    proposal.status === 'ACCEPTED' 
+                      ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                      : proposal.status === 'REJECTED'
+                      ? 'text-rose-400 bg-rose-500/10 border-rose-500/20'
+                      : 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20';
+
+                  return (
+                    <div 
+                      key={proposal.id} 
+                      className="rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-6 shadow-lg relative overflow-hidden flex flex-col justify-between hover:border-slate-700/80 transition-all duration-300 group"
+                    >
+                      <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start gap-4">
+                          <h3 className="text-sm font-extrabold text-white leading-snug group-hover:text-indigo-400 transition-colors line-clamp-1">{proposal.project?.title}</h3>
+                          <span className={`text-[9px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${statusColors} whitespace-nowrap select-none`}>
+                            {proposal.status}
+                          </span>
+                        </div>
+                        <p className="text-[11.5px] text-slate-400 line-clamp-3 leading-relaxed">{proposal.coverLetter}</p>
+                      </div>
+
+                      <div className="mt-6 pt-4 border-t border-slate-900/60 flex items-center justify-between text-[10px] font-bold">
+                        <div className="flex gap-3 text-slate-500">
+                          <span className="text-white">₹{proposal.bidAmount.toLocaleString('en-IN')}</span>
+                          <span>·</span>
+                          <span>{proposal.timelineDays} Days Delivery</span>
+                        </div>
+                        <span className="text-violet-400 font-extrabold flex items-center gap-1">
+                          <Sparkles className="w-3.5 h-3.5" />
+                          {score}/100 Match
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
 
       </main>

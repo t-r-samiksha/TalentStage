@@ -36,6 +36,7 @@ async (userId) => {
             email: true,
           },
         },
+        milestones: true,
       },
     });
 
@@ -99,7 +100,20 @@ async (userId) => {
       },
 
       include: {
-        project: true,
+        project: {
+          include: {
+            client: {
+              select: {
+                email: true,
+                profile: {
+                  select: {
+                    fullName: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
