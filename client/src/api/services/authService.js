@@ -26,10 +26,30 @@ export const authService = {
    * @param {string} email - User email
    * @param {string} password - User password
    * @param {string} role - User role
+   * @param {string} fullName - User full name
    * @returns {Promise<{success: boolean, data: *, error: Object|null}>}
    */
-  async signup(email, password, role) {
-    return request.post('/auth/signup', { email, password, role });
+  async signup(email, password, role, fullName) {
+    return request.post('/auth/signup', { email, password, role, fullName });
+  },
+
+  /**
+   * Sends a 6-digit OTP verification code to the target email address
+   * @param {string} email - User email
+   * @returns {Promise<{success: boolean, data: *, error: Object|null}>}
+   */
+  async sendOtp(email) {
+    return request.post('/auth/send-otp', { email });
+  },
+
+  /**
+   * Verifies the 6-digit OTP code sent to the email
+   * @param {string} email - User email
+   * @param {string} otp - 6-digit OTP code
+   * @returns {Promise<{success: boolean, data: *, error: Object|null}>}
+   */
+  async verifyOtp(email, otp) {
+    return request.post('/auth/verify-otp', { email, otp });
   },
 
   /**

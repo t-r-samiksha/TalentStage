@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Cpu, ArrowLeft, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 import { authService, authStorage } from './api';
 
@@ -70,6 +70,11 @@ function AuthInput({ id, label, type, placeholder, value, onChange, icon: Icon, 
 // ─── Main component ────────────────────────────────────────────────────────────
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const verifiedStatus = queryParams.get('verified');
+  const reason = queryParams.get('reason');
+
   const [email, setEmail]           = useState('');
   const [password, setPassword]     = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -215,6 +220,25 @@ function LoginPage() {
               <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-red-950/40 border border-red-900/40 text-xs text-red-350 leading-relaxed animate-fadeIn">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
                 <span>{error}</span>
+              </div>
+            )}
+
+            {/* Success/Verification banner */}
+            {verifiedStatus === 'true' && (
+              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-900/40 text-xs text-emerald-300 leading-relaxed animate-fadeIn">
+                <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <span>Your email has been verified successfully. You can now sign in!</span>
+              </div>
+            )}
+
+            {verifiedStatus === 'false' && (
+              <div className="mb-5 flex items-start gap-2.5 p-3.5 rounded-xl bg-red-950/40 border border-red-900/40 text-xs text-red-350 leading-relaxed animate-fadeIn">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+                <span>
+                  {reason === 'expired' 
+                    ? 'The verification link has expired. Please sign up again.' 
+                    : 'The verification link is invalid or malformed. Please verify and try again.'}
+                </span>
               </div>
             )}
 

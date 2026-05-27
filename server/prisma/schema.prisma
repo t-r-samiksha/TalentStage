@@ -46,6 +46,7 @@ model User {
   password  String
   role      Role
   createdAt DateTime @default(now())
+  isVerified        Boolean   @default(false)
 
   profile           Profile?
   freelancerProfile FreelancerProfile?
@@ -377,4 +378,13 @@ model SkillQuestion {
   createdAt DateTime @default(now())
 
   skillTest SkillTest @relation(fields: [skillTestId], references: [id], onDelete: Cascade)
+}
+
+model OtpVerification {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       String
+  expiry    DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
