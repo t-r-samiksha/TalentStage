@@ -1,5 +1,5 @@
 import prisma from "../../config/db.js";
-import { generateQuestion, processAnswer, getSkillResult } from "../../ai/skillFSM.js";
+import { generateQuestion, processAnswer, getSkillResult } from "../../ai/skillFSM.ts";
 import { logger } from "../../utils/logger.js";
 
 // Helper to parse question JSON safely
