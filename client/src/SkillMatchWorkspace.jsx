@@ -193,7 +193,7 @@ export default function SkillMatchWorkspace() {
       </div>
 
       {/* ── Premium Navigation Header ── */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200">
+      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button

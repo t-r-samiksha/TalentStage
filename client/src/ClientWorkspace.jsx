@@ -356,15 +356,7 @@ function ClientWorkspace() {
               )}
             </button>
 
-            {/* Browse Projects Link */}
-            <button
-              onClick={() => navigate('/project-feed')}
-              className="w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-200 hover:bg-white/[0.02] transition-all relative group cursor-pointer"
-            >
-              <Cpu className="w-4 h-4 text-indigo-400" />
-              <span>Browse Projects</span>
-              <span className="ml-auto text-xs font-extrabold uppercase bg-indigo-650/10 border border-indigo-500/20 text-indigo-400 px-1 rounded shadow-sm shadow-indigo-500/10">Feed</span>
-            </button>
+
 
             {/* Post Project Link (Page 7 view) */}
             <button
@@ -1228,7 +1220,7 @@ function ClientWorkspace() {
 
                   {/* Outcome 4: AI Risk Considerations */}
                   <div className="space-y-3 select-none">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-rose-400">
                       AI Risk Considerations
                     </h4>
                     <div className="space-y-2">
@@ -1236,8 +1228,8 @@ function ClientWorkspace() {
                         'Smart contract audit coverage must exceed 95% line coverage.',
                         'Escrow bridge functions must restrict fee parameter configurations.'
                       ]).map((risk, index) => (
-                        <div key={index} className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/80 border border-rose-200 text-xs text-slate-700 shadow-sm">
-                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                        <div key={index} className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 shadow-sm">
+                          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                           <span className="leading-relaxed font-medium">{risk}</span>
                         </div>
                       ))}

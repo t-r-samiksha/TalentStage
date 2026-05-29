@@ -743,7 +743,6 @@ function ContractsPanel({ contracts, isLoadingContracts }) {
 // ─── ROOT EXPORT ──────────────────────────────────────────────────────────────
 
 export default function WorkspaceMessagesAndContracts({ activeSection = 'messages' }) {
-  const [tab, setTab] = useState(activeSection === 'contracts' ? 'contracts' : 'messages');
   const [contracts, setContracts] = useState([]);
   const [isLoadingContracts, setIsLoadingContracts] = useState(true);
   const [socketConnected, setSocketConnected] = useState(false);
@@ -796,11 +795,6 @@ export default function WorkspaceMessagesAndContracts({ activeSection = 'message
     };
   }, [currentUserId]);
 
-  const TABS = [
-    { id: 'messages', label: 'Messages', icon: MessageSquare, badge: `${contracts.length} active` },
-    { id: 'contracts', label: 'Contracts & Escrow', icon: ShieldCheck, badge: `${contracts.length} contract${contracts.length !== 1 ? 's' : ''}` },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50 p-6 font-sans">
 
@@ -812,14 +806,14 @@ export default function WorkspaceMessagesAndContracts({ activeSection = 'message
               <span className="text-xs font-black text-indigo-600 uppercase tracking-widest">Workspace</span>
               <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-xs font-black text-slate-500 uppercase tracking-widest">
-                {tab === 'messages' ? 'Messages Hub' : 'Contracts & Escrow'}
+                {activeSection === 'messages' ? 'Messages Hub' : 'Contracts & Escrow'}
               </span>
             </div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
-              {tab === 'messages' ? 'Candidate Messages' : 'Milestone & Escrow Ledger'}
+              {activeSection === 'messages' ? 'Candidate Messages' : 'Milestone & Escrow Ledger'}
             </h1>
             <p className="text-base text-slate-500 font-semibold mt-1.5">
-              {tab === 'messages'
+              {activeSection === 'messages'
                 ? 'Real-time encrypted communication with your contractors.'
                 : 'Smart contract-backed milestone payments. Full audit trail & dispute resolution.'}
             </p>
@@ -836,32 +830,10 @@ export default function WorkspaceMessagesAndContracts({ activeSection = 'message
             </div>
           </div>
         </div>
-
-        {/* Tabs */}
-        <div className="flex items-center gap-1 mt-5 p-1 bg-white border border-slate-200 rounded-xl w-fit">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 cursor-pointer
-                ${tab === t.id
-                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
-                }`}
-            >
-              <t.icon className="w-4 h-4" />
-              {t.label}
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full
-                ${tab === t.id ? 'bg-indigo-200 text-indigo-700' : 'bg-slate-100 text-slate-500'}`}>
-                {t.badge}
-              </span>
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* ── CONTENT ── */}
-      {tab === 'messages' ? (
+      {activeSection === 'messages' ? (
         <MessagesPanel
           contracts={contracts}
           currentUserId={currentUserId}

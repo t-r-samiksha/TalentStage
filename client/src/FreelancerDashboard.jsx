@@ -4,7 +4,7 @@ import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   Clock, LogOut, LayoutDashboard, FolderGit2,
   ShieldCheck, Send, MessageSquare, User, Calendar, Plus,
-  ChevronRight, ArrowUpRight, Award, AlertCircle
+  ChevronRight, ArrowUpRight, Award, AlertCircle, FileText
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import { authService, dashboardService, projectService, aiService } from './api';
@@ -508,7 +508,7 @@ function FreelancerDashboard() {
       <main className="flex-1 h-screen overflow-y-auto p-8 lg:p-10 relative z-10 space-y-8 bg-slate-50">
         
         {/* ── CONDITIONAL TABS RENDER ── */}
-        {(activeTab === 'dashboard' || activeTab === 'portfolio' || activeTab === 'profile') && <>
+        {activeTab === 'dashboard' && <>
           
             {/* Workspace Top Header */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-6 select-none">
@@ -1105,14 +1105,168 @@ function FreelancerDashboard() {
 
           </section></>}
 
+        {/* Portfolio Registry View */}
+        {activeTab === 'portfolio' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6 select-none">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                  Portfolio Registry
+                  <FolderGit2 className="w-5 h-5 text-indigo-400" />
+                </h1>
+                <p className="text-xs text-slate-400 mt-1 leading-normal">
+                  Showcase your past work, open-source contributions, and verified project deliveries.
+                </p>
+              </div>
+              <button className="py-2 px-4 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-violet-500/10 transition-all cursor-pointer flex items-center gap-1.5 select-none">
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Portfolio Item</span>
+              </button>
+            </div>
+
+            <div className="text-center py-24 space-y-4 border border-slate-800/60 bg-slate-900/40 backdrop-blur-xl rounded-2xl max-w-xl mx-auto shadow-lg">
+              <div className="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-2">
+                <FolderGit2 className="w-8 h-8 text-indigo-400" />
+              </div>
+              <h2 className="text-lg font-black text-white">Your Portfolio is Empty</h2>
+              <p className="text-sm text-slate-400 px-8 leading-relaxed">
+                Start adding your best projects, GitHub repositories, or completed contracts to build your decentralized reputation.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Developer Profile View */}
+        {activeTab === 'profile' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6 select-none">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                  Developer Profile
+                  <User className="w-5 h-5 text-indigo-400" />
+                </h1>
+                <p className="text-xs text-slate-400 mt-1 leading-normal">
+                  Manage your verified decentralized identity and professional biography.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="md:col-span-1 space-y-6">
+                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 backdrop-blur-xl p-6 shadow-lg flex flex-col items-center text-center">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-600 flex items-center justify-center text-3xl font-black text-white shadow-lg shadow-violet-500/30 mb-4 border-4 border-slate-800">
+                    {(profile?.profile?.fullName || 'D').charAt(0).toUpperCase()}
+                  </div>
+                  <h2 className="text-lg font-black text-white">{profile?.profile?.fullName || 'Developer'}</h2>
+                  <p className="text-sm font-semibold text-slate-400 mb-4">{profile?.email}</p>
+                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-bold tracking-wide uppercase flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Identity Verified
+                  </span>
+                </div>
+              </div>
+
+              <div className="md:col-span-2 space-y-6">
+                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 backdrop-blur-xl p-6 shadow-lg">
+                  <h3 className="text-sm font-black text-slate-300 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-indigo-400" /> Professional Bio
+                  </h3>
+                  <div className="bg-slate-950/50 border border-slate-800/60 rounded-xl p-4">
+                    <p className="text-sm text-slate-400 leading-relaxed whitespace-pre-wrap">
+                      {profile?.freelancerProfile?.bio || 'No biography set. Head over to the Dashboard to use the AI Portfolio Auditor to optimize your bio!'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/40 backdrop-blur-xl p-6 shadow-lg">
+                  <h3 className="text-sm font-black text-slate-300 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <ShieldCheck className="w-4 h-4 text-indigo-400" /> Verified Skills
+                  </h3>
+                  {profile?.userSkills?.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {profile.userSkills.map((us) => (
+                        <span key={us.skillId} className="px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-lg text-xs font-bold flex items-center gap-1.5">
+                          <Award className="w-3.5 h-3.5 text-indigo-400" />
+                          {us.skill?.name}
+                          <span className="text-indigo-400 bg-slate-950/50 px-1.5 rounded-md border border-indigo-500/20 ml-1">{us.score}/100</span>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500 italic">No skills verified yet. Take a skill assessment to build your profile.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Workspace Messages Hub (Page 14) */}
         {activeTab === 'messages' && (
           <WorkspaceMessagesAndContracts activeSection="messages" />
         )}
 
         {/* Escrow Contract Ledger (Page 15) */}
-        {(activeTab === 'earnings' || activeTab === 'projects') && (
+        {activeTab === 'earnings' && (
           <WorkspaceMessagesAndContracts activeSection="contracts" />
+        )}
+
+        {/* Active Contracts view */}
+        {activeTab === 'projects' && (
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-900 pb-6 select-none">
+              <div>
+                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                  My Active Contracts
+                  <Briefcase className="w-5 h-5 text-indigo-400" />
+                </h1>
+                <p className="text-xs text-slate-500 mt-1 leading-normal">
+                  Manage the contracts you are currently working on.
+                </p>
+              </div>
+            </div>
+            
+            {(!dashboardData?.contracts || dashboardData.contracts.filter(c => c.status === 'ACTIVE').length === 0) ? (
+              <div className="text-center py-24 space-y-4 border border-slate-850 bg-slate-900/20 rounded-2xl max-w-xl mx-auto">
+                <Briefcase className="w-10 h-10 text-slate-700 mx-auto" />
+                <p className="text-sm font-bold text-slate-400">No Active Contracts</p>
+                <p className="text-xs text-slate-500">You don't have any active contracts at the moment.</p>
+                <button
+                  onClick={() => navigate('/project-feed')}
+                  className="py-2 px-4 rounded-xl bg-indigo-600 hover:brightness-110 active:scale-[0.98] text-xs font-bold text-white shadow-md shadow-indigo-500/10 transition-all cursor-pointer"
+                >
+                  Browse Projects
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {dashboardData.contracts.filter(c => c.status === 'ACTIVE').map(contract => (
+                  <div key={contract.id} className="rounded-2xl backdrop-blur-xl bg-slate-900/40 border border-slate-800/60 p-6 shadow-lg relative overflow-hidden flex flex-col justify-between hover:border-slate-700/80 transition-all duration-300 group">
+                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.015] to-transparent pointer-events-none" />
+                    <div className="flex justify-between items-start gap-4 mb-4">
+                      <h3 className="text-lg font-extrabold text-white leading-snug group-hover:text-indigo-400 transition-colors">{contract.project?.title || 'Contract'}</h3>
+                      <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border text-emerald-400 bg-emerald-500/10 border-emerald-500/20 whitespace-nowrap select-none">
+                        ACTIVE
+                      </span>
+                    </div>
+                    <div className="text-sm text-slate-400 mb-4 line-clamp-2">
+                      Client: <span className="text-slate-300">{contract.client?.profile?.fullName || contract.client?.email || 'Unknown Client'}</span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-900/60 flex items-center justify-between text-xs font-bold text-slate-500">
+                      <div className="flex gap-4">
+                        <span className="text-white">Budget: ₹{(contract.project?.budgetMax || 0).toLocaleString('en-IN')}</span>
+                      </div>
+                      <button 
+                        onClick={() => setActiveTab('earnings')}
+                        className="text-indigo-400 hover:text-indigo-300 transition-colors flex items-center gap-1 cursor-pointer font-extrabold"
+                      >
+                        View Escrow Ledger <ArrowUpRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Dedicated proposals list tab view */}

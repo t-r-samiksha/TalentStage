@@ -293,6 +293,7 @@ export default function ProjectFeedWorkspace() {
   // Proposal submission modal
   const [submitting, setSubmitting] = useState(null);
   const [submitted, setSubmitted] = useState(null);
+  const [sessionSubmitted, setSessionSubmitted] = useState(new Set());
 
   // Hire modal
   const [hiring, setHiring] = useState(false);
@@ -385,10 +386,11 @@ export default function ProjectFeedWorkspace() {
         match: calculateMatch(p.title),
         proposals: p.proposals?.length || 0,
         budgetRange: budgetRange,
-        status: p.status
+        status: p.status,
+        hasSubmitted: sessionSubmitted.has(p.id) || (Array.isArray(p.proposals) && p.proposals.some(prop => prop.freelancerId === authStorage.getUser()?.id))
       };
     });
-  }, [dbProjects]);
+  }, [dbProjects, sessionSubmitted]);
 
   // Computed filtered feed
   const filteredProjects = useMemo(() => {
@@ -665,6 +667,7 @@ export default function ProjectFeedWorkspace() {
       });
 
       if (res.success) {
+        setSessionSubmitted(prev => new Set(prev).add(projectId));
         setSubmitted(projectId);
         setTimeout(() => setSubmitted(null), 3000);
 
@@ -1051,7 +1054,7 @@ export default function ProjectFeedWorkspace() {
                         </button>
                         <button
                           onClick={() => handleSubmitProposal(project.id)}
-                          disabled={submitting === project.id || submitted === project.id}
+                          disabled={project.hasSubmitted || submitting === project.id || submitted === project.id}
                           className="
                             flex-1 lg:flex-none py-2.5 px-5 rounded-xl text-sm font-semibold
                             bg-gradient-to-r from-indigo-600 to-violet-600
@@ -1067,10 +1070,10 @@ export default function ProjectFeedWorkspace() {
                               <span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
                               <span>Submitting…</span>
                             </>
-                          ) : submitted === project.id ? (
+                          ) : project.hasSubmitted || submitted === project.id ? (
                             <>
                               <Check className="w-3.5 h-3.5 text-emerald-300" strokeWidth={3} />
-                              <span className="text-emerald-300">Proposal Sent</span>
+                              <span className="text-emerald-300">Submitted</span>
                             </>
                           ) : (
                             <>
@@ -1226,14 +1229,15 @@ export default function ProjectFeedWorkspace() {
                 </div>
 
                 {/* Submit your proposal inline CTA */}
-                <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex items-center justify-between gap-4">
+                {authStorage.getUser()?.role === 'FREELANCER' && (
+                  <div className="rounded-2xl bg-slate-900 border border-slate-800 p-5 flex items-center justify-between gap-4">
                   <div>
                     <h4 className="text-base font-extrabold text-slate-100 tracking-tight select-none">Interested in this contract?</h4>
                     <p className="text-sm text-slate-400 mt-1 select-none">Our AI will optimise your bid for maximum acceptance probability.</p>
                   </div>
                   <button
                     onClick={() => handleSubmitProposal(selectedProject.id)}
-                    disabled={submitting === selectedProject.id || submitted === selectedProject.id}
+                    disabled={selectedProject.hasSubmitted || submitting === selectedProject.id || submitted === selectedProject.id}
                     className="
                       py-2.5 px-5 rounded-xl text-xs font-bold
                       bg-gradient-to-r from-indigo-600 to-violet-600
@@ -1244,13 +1248,14 @@ export default function ProjectFeedWorkspace() {
                   >
                     {submitting === selectedProject.id ? (
                       <><span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" /><span>Sending…</span></>
-                    ) : submitted === selectedProject.id ? (
-                      <><Check className="w-3.5 h-3.5 text-emerald-300" strokeWidth={3} /><span className="text-emerald-300">Proposal Sent!</span></>
+                    ) : selectedProject.hasSubmitted || submitted === selectedProject.id ? (
+                      <><Check className="w-3.5 h-3.5 text-emerald-300" strokeWidth={3} /><span className="text-emerald-300">Submitted</span></>
                     ) : (
                       <><Send className="w-3.5 h-3.5" /><span>Submit Proposal</span></>
                     )}
                   </button>
                 </div>
+                )}
 
               </div>
 
@@ -1398,7 +1403,8 @@ export default function ProjectFeedWorkspace() {
             </div>
 
             {/* ── Proposals Evaluation Queue (Bottom) ── */}
-            <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-7 shadow-sm relative overflow-hidden">
+            {authStorage.getUser()?.role === 'CLIENT' && (
+              <div className="rounded-2xl bg-slate-900 border border-slate-800 p-6 md:p-7 shadow-sm relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-slate-800/80 to-transparent pointer-events-none" />
 
               <div className="flex items-center justify-between mb-6 select-none">
@@ -1507,6 +1513,7 @@ export default function ProjectFeedWorkspace() {
                 })}
               </div>
             </div>
+            )}
 
           </div>
         )}
