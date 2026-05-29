@@ -107,3 +107,39 @@ Return ONLY a JSON object in this format:
   "difficulty": "${difficulty}"
 }`;
 }
+
+/**
+ * Builds the prompt for generating a project brief.
+ */
+export function buildBriefGenerationPrompt(params: {
+  title: string;
+  skills: string[];
+  budgetMin: number;
+  budgetMax: number;
+  deadline: string;
+  billingModel: string;
+}): string {
+  return `Generate a professional project brief based on these initial inputs:
+Title: ${params.title}
+Target Skills: ${params.skills.join(', ')}
+Budget Range: ₹${params.budgetMin} - ₹${params.budgetMax}
+Estimated Deadline: ${params.deadline}
+Billing Model: ${params.billingModel}
+
+You must return ONLY a valid JSON object matching the following structure:
+{
+  "description": "<A detailed, professional project description detailing scope, architectural guidelines, and expectations>",
+  "deliverables": [
+    { "text": "<Scope item description>", "weight": "<High Priority | Core Protocol | Crucial | Standard Requirement>" }
+  ],
+  "milestones": [
+    { "phase": "Phase 1: <Phase Name>", "days": "Optimized: <N> Days" }
+  ],
+  "timeline": "<timeline summary>",
+  "recommendedSkills": ["<skill 1>", "<skill 2>"],
+  "risks": ["<risk consideration 1>", "<risk consideration 2>"]
+}
+
+Ensure all JSON properties are populated. Do not include markdown code blocks or additional text around the JSON.`;
+}
+

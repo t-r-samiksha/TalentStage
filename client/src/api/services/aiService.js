@@ -8,6 +8,21 @@ import { request } from '../requestWrapper';
  */
 export const aiService = {
   /**
+   * Generates a project description, deliverables, milestones, recommended skills, and risks based on input parameters.
+   * @param {Object} data - Project input options
+   * @param {string} data.title - Project title
+   * @param {string[]} data.skills - Chosen/required skills
+   * @param {number} data.budgetMin - Minimum budget
+   * @param {number} data.budgetMax - Maximum budget
+   * @param {string} data.deadline - Project deadline description
+   * @param {string} data.billingModel - Project billing model ('fixed' | 'hourly')
+   * @returns {Promise<{success: boolean, data: *, error: Object|null}>}
+   */
+  async generateBrief(data) {
+    return request.post('/ai/generate-brief', data);
+  },
+
+  /**
    * Evaluates text portfolios or GitHub data repositories using Gemini AI,
    * returning code quality, tech stack, and risk metrics.
    * @param {string} text - Raw biography or portfolio list

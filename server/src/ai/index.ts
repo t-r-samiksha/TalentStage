@@ -4,6 +4,7 @@ import rateLimit from 'express-rate-limit';
 import portfolioRoutes from './routes/portfolioRoutes';
 import proposalRoutes from './routes/proposalRoutes';
 import matchRoutes from './routes/matchRoutes';
+import briefRoutes from './routes/briefRoutes';
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use(aiRateLimiter);
 router.use('/', portfolioRoutes);
 router.use('/', proposalRoutes);
 router.use('/', matchRoutes);
+router.use('/', briefRoutes);
 
 export default router;

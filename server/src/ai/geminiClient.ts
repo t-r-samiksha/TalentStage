@@ -1,20 +1,28 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
+let genAI: GoogleGenerativeAI | null = null;
+
+function getGenAI(): GoogleGenerativeAI {
+  if (!genAI) {
+    const apiKey = (process.env.GEMINI_API_KEY || '').trim();
+    genAI = new GoogleGenerativeAI(apiKey);
+  }
+  return genAI;
+}
 
 export let lastLatencyMs = 0;
 
 /**
  * Calls the Gemini API with the given prompt and optional system prompt.
- * Uses gemini-1.5-flash model and includes retry logic with exponential backoff.
+ * Uses gemini-2.5-flash model and includes retry logic with exponential backoff.
  * @param prompt - The user prompt to send to Gemini
  * @param systemPrompt - Optional system instruction
  * @returns The generated text response
  */
 export async function callGemini(prompt: string, systemPrompt?: string): Promise<string> {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+  const client = getGenAI();
+  const model = client.getGenerativeModel({
+    model: 'gemini-2.5-flash',
     ...(systemPrompt && { systemInstruction: systemPrompt }),
   });
 

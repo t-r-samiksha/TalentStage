@@ -26,7 +26,7 @@ export function parseAIJson<T>(raw: string, schema: ZodSchema<T>): T {
 
   // 2. Extract substring between the first '{' or '[' and the last '}' or ']'
   const firstBrace = cleanString.search(/[{[]/);
-  const lastBrace = cleanString.search(/[}\]]/);
+  const lastBrace = Math.max(cleanString.lastIndexOf('}'), cleanString.lastIndexOf(']'));
   if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
     // If there is conversational text before or after, extract the exact JSON boundary
     if (firstBrace > 0 || lastBrace < cleanString.length - 1) {
@@ -36,8 +36,7 @@ export function parseAIJson<T>(raw: string, schema: ZodSchema<T>): T {
         JSON.parse(candidate);
         cleanString = candidate;
       } catch (e) {
-        // Fallback: strip outer text but let parser handle it if slice is broken
-        cleanString = candidate;
+        // Fallback: only use candidate if it doesn't break parsing, otherwise keep cleanString as is
       }
     }
   }

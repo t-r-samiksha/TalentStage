@@ -7,7 +7,7 @@ import {
   Calendar, Check, ArrowRight, ShieldCheck, AlertCircle
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
-import { authService, dashboardService, projectService } from './api';
+import { authService, dashboardService, projectService, aiService } from './api';
 
 function ClientWorkspace() {
   const location = useLocation();
@@ -48,6 +48,10 @@ function ClientWorkspace() {
 
   // Simulated AI Diagnostics states
   const [generatingBrief, setGeneratingBrief] = useState(false);
+  const [aiScope, setAiScope] = useState(null);
+  const [aiTimeline, setAiTimeline] = useState(null);
+  const [aiRisks, setAiRisks] = useState(null);
+
 
   // ─── Real database-backed states ───────────────────────────────────────────
   const [profile, setProfile] = useState(null);
@@ -147,32 +151,49 @@ function ClientWorkspace() {
   };
 
   // ─── Form Submission Handlers ──────────────────────────────────────────────
-  const handleGenerateAiBrief = () => {
+  const handleGenerateAiBrief = async () => {
     if (generatingBrief) return;
+    
+    if (!title.trim()) {
+      setFormError('Please enter a project title first to generate an AI brief.');
+      return;
+    }
+    
     setGeneratingBrief(true);
-    setTitle('');
-    setDescription('');
+    setFormError('');
     
-    const targetTitle = 'Automated Decentralized Vesting Vault Protocol';
-    const targetDesc = 'An AI-suggested project structure focusing on secure smart contracts. It implements custom multi-token lockup schedules, gas-optimized ERC-20 staking vaults, and on-chain oracle verification models. Includes comprehensive unit tests using Hardhat and Slither static code auditing analysis.';
-    
-    let i = 0;
-    const speed = 15; // ms per frame
-    
-    const streamInterval = setInterval(() => {
-      i++;
-      setTitle(targetTitle.substring(0, Math.floor(i / 2)));
-      setDescription(targetDesc.substring(0, i));
+    try {
+      const res = await aiService.generateBrief({
+        title: title.trim(),
+        skills,
+        budgetMin: parseInt(budgetMin, 10) || 0,
+        budgetMax: parseInt(budgetMax, 10) || 0,
+        deadline,
+        billingModel: projectType
+      });
       
-      if (i >= targetDesc.length) {
-        clearInterval(streamInterval);
-        setTitle(targetTitle);
-        setDescription(targetDesc);
-        setGeneratingBrief(false);
-        setSkills(prev => Array.from(new Set([...prev, 'Solidity', 'Hardhat', 'ERC-20'])));
+      if (res.success && res.data) {
+        setDescription(res.data.description);
+        
+        // Merge recommended skills into active tags
+        if (res.data.recommendedSkills && Array.isArray(res.data.recommendedSkills)) {
+          setSkills(prev => Array.from(new Set([...prev, ...res.data.recommendedSkills])));
+        }
+        
+        // Populate AI Diagnostics states
+        setAiScope(res.data.deliverables);
+        setAiTimeline(res.data.milestones);
+        setAiRisks(res.data.risks);
+      } else {
+        setFormError(res.message || 'Failed to generate AI project brief.');
       }
-    }, speed);
+    } catch (err) {
+      setFormError(err.response?.data?.message || err.message || 'Failed to generate AI project brief.');
+    } finally {
+      setGeneratingBrief(false);
+    }
   };
+
 
   const handlePostProject = async (e) => {
     e.preventDefault();
@@ -1119,12 +1140,12 @@ function ClientWorkspace() {
                     </h4>
                     
                     <div className="space-y-2.5">
-                      {[
+                      {(aiScope || [
                         { text: 'Decentralized Escrow Verification', weight: 'High Priority' },
                         { text: 'ERC-20 Compounding Vesting Vaults', weight: 'Core Protocol' },
                         { text: 'Gas Optimization Audit (<85k limit)', weight: 'Crucial' },
                         { text: 'E2E Unit Attestations Suite', weight: 'Standard Requirement' }
-                      ].map((item, idx) => (
+                      ]).map((item, idx) => (
                         <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg bg-white border border-slate-200 select-none">
                           <div className="w-4.5 h-4.5 rounded-full bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-center text-emerald-400 shrink-0">
                             <Check className="w-3 h-3" strokeWidth={3} />
@@ -1146,22 +1167,28 @@ function ClientWorkspace() {
 
                     {/* Vertical Micro-Timeline Chart */}
                     <div className="space-y-3 pl-2.5 border-l border-slate-200 select-none">
-                      {[
-                        { phase: 'Phase 1: Solidity Smart Contract Audit', days: 'Optimized: 4 Days', width: 'w-2/3', color: 'from-violet-600 to-indigo-600' },
-                        { phase: 'Phase 2: Escrow Bridge Compilation & Test', days: 'Optimized: 6 Days', width: 'w-full', color: 'from-indigo-600 to-violet-600' },
-                        { phase: 'Phase 3: Attestations Attuned Compliance Review', days: 'Optimized: 2 Days', width: 'w-1/3', color: 'from-violet-600 to-fuchsia-600' }
-                      ].map((t, index) => (
-                        <div key={index} className="relative space-y-1.5">
-                          <div className="absolute -left-[14.5px] top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/30" />
-                          <h5 className="text-sm font-bold text-slate-900 tracking-wide leading-none">{t.phase}</h5>
-                          <span className="text-xs font-semibold text-slate-400">{t.days}</span>
-                          
-                          {/* Dotted chart loading line */}
-                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div className={`h-full bg-gradient-to-r ${t.color} ${t.width} transition-all duration-500`} />
+                      {(aiTimeline || [
+                        { phase: 'Phase 1: Solidity Smart Contract Audit', days: 'Optimized: 4 Days' },
+                        { phase: 'Phase 2: Escrow Bridge Compilation & Test', days: 'Optimized: 6 Days' },
+                        { phase: 'Phase 3: Attestations Attuned Compliance Review', days: 'Optimized: 2 Days' }
+                      ]).map((t, index) => {
+                        const colors = ['from-violet-600 to-indigo-600', 'from-indigo-600 to-violet-600', 'from-violet-600 to-fuchsia-600'];
+                        const widths = ['w-2/3', 'w-full', 'w-1/3'];
+                        const color = colors[index % colors.length];
+                        const width = widths[index % widths.length];
+                        return (
+                          <div key={index} className="relative space-y-1.5">
+                            <div className="absolute -left-[14.5px] top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/30" />
+                            <h5 className="text-sm font-bold text-slate-900 tracking-wide leading-none">{t.phase}</h5>
+                            <span className="text-xs font-semibold text-slate-400">{t.days.startsWith('Optimized:') ? t.days : `Optimized: ${t.days}`}</span>
+                            
+                            {/* Dotted chart loading line */}
+                            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                              <div className={`h-full bg-gradient-to-r ${color} ${width} transition-all duration-500`} />
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -1198,6 +1225,25 @@ function ClientWorkspace() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Outcome 4: AI Risk Considerations */}
+                  <div className="space-y-3 select-none">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
+                      AI Risk Considerations
+                    </h4>
+                    <div className="space-y-2">
+                      {(aiRisks || [
+                        'Smart contract audit coverage must exceed 95% line coverage.',
+                        'Escrow bridge functions must restrict fee parameter configurations.'
+                      ]).map((risk, index) => (
+                        <div key={index} className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50/80 border border-rose-200 text-xs text-slate-700 shadow-sm">
+                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                          <span className="leading-relaxed font-medium">{risk}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
 
                 </div>
 
