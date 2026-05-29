@@ -4,10 +4,11 @@ import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   Clock, LogOut, LayoutDashboard, FolderGit2,
   ShieldCheck, Send, MessageSquare, User, Calendar, Plus,
-  ChevronRight, ArrowUpRight, Award, AlertCircle, FileText
+  ChevronRight, ArrowUpRight, Award, AlertCircle, FileText, Bell, Check, Star
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
-import { authService, dashboardService, projectService, aiService } from './api';
+import { authService, dashboardService, projectService, aiService, notificationService } from './api';
+import { socketService } from './api/services/socketService';
 
 function FreelancerDashboard() {
   const location = useLocation();
@@ -21,6 +22,7 @@ function FreelancerDashboard() {
     if (path.endsWith('/earnings')) return 'earnings';
     if (path.endsWith('/messages')) return 'messages';
     if (path.endsWith('/profile')) return 'profile';
+    if (path.endsWith('/notifications')) return 'notifications';
     return 'dashboard';
   }, [location.pathname]);
 
@@ -54,6 +56,11 @@ function FreelancerDashboard() {
   const [applySuccess, setApplySuccess] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  // Notifications states
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
   // Simulated dynamic dates
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -80,6 +87,11 @@ function FreelancerDashboard() {
         setProfile(profileResult.data);
         setDashboardData(dashboardResult.data);
         setPortfolioText(profileResult.data?.freelancerProfile?.bio || '');
+
+        // Initialize notifications and unread count from dashboard data
+        const initialNotifications = dashboardResult.data?.notifications || [];
+        setNotifications(initialNotifications);
+        setUnreadCount(initialNotifications.filter(n => !n.isRead).length);
       } else {
         setError('Failed to fetch dashboard data. Please try again later.');
       }
@@ -88,6 +100,73 @@ function FreelancerDashboard() {
     fetchDashboardData();
     return () => { active = false; };
   }, []);
+
+  // Fetch full notifications when notifications tab is active
+  useEffect(() => {
+    if (activeTab !== 'notifications') return;
+    
+    let active = true;
+    const fetchAllNotifications = async () => {
+      setNotificationsLoading(true);
+      try {
+        const res = await notificationService.getMyNotifications();
+        if (active && res.success) {
+          setNotifications(res.data || []);
+          setUnreadCount((res.data || []).filter(n => !n.isRead).length);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (active) setNotificationsLoading(false);
+      }
+    };
+    fetchAllNotifications();
+    return () => { active = false; };
+  }, [activeTab]);
+
+  // Connect socket and listen for real-time notifications
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    socketService.connect();
+    socketService.join(profile.id);
+
+    const onNewNotification = (notification) => {
+      setNotifications(prev => [notification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+    };
+
+    socketService.on('new_notification', onNewNotification);
+
+    return () => {
+      socketService.off('new_notification', onNewNotification);
+    };
+  }, [profile?.id]);
+
+  const handleMarkAsRead = async (id) => {
+    try {
+      const res = await notificationService.markAsRead(id);
+      if (res.success) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const res = await notificationService.markAllAsRead();
+      if (res.success) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
+    }
+  };
+
 
   const handleAuditPortfolio = async () => {
     if (!portfolioText.trim() || portfolioText.length < 5) return;
@@ -468,6 +547,26 @@ function FreelancerDashboard() {
             >
               <User className="w-4 h-4" />
               <span>Developer Profile</span>
+            </button>
+
+            {/* Notifications */}
+            <button
+              onClick={() => setActiveTab('notifications')}
+              className={`
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
+                ${activeTab === 'notifications'
+                  ? 'bg-indigo-50 text-indigo-600 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                }
+              `}
+            >
+              <Bell className="w-4 h-4 text-violet-400" />
+              <span>Notifications</span>
+              {unreadCount > 0 && (
+                <span className="ml-auto px-1.5 py-0.5 rounded-md bg-violet-600 text-white text-xs font-extrabold tracking-wide">
+                  {unreadCount}
+                </span>
+              )}
             </button>
 
           </nav>
@@ -1330,7 +1429,7 @@ function FreelancerDashboard() {
                       ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
                       : proposal.status === 'REJECTED'
                       ? 'text-rose-400 bg-rose-500/10 border-rose-500/20'
-                      : 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20';
+                      : 'text-indigo-400 bg-indigo-50/10 border-indigo-500/20';
 
                   return (
                     <div 
@@ -1368,8 +1467,287 @@ function FreelancerDashboard() {
           </div>
         )}
 
+        {/* Freelancer Notifications Hub */}
+        {activeTab === 'notifications' && (
+          <NotificationsView 
+            notifications={notifications}
+            loading={notificationsLoading}
+            onMarkAsRead={handleMarkAsRead}
+            onMarkAllAsRead={handleMarkAllAsRead}
+          />
+        )}
+
       </main>
 
+    </div>
+  );
+}
+
+function NotificationsView({ notifications, loading, onMarkAsRead, onMarkAllAsRead }) {
+  const navigate = useNavigate();
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const TYPE_CONFIG = {
+    NEW_PROJECT: {
+      icon: Sparkles,
+      iconColor: 'text-rose-500 bg-rose-50 border-rose-200',
+      actionLabel: 'View Project',
+      actionColor: 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20',
+    },
+    PROPOSAL_ACCEPTED: {
+      icon: Award,
+      iconColor: 'text-emerald-500 bg-emerald-50 border-emerald-200',
+      actionLabel: 'Open Contract',
+      actionColor: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20',
+    },
+    NEW_MESSAGE: {
+      icon: MessageSquare,
+      iconColor: 'text-sky-500 bg-sky-50 border-sky-200',
+      actionLabel: 'Open Chat',
+      actionColor: 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20',
+    },
+    PROJECT_INVITATION: {
+      icon: Briefcase,
+      iconColor: 'text-violet-500 bg-violet-50 border-violet-200',
+      actionLabel: 'View Invitation',
+      actionColor: 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-500/20',
+    },
+    FOLLOW_NOTIFICATION: {
+      icon: User,
+      iconColor: 'text-indigo-500 bg-indigo-50 border-indigo-200',
+      actionLabel: 'View Profile',
+      actionColor: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20',
+    },
+    REVIEW_RECEIVED: {
+      icon: Star,
+      iconColor: 'text-amber-500 bg-amber-50 border-amber-200',
+      actionLabel: 'View Profile',
+      actionColor: 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20',
+    },
+    CONTRACT_COMPLETED: {
+      icon: CheckCircle2,
+      iconColor: 'text-emerald-500 bg-emerald-50 border-emerald-200',
+      actionLabel: 'View Contract',
+      actionColor: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20',
+    },
+  };
+
+  const DEFAULT_CONFIG = {
+    icon: Bell,
+    iconColor: 'text-slate-505 bg-slate-50 border-slate-200',
+    actionLabel: null,
+    actionColor: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20',
+  };
+
+  const handleActionClick = (n) => {
+    const type = n.type;
+    if (!n.isRead) {
+      onMarkAsRead(n.id);
+    }
+    
+    if (type === 'NEW_PROJECT' && n.projectId) {
+      navigate('/project-feed', { state: { projectId: n.projectId } });
+    } else if (type === 'PROPOSAL_ACCEPTED' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'contracts' } });
+    } else if (type === 'NEW_MESSAGE' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'messages' } });
+    } else if (type === 'PROJECT_INVITATION' && n.projectId) {
+      navigate('/project-feed', { state: { projectId: n.projectId } });
+    } else if (type === 'FOLLOW_NOTIFICATION') {
+      if (n.clientId) {
+        navigate(`/client/${n.clientId}`);
+      } else if (n.freelancerId) {
+        navigate(`/freelancer/${n.freelancerId}`);
+      }
+    } else if (type === 'REVIEW_RECEIVED') {
+      if (n.freelancerId) {
+        navigate(`/freelancer/${n.freelancerId}`);
+      } else if (n.clientId) {
+        navigate(`/client/${n.clientId}`);
+      }
+    } else if (type === 'CONTRACT_COMPLETED' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'contracts' } });
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in select-none">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-200 pb-6 select-none">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
+            System Alerts & Notifications
+            <span className="w-5 h-5 rounded-full bg-indigo-650/10 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-500">
+              {notifications.length}
+            </span>
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 leading-normal font-medium">
+            Real-time updates regarding your contract invitations, followings, and escrow payments.
+          </p>
+        </div>
+
+        {unreadCount > 0 && (
+          <button 
+            onClick={onMarkAllAsRead}
+            className="py-2 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold text-indigo-600 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+          >
+            <Check className="w-3.5 h-3.5" />
+            <span>Mark all as read</span>
+          </button>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4 select-none">
+          <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin animate-pulse" />
+          <p className="text-xs font-bold text-slate-500 tracking-wider uppercase">Loading Notifications...</p>
+        </div>
+      ) : notifications.length === 0 ? (
+        <div className="text-center py-24 space-y-4 border border-slate-200 bg-white rounded-2xl max-w-xl mx-auto shadow-sm select-none">
+          <Bell className="w-10 h-10 text-slate-350 mx-auto animate-bounce" />
+          <p className="text-sm font-bold text-slate-800">You're all caught up!</p>
+          <p className="text-xs text-slate-400">No notifications found at the moment.</p>
+        </div>
+      ) : (
+        <div className="space-y-4 max-w-4xl">
+          {notifications.map((n) => {
+            const config = TYPE_CONFIG[n.type] || DEFAULT_CONFIG;
+            return (
+              <div 
+                key={n.id} 
+                className={`
+                  p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row gap-5
+                  bg-white shadow-sm hover:shadow-md
+                  ${n.isRead ? 'border-slate-200 opacity-90' : 'border-indigo-150 bg-indigo-50/5 ring-1 ring-indigo-500/5'}
+                `}
+              >
+                {/* Icon Container */}
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${config.iconColor}`}>
+                  <config.icon className="w-6 h-6" />
+                </div>
+
+                {/* Main content block */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {!n.isRead && (
+                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shrink-0 animate-ping" />
+                      )}
+                      <h3 className="text-sm font-black text-slate-800 leading-tight truncate">
+                        {n.title}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                      {new Date(n.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    {n.message}
+                  </p>
+
+                  {/* Expanded Project & Client Credibility Snapshot for NEW_PROJECT */}
+                  {n.type === 'NEW_PROJECT' && n.metadata?.project && (
+                    <div className="mt-4 p-5 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-4">
+                      {/* Project Details Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="col-span-2 space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Project Name</span>
+                          <span className="text-xs font-black text-slate-800 leading-normal">{n.metadata.project.title}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Budget Limits</span>
+                          <span className="text-xs font-bold text-slate-700">
+                            ₹{n.metadata.project.budgetMin?.toLocaleString('en-IN')} - ₹{n.metadata.project.budgetMax?.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Billing Type</span>
+                          <span className="text-xs font-bold text-slate-700">{n.metadata.project.billingModel}</span>
+                        </div>
+                      </div>
+
+                      {/* Skills required & Deadline */}
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pt-3 border-t border-slate-200/60">
+                        {n.metadata.project.skills?.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-1">Skills:</span>
+                            {n.metadata.project.skills.map((s, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-[10px] font-extrabold text-indigo-600 uppercase tracking-wide">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {n.metadata.project.deadline && (
+                          <div className="text-[10px] font-bold text-slate-500 shrink-0">
+                            Deadline: <span className="text-slate-800">{new Date(n.metadata.project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Client Reputation Snapshot */}
+                      {n.metadata.client?.stats && (
+                        <div className="mt-3 p-4 rounded-xl bg-indigo-55 bg-indigo-50/20 border border-indigo-100/50 space-y-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9.5px] font-black text-indigo-600 uppercase tracking-wider">Client Credibility Snapshot</span>
+                            <span className="h-px bg-indigo-100/50 flex-1" />
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.totalProjectsPosted}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Posted</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.totalProjectsCompleted}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Completed</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">₹{n.metadata.client.stats.totalAmountSpent.toLocaleString('en-IN')}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Spent</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.followersCount}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Followers</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Contextual Action Button Block */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+                    {config.actionLabel && (
+                      <button 
+                        onClick={() => handleActionClick(n)}
+                        className={`py-2 px-4 rounded-xl text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 ${config.actionColor}`}
+                      >
+                        <span>{config.actionLabel}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {!n.isRead && (
+                      <button 
+                        onClick={() => onMarkAsRead(n.id)}
+                        className="py-2 px-4 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/10 text-xs font-black text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-1 cursor-pointer bg-white"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Mark as Read</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

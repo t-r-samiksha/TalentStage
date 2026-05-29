@@ -95,7 +95,7 @@ function EmptyChat({ contractTitle }) {
 
 // ─── MESSAGES PANEL ───────────────────────────────────────────────────────────
 
-function MessagesPanel({ contracts, currentUserId, isLoadingContracts, socketConnected }) {
+function MessagesPanel({ contracts, currentUserId, isLoadingContracts, socketConnected, preselectedContractId }) {
   const [activeContract, setActiveContract] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -113,15 +113,21 @@ function MessagesPanel({ contracts, currentUserId, isLoadingContracts, socketCon
   const isTypingRef = useRef(false);
   const prevContractRef = useRef(null);
 
-  // ── Auto-select first contract ──
+  // ── Auto-select preselected or first contract ──
   useEffect(() => {
-    if (contracts.length > 0 && !activeContract) {
-      const timer = setTimeout(() => {
+    if (contracts.length > 0) {
+      if (preselectedContractId) {
+        const found = contracts.find(c => c.id === preselectedContractId);
+        if (found) {
+          setActiveContract(found);
+          return;
+        }
+      }
+      if (!activeContract) {
         setActiveContract(contracts[0]);
-      }, 0);
-      return () => clearTimeout(timer);
+      }
     }
-  }, [contracts, activeContract]);
+  }, [contracts, activeContract, preselectedContractId]);
 
   // ── Scroll to bottom when messages change ──
   useEffect(() => {
@@ -580,8 +586,23 @@ function MessagesPanel({ contracts, currentUserId, isLoadingContracts, socketCon
 
 // ─── CONTRACTS PANEL ──────────────────────────────────────────────────────────
 
-function ContractsPanel({ contracts, isLoadingContracts }) {
+function ContractsPanel({
+  contracts,
+  isLoadingContracts,
+  currentUserId,
+  onCompleteContract,
+  onOpenReview,
+  onApproveMilestone,
+  onRequestRevision,
+  preselectedContractId
+}) {
   const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    if (preselectedContractId) {
+      setExpanded(preselectedContractId);
+    }
+  }, [preselectedContractId]);
 
   const totalEscrow = contracts.reduce((a, c) =>
     a + (c.milestones || []).reduce((s, m) => s + (m.amount || 0), 0), 0);
@@ -650,7 +671,7 @@ function ContractsPanel({ contracts, isLoadingContracts }) {
             allMilestones.map((m) => {
               const cfg = STATUS_CONFIG[m.status] || STATUS_CONFIG.PENDING;
               const StatusIcon = cfg.icon;
-              const isOpen = expanded === m.id;
+              const isOpen = expanded === m.id || expanded === m.contractId;
 
               return (
                 <div key={m.id} className="bg-white hover:bg-slate-50 transition-colors">
@@ -703,13 +724,25 @@ function ContractsPanel({ contracts, isLoadingContracts }) {
                           <p className="text-sm font-black text-emerald-600">₹{(m.amount || 0).toLocaleString()}</p>
                         </div>
                         <div className="flex gap-2 items-end">
-                          {m.status === 'SUBMITTED' && (
+                          {m.status === 'SUBMITTED' && m.contract?.clientId === currentUserId && (
                             <>
-                              <button className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onApproveMilestone(m.id);
+                                }}
+                                className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20"
+                              >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Approve & Release
                               </button>
-                              <button className="flex-1 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all cursor-pointer">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRequestRevision(m.id);
+                                }}
+                                className="flex-1 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+                              >
                                 Request Revision
                               </button>
                             </>
@@ -720,11 +753,68 @@ function ContractsPanel({ contracts, isLoadingContracts }) {
                               Payment Released
                             </div>
                           )}
-                          {m.status === 'PENDING' && (
-                            <button className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-500/20">
-                              <Zap className="w-3.5 h-3.5" />
-                              Fund Escrow
-                            </button>
+                          {m.status === 'PENDING' && m.contract?.clientId === currentUserId && (
+                            <div className="flex-1 py-2 text-slate-500 text-xs font-semibold text-center bg-slate-100 border border-slate-200 rounded-xl">
+                              Pending submission from contractor
+                            </div>
+                          )}
+                          {m.contract?.clientId !== currentUserId && (
+                            <div className="flex-1 py-2 text-slate-500 text-xs font-semibold text-center bg-slate-100 border border-slate-200 rounded-xl">
+                              Milestone Status: {cfg.label}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Contract-level Actions (Full-width inside grid) */}
+                        <div className="col-span-3 pt-3 mt-1 border-t border-slate-200 flex items-center justify-between text-xs">
+                          <div>
+                            <span className="text-[10px] font-black text-slate-505 uppercase tracking-widest mr-2">Contract Status:</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
+                              m.contract?.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-800' : 'bg-indigo-100 text-indigo-800'
+                            }`}>
+                              {m.contract?.status || 'ACTIVE'}
+                            </span>
+                          </div>
+                          {m.contract?.clientId === currentUserId && (
+                            <div className="flex items-center gap-2">
+                              {m.contract?.status !== 'COMPLETED' ? (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const allMilestonesApproved = m.contract?.milestones?.every(ms => ms.status === 'APPROVED');
+                                    if (!allMilestonesApproved) {
+                                      alert('All escrow milestones must be approved and released first.');
+                                      return;
+                                    }
+                                    onCompleteContract(m.contract.id);
+                                  }}
+                                  className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  Complete Contract
+                                </button>
+                              ) : (
+                                <>
+                                  {m.contract?.review ? (
+                                    <div className="flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg font-bold">
+                                      <Star className="w-3.5 h-3.5 fill-current text-emerald-500" />
+                                      Reviewed ({m.contract.review.rating}/5)
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onOpenReview(m.contract);
+                                      }}
+                                      className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold transition-all cursor-pointer flex items-center gap-1 shadow-sm"
+                                    >
+                                      <Star className="w-3.5 h-3.5 fill-current" />
+                                      Submit Review
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -742,13 +832,116 @@ function ContractsPanel({ contracts, isLoadingContracts }) {
 
 // ─── ROOT EXPORT ──────────────────────────────────────────────────────────────
 
-export default function WorkspaceMessagesAndContracts({ activeSection = 'messages' }) {
+export default function WorkspaceMessagesAndContracts({ activeSection = 'messages', preselectedContractId = null }) {
   const [contracts, setContracts] = useState([]);
   const [isLoadingContracts, setIsLoadingContracts] = useState(true);
   const [socketConnected, setSocketConnected] = useState(false);
 
   const currentUser = authStorage.getUser();
   const currentUserId = currentUser?.id;
+
+  // ── State for Reviews & Contract Completion ──
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewContract, setReviewContract] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+
+  const handleCompleteContract = async (contractId) => {
+    try {
+      const res = await contractService.completeContract(contractId);
+      if (res.success) {
+        setContracts((prev) =>
+          prev.map((c) => (c.id === contractId ? { ...c, status: 'COMPLETED' } : c))
+        );
+        alert('Contract completed successfully!');
+      } else {
+        alert(res.error?.message || 'Failed to complete contract');
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to complete contract');
+    }
+  };
+
+  const handleOpenReviewModal = (contract) => {
+    setReviewContract(contract);
+    setReviewRating(5);
+    setReviewComment('');
+    setReviewError('');
+    setReviewModalOpen(true);
+  };
+
+  const handleSubmitReview = async () => {
+    if (!reviewContract) return;
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      const res = await contractService.submitReview(reviewContract.id, reviewRating, reviewComment);
+      if (res.success) {
+        setContracts((prev) =>
+          prev.map((c) =>
+            c.id === reviewContract.id
+              ? { ...c, review: res.data }
+              : c
+          )
+        );
+        setReviewModalOpen(false);
+        setReviewContract(null);
+        setReviewRating(5);
+        setReviewComment('');
+        alert('Review submitted successfully!');
+      } else {
+        setReviewError(res.error?.message || 'Failed to submit review');
+      }
+    } catch (err) {
+      setReviewError(err.message || 'Failed to submit review');
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  const handleApproveMilestone = async (milestoneId) => {
+    try {
+      const res = await contractService.approveMilestone(milestoneId);
+      if (res.success) {
+        setContracts((prev) =>
+          prev.map((c) => ({
+            ...c,
+            milestones: (c.milestones || []).map((m) =>
+              m.id === milestoneId ? { ...m, status: 'APPROVED' } : m
+            ),
+          }))
+        );
+        alert('Milestone approved and payment released!');
+      } else {
+        alert(res.error?.message || 'Failed to approve milestone');
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to approve milestone');
+    }
+  };
+
+  const handleRequestRevision = async (milestoneId) => {
+    try {
+      const res = await contractService.requestRevision(milestoneId);
+      if (res.success) {
+        setContracts((prev) =>
+          prev.map((c) => ({
+            ...c,
+            milestones: (c.milestones || []).map((m) =>
+              m.id === milestoneId ? { ...m, status: 'REVISION_REQUESTED' } : m
+            ),
+          }))
+        );
+        alert('Revision requested successfully.');
+      } else {
+        alert(res.error?.message || 'Failed to request revision');
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to request revision');
+    }
+  };
 
   // ── Fetch contracts on mount ──
   useEffect(() => {
@@ -839,12 +1032,101 @@ export default function WorkspaceMessagesAndContracts({ activeSection = 'message
           currentUserId={currentUserId}
           isLoadingContracts={isLoadingContracts}
           socketConnected={socketConnected}
+          preselectedContractId={preselectedContractId}
         />
       ) : (
         <ContractsPanel
           contracts={contracts}
           isLoadingContracts={isLoadingContracts}
+          currentUserId={currentUserId}
+          onCompleteContract={handleCompleteContract}
+          onOpenReview={handleOpenReviewModal}
+          onApproveMilestone={handleApproveMilestone}
+          onRequestRevision={handleRequestRevision}
+          preselectedContractId={preselectedContractId}
         />
+      )}
+
+      {/* ── Submit Review Modal Overlay ── */}
+      {reviewModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/40 backdrop-blur-sm">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white border border-slate-205 shadow-2xl p-6 md:p-8">
+            <h3 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <Star className="w-5 h-5 text-indigo-500 fill-indigo-500" />
+              <span>Submit Contract Review</span>
+            </h3>
+            
+            <p className="text-xs text-slate-505 mb-6">
+              Rate your experience collaborating with <span className="font-bold text-slate-800">{getDisplayName(reviewContract?.clientId === currentUserId ? reviewContract?.freelancer : reviewContract?.client)}</span> on <span className="font-semibold text-indigo-650">{reviewContract?.project?.title}</span>.
+            </p>
+
+            <div className="space-y-4 mb-6">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-400">
+                  Rating (1 to 5 Stars) *
+                </label>
+                
+                <div className="flex items-center gap-1.5 mt-1 select-none">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className="p-1 focus:outline-none hover:scale-110 transition-transform cursor-pointer bg-transparent border-none"
+                    >
+                      <Star
+                        className={`w-6 h-6 ${star <= reviewRating ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}`}
+                      />
+                    </button>
+                  ))}
+                  <span className="text-sm font-bold text-slate-600 ml-2">{reviewRating}/5 Stars</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-400">
+                  Review Comment *
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Share details about the quality of communication, delivery speed, and overall satisfaction..."
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60 resize-none transition-colors"
+                />
+              </div>
+
+              {reviewError && (
+                <p className="text-xs font-semibold text-rose-600">
+                  {reviewError}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => { setReviewModalOpen(false); setReviewContract(null); }}
+                className="py-2 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmitReview}
+                disabled={reviewSubmitting || !reviewComment.trim()}
+                className="py-2 px-5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+              >
+                {reviewSubmitting ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <span>Submit Review</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

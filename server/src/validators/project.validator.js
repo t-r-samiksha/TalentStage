@@ -8,4 +8,10 @@ export const createProjectSchema = z.object({
   budgetMin: z.number().positive(),
 
   budgetMax: z.number().positive(),
+
+  skills: z.array(z.string()).optional(),
+
+  deadline: z.string().optional().nullable(),
+
+  billingModel: z.string().optional(),
 });

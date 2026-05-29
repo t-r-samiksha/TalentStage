@@ -52,15 +52,29 @@ async ({
       },
     });
 
+  // Fetch freelancer user profile to personalize name
+  let freelancerName = "A freelancer";
+  try {
+    const freelancerUser = await prisma.user.findUnique({
+      where: { id: freelancerId },
+      include: { profile: true }
+    });
+    if (freelancerUser?.profile?.fullName) {
+      freelancerName = freelancerUser.profile.fullName;
+    } else if (freelancerUser?.email) {
+      freelancerName = freelancerUser.email.split('@')[0];
+    }
+  } catch (err) {
+    console.error(`[Follow Notification Profile Error] ${err.message}`);
+  }
+
   // notify client
   await createNotificationService({
-
     userId: clientId,
-
     title: "New Follower",
-
-    message:
-      "A freelancer started following you",
+    message: `${freelancerName} started following you.`,
+    type: "FOLLOW_NOTIFICATION",
+    freelancerId: freelancerId
   });
 
   return follow;
@@ -107,6 +121,25 @@ async (clientId) => {
           select: {
             id: true,
             email: true,
+            profile: {
+              select: {
+                fullName: true,
+                bio: true,
+                avatarUrl: true
+              }
+            },
+            freelancerProfile: {
+              select: {
+                hourlyRate: true,
+                totalEarned: true,
+                rating: true
+              }
+            },
+            userSkills: {
+              include: {
+                skill: true
+              }
+            }
           },
         },
       },
@@ -116,5 +149,18 @@ async (clientId) => {
       },
     });
 
-  return followers;
+  return followers.map(item => {
+    const f = item.freelancer;
+    return {
+      id: f.id,
+      email: f.email,
+      fullName: f.profile?.fullName || f.email.split('@')[0],
+      bio: f.profile?.bio || "",
+      avatarUrl: f.profile?.avatarUrl || null,
+      hourlyRate: f.freelancerProfile?.hourlyRate || null,
+      totalEarned: f.freelancerProfile?.totalEarned || 0,
+      rating: f.freelancerProfile?.rating || 0.0,
+      skills: f.userSkills ? f.userSkills.map(us => us.skill.name) : []
+    };
+  });
 };

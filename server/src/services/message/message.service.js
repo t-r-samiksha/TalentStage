@@ -1,6 +1,6 @@
 import prisma from "../../config/db.js";
-
 import { getIO } from "../../socket/socket.js";
+import { createNotificationService } from "../notification/notification.service.js";
 
 export const sendMessageService = async ({
   contractId,
@@ -48,6 +48,7 @@ export const sendMessageService = async ({
         select: {
           id: true,
           email: true,
+          profile: true,
         },
       },
     },
@@ -60,6 +61,23 @@ export const sendMessageService = async ({
     io.to(contractId).emit("chat:receive", message);
   } catch (error) {
     console.log("Socket emit failed");
+  }
+
+  // trigger NEW_MESSAGE notification for recipient
+  try {
+    const recipientId = contract.clientId === senderId ? contract.freelancerId : contract.clientId;
+    const senderName = message.sender?.profile?.fullName || message.sender?.email?.split('@')[0] || "Someone";
+    
+    await createNotificationService({
+      userId: recipientId,
+      title: "New Message Received",
+      message: `${senderName}: ${content.substring(0, 60)}${content.length > 60 ? '...' : ''}`,
+      type: "NEW_MESSAGE",
+      contractId: contractId,
+      messageThreadId: contractId,
+    });
+  } catch (err) {
+    console.error(`[Message Notification Error] Failed to trigger notification: ${err.message}`);
   }
 
   return message;

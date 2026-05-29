@@ -45,6 +45,22 @@ export const contractService = {
   async getMyContracts() {
     return request.get('/contracts/my');
   },
+
+  async completeContract(contractId) {
+    return request.patch(`/contracts/${contractId}/complete`);
+  },
+
+  async submitReview(contractId, rating, comment) {
+    return request.post(`/contracts/${contractId}/review`, { rating, comment });
+  },
+
+  async approveMilestone(milestoneId) {
+    return request.patch(`/milestones/${milestoneId}/approve`);
+  },
+
+  async requestRevision(milestoneId) {
+    return request.patch(`/milestones/${milestoneId}/revision`);
+  }
 };
 
 export default messageService;

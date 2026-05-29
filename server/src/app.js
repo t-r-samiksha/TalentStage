@@ -16,6 +16,8 @@ import dashboardRoutes from "./routes/dashboard.routes.js";
 import followRoutes from "./routes/follow.routes.js";
 import ledgerRoutes from "./routes/ledger.routes.js";
 import skillTestRoutes from "./routes/skilltest.routes.js";
+import savedRoutes from "./routes/saved.routes.js";
+import reviewRoutes from "./routes/review.routes.js";
 import aiRouter from "./ai/index.js";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -80,6 +82,8 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api", followRoutes);
 app.use("/api/ledger", ledgerRoutes);
 app.use("/api", skillTestRoutes);
+app.use("/api/saved-freelancers", savedRoutes);
+app.use("/api", reviewRoutes);
 app.use("/api/ai", aiRouter);
 
 app.use(errorMiddleware);

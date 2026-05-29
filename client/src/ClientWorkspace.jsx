@@ -4,10 +4,12 @@ import {
   Cpu, Briefcase, Sparkles, DollarSign, CheckCircle2,
   LogOut, LayoutDashboard, Plus,
   ChevronRight, Award, MessageSquare,
-  Calendar, Check, ArrowRight, ShieldCheck, AlertCircle
+  Calendar, Check, ArrowRight, ShieldCheck, AlertCircle,
+  Star, User, Bell, ArrowUpRight
 } from 'lucide-react';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
-import { authService, dashboardService, projectService, aiService } from './api';
+import { authService, dashboardService, projectService, aiService, notificationService, savedService, followService } from './api';
+import { socketService } from './api/services/socketService';
 
 function ClientWorkspace() {
   const location = useLocation();
@@ -60,6 +62,23 @@ function ClientWorkspace() {
   const [error, setError] = useState('');
   const [clientProjects, setClientProjects] = useState([]);
 
+  // ─── Saved Candidates & Followers states ──────────────────────────────────
+  const [savedFreelancers, setSavedFreelancers] = useState([]);
+  const [savedLoading, setSavedLoading] = useState(false);
+  const [followers, setFollowers] = useState([]);
+  const [followersLoading, setFollowersLoading] = useState(false);
+
+  // ─── Invitation Modal states ──────────────────────────────────────────────
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [invitingFreelancer, setInvitingFreelancer] = useState(null);
+  const [selectedProjectIdToInvite, setSelectedProjectIdToInvite] = useState('');
+  const [invitingStatusMessage, setInvitingStatusMessage] = useState('');
+
+  // ─── Notifications states ───────────────────────────────────────────────
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+
   useEffect(() => {
     let active = true;
     const fetchDashboardData = async () => {
@@ -77,6 +96,11 @@ function ClientWorkspace() {
       if (profileResult.success && dashboardResult.success) {
         setProfile(profileResult.data);
         setDashboardData(dashboardResult.data);
+
+        // Initialize notifications and count
+        const initialNotifications = dashboardResult.data?.notifications || [];
+        setNotifications(initialNotifications);
+        setUnreadCount(initialNotifications.filter(n => !n.isRead).length);
         
         // Map database projects to clientProjects state
         const mapped = (dashboardResult.data?.projects || []).map(p => ({
@@ -101,6 +125,161 @@ function ClientWorkspace() {
     fetchDashboardData();
     return () => { active = false; };
   }, []);
+
+  // Fetch full notifications when notifications tab is active
+  useEffect(() => {
+    if (activeTab !== 'notifications') return;
+
+    let active = true;
+    const fetchAllNotifications = async () => {
+      setNotificationsLoading(true);
+      try {
+        const res = await notificationService.getMyNotifications();
+        if (res.success && active) {
+          setNotifications(res.data || []);
+          setUnreadCount((res.data || []).filter(n => !n.isRead).length);
+        }
+      } catch (err) {
+        console.error("Failed to fetch all notifications", err);
+      } finally {
+        if (active) setNotificationsLoading(false);
+      }
+    };
+
+    fetchAllNotifications();
+    return () => { active = false; };
+  }, [activeTab]);
+
+  // Connect socket and listen for real-time notifications
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    const onNewNotification = (notification) => {
+      setNotifications(prev => [notification, ...prev]);
+      setUnreadCount(prev => prev + 1);
+    };
+
+    socketService.connect();
+    socketService.join(profile.id);
+    socketService.on('new_notification', onNewNotification);
+
+    return () => {
+      socketService.off('new_notification', onNewNotification);
+    };
+  }, [profile]);
+
+  // Fetch Saved Freelancers when activeTab is active
+  useEffect(() => {
+    if (activeTab !== 'saved-freelancers') return;
+    
+    let active = true;
+    const fetchSaved = async () => {
+      setSavedLoading(true);
+      try {
+        const res = await savedService.getSavedFreelancers();
+        if (res.success && active) {
+          setSavedFreelancers(res.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch saved candidates", err);
+      } finally {
+        if (active) setSavedLoading(false);
+      }
+    };
+    fetchSaved();
+    return () => { active = false; };
+  }, [activeTab]);
+
+  // Fetch Followers when activeTab is active
+  useEffect(() => {
+    if (activeTab !== 'followers') return;
+    
+    let active = true;
+    const fetchFollowers = async () => {
+      setFollowersLoading(true);
+      try {
+        const res = await followService.getClientFollowers();
+        if (res.success && active) {
+          setFollowers(res.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch followers", err);
+      } finally {
+        if (active) setFollowersLoading(false);
+      }
+    };
+    fetchFollowers();
+    return () => { active = false; };
+  }, [activeTab]);
+
+  // ─── Notification Handlers ────────────────────────────────────────────────
+  const handleMarkAsRead = async (id) => {
+    try {
+      const res = await notificationService.markAsRead(id);
+      if (res.success) {
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error("Failed to mark notification as read", err);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const res = await notificationService.markAllAsRead();
+      if (res.success) {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setUnreadCount(0);
+      }
+    } catch (err) {
+      console.error("Failed to mark all notifications as read", err);
+    }
+  };
+
+  // ─── Saved Candidate & Invitation Handlers ────────────────────────────────
+  const handleOpenInviteModal = (freelancer) => {
+    setInvitingFreelancer(freelancer);
+    setSelectedProjectIdToInvite('');
+    setInvitingStatusMessage('');
+    setInviteModalOpen(true);
+  };
+
+  const handleSendInvite = async () => {
+    if (!selectedProjectIdToInvite || !invitingFreelancer) return;
+    setInvitingStatusMessage('Sending invitation...');
+    try {
+      const result = await projectService.inviteFreelancer({
+        projectId: selectedProjectIdToInvite,
+        freelancerId: invitingFreelancer.id
+      });
+      if (result.success) {
+        setInvitingStatusMessage('Invitation sent successfully!');
+        setTimeout(() => {
+          setInviteModalOpen(false);
+          setInvitingFreelancer(null);
+        }, 1500);
+      } else {
+        setInvitingStatusMessage(result.error?.message || 'Failed to send invitation.');
+      }
+    } catch (err) {
+      setInvitingStatusMessage(err.message || 'Failed to send invitation.');
+    }
+  };
+
+  const handleRemoveSaved = async (freelancerId) => {
+    try {
+      const res = await savedService.removeSavedFreelancer(freelancerId);
+      if (res.success) {
+        setSavedFreelancers(prev => prev.filter(item => item.id !== freelancerId));
+        alert('Freelancer removed from saved list.');
+      } else {
+        alert(res.error?.message || 'Failed to remove freelancer.');
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to remove freelancer.');
+    }
+  };
 
   const totalBudget = useMemo(() => {
     if (!dashboardData?.projects) return 0;
@@ -203,8 +382,16 @@ function ClientWorkspace() {
       setFormError('Please specify a project title.');
       return;
     }
+    if (title.trim().length < 3) {
+      setFormError('Project title must be at least 3 characters long.');
+      return;
+    }
     if (!description.trim()) {
       setFormError('Please describe the scope of deliverables.');
+      return;
+    }
+    if (description.trim().length < 10) {
+      setFormError('Contract deliverables & scope must be at least 10 characters long.');
       return;
     }
     if (skills.length === 0) {
@@ -216,12 +403,26 @@ function ClientWorkspace() {
       return;
     }
 
+    const parsedMin = parseInt(budgetMin, 10);
+    const parsedMax = parseInt(budgetMax, 10);
+    if (isNaN(parsedMin) || parsedMin <= 0 || isNaN(parsedMax) || parsedMax <= 0) {
+      setFormError('Budget limits must be positive numbers.');
+      return;
+    }
+    if (parsedMin > parsedMax) {
+      setFormError('Minimum budget limit cannot exceed maximum budget limit.');
+      return;
+    }
+
     setIsPosting(true);
     const result = await projectService.createProject({
       title: title.trim(),
       description: description.trim(),
-      budgetMin: parseInt(budgetMin, 10),
-      budgetMax: parseInt(budgetMax, 10)
+      budgetMin: parsedMin,
+      budgetMax: parsedMax,
+      skills,
+      deadline: deadline || null,
+      billingModel: projectType
     });
     setIsPosting(false);
 
@@ -403,6 +604,24 @@ function ClientWorkspace() {
               <span>Saved Freelancers</span>
               <span className="ml-auto px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-400 text-[10px] font-extrabold tracking-wide">
                 4
+              </span>
+            </button>
+
+            {/* Followers */}
+            <button
+              onClick={() => setActiveTab('followers')}
+              className={`
+                w-full flex items-center gap-3 py-2.5 px-3 rounded-xl text-sm font-semibold transition-all relative group cursor-pointer
+                ${activeTab === 'followers'
+                  ? 'bg-indigo-600/10 text-indigo-400 border-l-2 border-indigo-500 pl-2.5 rounded-l-none'
+                  : 'text-slate-500 hover:text-slate-200 hover:bg-white/[0.02]'
+                }
+              `}
+            >
+              <User className="w-4 h-4 text-violet-400" />
+              <span>My Followers</span>
+              <span className="ml-auto px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-400 text-[10px] font-extrabold tracking-wide">
+                {followers.length}
               </span>
             </button>
 
@@ -1256,6 +1475,35 @@ function ClientWorkspace() {
           <WorkspaceMessagesAndContracts activeSection="contracts" />
         )}
 
+        {/* Saved Candidates View */}
+        {activeTab === 'saved-freelancers' && (
+          <SavedCandidatesView
+            savedFreelancers={savedFreelancers}
+            loading={savedLoading}
+            onInvite={handleOpenInviteModal}
+            onRemove={handleRemoveSaved}
+          />
+        )}
+
+        {/* Followers View */}
+        {activeTab === 'followers' && (
+          <FollowersView
+            followers={followers}
+            loading={followersLoading}
+            onInvite={handleOpenInviteModal}
+          />
+        )}
+
+        {/* Notifications Hub */}
+        {activeTab === 'notifications' && (
+          <NotificationsView
+            notifications={notifications}
+            loading={notificationsLoading}
+            onMarkAsRead={handleMarkAsRead}
+            onMarkAllAsRead={handleMarkAllAsRead}
+          />
+        )}
+
       </main>
 
       {/* ── Simulated Success Modal Overlay (Page 7 success) ── */}
@@ -1293,6 +1541,518 @@ function ClientWorkspace() {
         </div>
       )}
 
+    </div>
+  );
+}
+
+function SavedCandidatesView({ savedFreelancers, loading, onInvite, onRemove }) {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-8 animate-fade-in select-none">
+      <div className="border-b border-slate-200 pb-6">
+        <h1 className="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
+          Saved Freelancers
+          <span className="w-5 h-5 rounded-full bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-500">
+            {savedFreelancers.length}
+          </span>
+        </h1>
+        <p className="text-sm text-slate-400 mt-1 leading-normal font-medium">
+          Talented professionals you have bookmarked for current or future project collaborations.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+          <p className="text-xs font-bold text-slate-505 tracking-wider uppercase">Loading Candidates...</p>
+        </div>
+      ) : savedFreelancers.length === 0 ? (
+        <div className="text-center py-24 space-y-4 border border-slate-200 bg-white rounded-2xl max-w-xl mx-auto shadow-sm">
+          <Award className="w-10 h-10 text-slate-355 mx-auto" />
+          <p className="text-sm font-bold text-slate-800">No Saved Candidates</p>
+          <p className="text-xs text-slate-400">Bookmark freelancers from their profiles to keep them handy here.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
+          {savedFreelancers.map((item) => (
+            <div key={item.id} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between gap-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-sm font-black text-indigo-600">
+                      {item.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 onClick={() => navigate(`/freelancer/${item.id}`)} className="text-sm font-black text-slate-900 cursor-pointer hover:text-indigo-600 transition-colors">
+                        {item.fullName}
+                      </h3>
+                      <div className="flex items-center gap-1.5 mt-0.5 select-none">
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span className="text-xs font-bold text-slate-600">{item.rating?.toFixed(2) || "0.00"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">
+                  {item.bio || "No bio description provided by the freelancer."}
+                </p>
+
+                {item.skills?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {item.skills.slice(0, 3).map((s, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-500 uppercase">
+                        {s}
+                      </span>
+                    ))}
+                    {item.skills.length > 3 && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-black text-slate-400 uppercase">
+                        +{item.skills.length - 3} More
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center pt-3 border-t border-slate-100 mt-2">
+                <div className="text-[10px] font-bold text-slate-500">
+                  Rate: <span className="text-xs font-black text-slate-800">₹{item.hourlyRate || "0"}/hr</span>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleRemoveSaved(item.id)}
+                    className="py-1.5 px-3 rounded-lg border border-rose-200 hover:border-rose-400 hover:bg-rose-50/20 text-[10.5px] font-bold text-rose-600 transition-all cursor-pointer bg-white"
+                  >
+                    Remove
+                  </button>
+                  <button 
+                    onClick={() => handleOpenInviteModal(item)}
+                    className="py-1.5 px-3.5 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-[10.5px] font-black text-white transition-all shadow-md cursor-pointer flex items-center gap-0.5"
+                  >
+                    Invite
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FollowersView({ followers, loading, onInvite }) {
+  const navigate = useNavigate();
+  return (
+    <div className="space-y-8 animate-fade-in select-none">
+      <div className="border-b border-slate-200 pb-6">
+        <h1 className="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
+          My Followers
+          <span className="w-5 h-5 rounded-full bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-500">
+            {followers.length}
+          </span>
+        </h1>
+        <p className="text-sm text-slate-400 mt-1 leading-normal font-medium">
+          Freelancers who follow you to get real-time alerts whenever you post new project opportunities.
+        </p>
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+          <p className="text-xs font-bold text-slate-505 tracking-wider uppercase">Loading Followers...</p>
+        </div>
+      ) : followers.length === 0 ? (
+        <div className="text-center py-24 space-y-4 border border-slate-200 bg-white rounded-2xl max-w-xl mx-auto shadow-sm">
+          <User className="w-10 h-10 text-slate-355 mx-auto" />
+          <p className="text-sm font-bold text-slate-800">No Followers Yet</p>
+          <p className="text-xs text-slate-400">Once freelancers start following your client profile, they'll list here.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
+          {followers.map((item) => (
+            <div key={item.id} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between gap-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-sm font-black text-indigo-600">
+                      {item.fullName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 onClick={() => navigate(`/freelancer/${item.id}`)} className="text-sm font-black text-slate-900 cursor-pointer hover:text-indigo-600 transition-colors">
+                        {item.fullName}
+                      </h3>
+                      <div className="flex items-center gap-1.5 mt-0.5 select-none">
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span className="text-xs font-bold text-slate-600">{item.rating?.toFixed(2) || "0.00"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-505 leading-relaxed line-clamp-2">
+                  {item.bio || "No bio description provided by the freelancer."}
+                </p>
+
+                {item.skills?.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {item.skills.slice(0, 3).map((s, idx) => (
+                      <span key={idx} className="px-2 py-0.5 rounded bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-500 uppercase">
+                        {s}
+                      </span>
+                    ))}
+                    {item.skills.length > 3 && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-black text-slate-400 uppercase">
+                        +{item.skills.length - 3} More
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between items-center pt-3 border-t border-slate-100 mt-2">
+                <div className="text-[10px] font-bold text-slate-505">
+                  Earned: <span className="text-xs font-black text-slate-800">₹{item.totalEarned?.toLocaleString() || "0"}</span>
+                </div>
+                <button 
+                  onClick={() => handleOpenInviteModal(item)}
+                  className="py-1.5 px-3.5 rounded-lg bg-indigo-650 hover:bg-indigo-700 text-[10.5px] font-black text-white transition-all shadow-md cursor-pointer flex items-center gap-0.5"
+                >
+                  Invite to Apply
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotificationsView({ notifications, loading, onMarkAsRead, onMarkAllAsRead }) {
+  const navigate = useNavigate();
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  const TYPE_CONFIG = {
+    NEW_PROJECT: {
+      icon: Sparkles,
+      iconColor: 'text-rose-500 bg-rose-50 border-rose-200',
+      actionLabel: 'View Project',
+      actionColor: 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-500/20',
+    },
+    PROPOSAL_ACCEPTED: {
+      icon: Award,
+      iconColor: 'text-emerald-500 bg-emerald-50 border-emerald-200',
+      actionLabel: 'Open Contract',
+      actionColor: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20',
+    },
+    NEW_MESSAGE: {
+      icon: MessageSquare,
+      iconColor: 'text-sky-500 bg-sky-50 border-sky-200',
+      actionLabel: 'Open Chat',
+      actionColor: 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20',
+    },
+    PROJECT_INVITATION: {
+      icon: Briefcase,
+      iconColor: 'text-violet-500 bg-violet-50 border-violet-200',
+      actionLabel: 'View Invitation',
+      actionColor: 'bg-violet-600 hover:bg-violet-700 text-white shadow-violet-500/20',
+    },
+    FOLLOW_NOTIFICATION: {
+      icon: User,
+      iconColor: 'text-indigo-500 bg-indigo-50 border-indigo-200',
+      actionLabel: 'View Profile',
+      actionColor: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20',
+    },
+    REVIEW_RECEIVED: {
+      icon: Star,
+      iconColor: 'text-amber-500 bg-amber-50 border-amber-200',
+      actionLabel: 'View Profile',
+      actionColor: 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/20',
+    },
+    CONTRACT_COMPLETED: {
+      icon: CheckCircle2,
+      iconColor: 'text-emerald-500 bg-emerald-50 border-emerald-200',
+      actionLabel: 'View Contract',
+      actionColor: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20',
+    },
+  };
+
+  const DEFAULT_CONFIG = {
+    icon: Bell,
+    iconColor: 'text-slate-505 bg-slate-50 border-slate-200',
+    actionLabel: null,
+    actionColor: 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20',
+  };
+
+  const handleActionClick = (n) => {
+    const type = n.type;
+    if (!n.isRead) {
+      onMarkAsRead(n.id);
+    }
+    
+    if (type === 'NEW_PROJECT' && n.projectId) {
+      navigate('/project-feed', { state: { projectId: n.projectId } });
+    } else if (type === 'PROPOSAL_ACCEPTED' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'contracts' } });
+    } else if (type === 'NEW_MESSAGE' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'messages' } });
+    } else if (type === 'PROJECT_INVITATION' && n.projectId) {
+      navigate('/project-feed', { state: { projectId: n.projectId } });
+    } else if (type === 'FOLLOW_NOTIFICATION') {
+      if (n.clientId) {
+        navigate(`/client/${n.clientId}`);
+      } else if (n.freelancerId) {
+        navigate(`/freelancer/${n.freelancerId}`);
+      }
+    } else if (type === 'REVIEW_RECEIVED') {
+      if (n.freelancerId) {
+        navigate(`/freelancer/${n.freelancerId}`);
+      } else if (n.clientId) {
+        navigate(`/client/${n.clientId}`);
+      }
+    } else if (type === 'CONTRACT_COMPLETED' && n.contractId) {
+      navigate('/workspace', { state: { contractId: n.contractId, section: 'contracts' } });
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-fade-in select-none">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-200 pb-6 select-none">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
+            System Alerts & Notifications
+            <span className="w-5 h-5 rounded-full bg-indigo-650/10 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-500">
+              {notifications.length}
+            </span>
+          </h1>
+          <p className="text-sm text-slate-400 mt-1 leading-normal font-medium">
+            Real-time updates regarding your contract matches, followings, and escrow payments.
+          </p>
+        </div>
+
+        {unreadCount > 0 && (
+          <button 
+            onClick={onMarkAllAsRead}
+            className="py-2 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-xs font-bold text-indigo-600 transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+          >
+            <Check className="w-3.5 h-3.5" />
+            <span>Mark all as read</span>
+          </button>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-32 space-y-4 select-none">
+          <div className="w-10 h-10 rounded-full border-4 border-indigo-500/20 border-t-indigo-500 animate-spin" />
+          <p className="text-xs font-bold text-slate-500 tracking-wider uppercase">Loading Notifications...</p>
+        </div>
+      ) : notifications.length === 0 ? (
+        <div className="text-center py-24 space-y-4 border border-slate-200 bg-white rounded-2xl max-w-xl mx-auto shadow-sm select-none">
+          <Bell className="w-10 h-10 text-slate-350 mx-auto animate-bounce" />
+          <p className="text-sm font-bold text-slate-800">You're all caught up!</p>
+          <p className="text-xs text-slate-400">No notifications found at the moment.</p>
+        </div>
+      ) : (
+        <div className="space-y-4 max-w-4xl">
+          {notifications.map((n) => {
+            const config = TYPE_CONFIG[n.type] || DEFAULT_CONFIG;
+            return (
+              <div 
+                key={n.id} 
+                className={`
+                  p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row gap-5
+                  bg-white shadow-sm hover:shadow-md
+                  ${n.isRead ? 'border-slate-200 opacity-90' : 'border-indigo-150 bg-indigo-50/5 ring-1 ring-indigo-500/5'}
+                `}
+              >
+                {/* Icon Container */}
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${config.iconColor}`}>
+                  <config.icon className="w-6 h-6" />
+                </div>
+
+                {/* Main content block */}
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {!n.isRead && (
+                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse shrink-0 animate-ping" />
+                      )}
+                      <h3 className="text-sm font-black text-slate-800 leading-tight truncate">
+                        {n.title}
+                      </h3>
+                    </div>
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                      {new Date(n.createdAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-505 leading-relaxed font-semibold">
+                    {n.message}
+                  </p>
+
+                  {/* Expanded Project & Client Credibility Snapshot for NEW_PROJECT */}
+                  {n.type === 'NEW_PROJECT' && n.metadata?.project && (
+                    <div className="mt-4 p-5 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-4">
+                      {/* Project Details Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="col-span-2 space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Project Name</span>
+                          <span className="text-xs font-black text-slate-800 leading-normal">{n.metadata.project.title}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Budget Limits</span>
+                          <span className="text-xs font-bold text-slate-700">
+                            ₹{n.metadata.project.budgetMin?.toLocaleString('en-IN')} - ₹{n.metadata.project.budgetMax?.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">Billing Type</span>
+                          <span className="text-xs font-bold text-slate-700">{n.metadata.project.billingModel}</span>
+                        </div>
+                      </div>
+
+                      {/* Skills required & Deadline */}
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pt-3 border-t border-slate-200/60">
+                        {n.metadata.project.skills?.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-1">Skills:</span>
+                            {n.metadata.project.skills.map((s, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-100 text-[10px] font-extrabold text-indigo-600 uppercase tracking-wide">
+                                {s}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {n.metadata.project.deadline && (
+                          <div className="text-[10px] font-bold text-slate-500 shrink-0">
+                            Deadline: <span className="text-slate-800">{new Date(n.metadata.project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Client Reputation Snapshot */}
+                      {n.metadata.client?.stats && (
+                        <div className="mt-3 p-4 rounded-xl bg-indigo-50/20 border border-indigo-100/50 space-y-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[9.5px] font-black text-indigo-600 uppercase tracking-wider">Client Credibility Snapshot</span>
+                            <span className="h-px bg-indigo-100/50 flex-1" />
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.totalProjectsPosted}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Posted</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.totalProjectsCompleted}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Completed</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">₹{n.metadata.client.stats.totalAmountSpent.toLocaleString('en-IN')}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Spent</span>
+                            </div>
+                            <div className="p-2 rounded bg-white/60 border border-slate-100">
+                              <span className="text-[15px] font-black text-slate-850 block">{n.metadata.client.stats.followersCount}</span>
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Followers</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Contextual Action Button Block */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1 pb-1">
+                    {config.actionLabel && (
+                      <button 
+                        onClick={() => handleActionClick(n)}
+                        className={`py-2 px-4 rounded-xl text-xs font-black tracking-wide uppercase transition-all shadow-md active:scale-95 cursor-pointer flex items-center gap-1.5 ${config.actionColor}`}
+                      >
+                        <span>{config.actionLabel}</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {!n.isRead && (
+                      <button 
+                        onClick={() => onMarkAsRead(n.id)}
+                        className="py-2 px-4 rounded-xl border border-slate-205 hover:border-indigo-400 hover:bg-indigo-50/10 text-xs font-black text-slate-600 hover:text-indigo-600 transition-all flex items-center gap-1 cursor-pointer bg-white"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Mark as Read</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Invitation Modal Overlay ── */}
+      {inviteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/40 backdrop-blur-sm animate-fadeIn">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-2xl p-6 md:p-8 animate-scaleUp">
+            <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
+              <Plus className="w-5 h-5 text-indigo-500" />
+              <span>Invite to Project</span>
+            </h3>
+            
+            {invitingFreelancer && (
+              <p className="text-xs text-slate-505 mb-6">
+                Send an invitation to <span className="font-bold text-slate-800">{invitingFreelancer.fullName}</span> to collaborate on one of your active projects.
+              </p>
+            )}
+
+            <div className="space-y-4 mb-6">
+              <label className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-400">
+                Select Project Listing *
+              </label>
+              
+              <div className="relative">
+                <select
+                  value={selectedProjectIdToInvite}
+                  onChange={(e) => setSelectedProjectIdToInvite(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-900 cursor-pointer focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/60"
+                >
+                  <option value="" disabled>-- Choose an active project --</option>
+                  {clientProjects.filter(p => p.status === 'Active' || p.status === 'OPEN').map(p => (
+                    <option key={p.id} value={p.id}>{p.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              {invitingStatusMessage && (
+                <p className={`text-xs font-semibold ${invitingStatusMessage.includes('successfully') ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {invitingStatusMessage}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setInviteModalOpen(false)}
+                className="py-2 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendInvite}
+                disabled={!selectedProjectIdToInvite || invitingStatusMessage.includes('Sending')}
+                className="py-2 px-5 rounded-xl bg-indigo-650 hover:bg-indigo-700 text-xs font-bold text-white disabled:opacity-50 cursor-pointer"
+              >
+                Send Invitation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

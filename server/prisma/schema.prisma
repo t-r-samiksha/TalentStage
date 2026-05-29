@@ -73,6 +73,11 @@ model User {
   ledgerAccount LedgerAccount?
 
   skillTests SkillTest[]
+
+  savedFreelancers SavedFreelancer[] @relation("ClientSavedFreelancers")
+  savedByClients   SavedFreelancer[] @relation("FreelancerSaved")
+  reviewsGiven     Review[]          @relation("ClientReviews")
+  reviewsReceived  Review[]          @relation("FreelancerReviews")
 }
 
 model Profile {
@@ -127,6 +132,10 @@ model Project {
   status      ProjectStatus @default(OPEN)
   createdAt   DateTime      @default(now())
 
+  skills       String[]      @default([])
+  deadline     DateTime?
+  billingModel String?       @default("Fixed Price")
+
   client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   proposals Proposal[]
@@ -172,6 +181,8 @@ model Contract {
 
   transactions Transaction[]
 
+  review Review?
+
   @@index([clientId])
   @@index([freelancerId])
 }
@@ -206,6 +217,14 @@ model Notification {
   isRead Boolean @default(false)
 
   createdAt DateTime @default(now())
+
+  type            String?
+  projectId       String?
+  contractId      String?
+  messageThreadId String?
+  reviewId        String?
+  clientId        String?
+  freelancerId    String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -387,4 +406,35 @@ model OtpVerification {
   expiry    DateTime
   verified  Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model SavedFreelancer {
+  id           String   @id @default(uuid())
+  clientId     String
+  freelancerId String
+  createdAt    DateTime @default(now())
+
+  client     User @relation("ClientSavedFreelancers", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer User @relation("FreelancerSaved", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, freelancerId])
+  @@index([clientId])
+  @@index([freelancerId])
+}
+
+model Review {
+  id           String   @id @default(uuid())
+  contractId   String   @unique
+  clientId     String
+  freelancerId String
+  rating       Int
+  comment      String
+  createdAt    DateTime @default(now())
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  client     User     @relation("ClientReviews", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancer User     @relation("FreelancerReviews", fields: [freelancerId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([freelancerId])
 }

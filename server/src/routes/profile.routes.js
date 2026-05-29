@@ -5,6 +5,8 @@ import {
   updateProfileController,
   updateFreelancerProfileController,
   addSkillController,
+  getClientProfileController,
+  getFreelancerProfileController,
 } from "../controllers/profile.controller.js";
 
 import { authMiddleware }
@@ -34,6 +36,18 @@ router.post(
   "/skills",
   authMiddleware,
   addSkillController
+);
+
+router.get(
+  "/client/:id",
+  authMiddleware,
+  getClientProfileController
+);
+
+router.get(
+  "/freelancer/:id",
+  authMiddleware,
+  getFreelancerProfileController
 );
 
 export default router;

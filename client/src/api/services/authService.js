@@ -98,6 +98,14 @@ export const authService = {
    */
   async addSkill(skillId) {
     return request.post('/profile/skills', { skillId });
+  },
+
+  async getClientProfile(clientId) {
+    return request.get(`/profile/client/${clientId}`);
+  },
+
+  async getFreelancerProfile(freelancerId) {
+    return request.get(`/profile/freelancer/${freelancerId}`);
   }
 };
 

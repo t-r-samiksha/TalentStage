@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect, Component } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Cpu, ArrowLeft, Search, Filter, Sparkles, CheckCircle2, Star,
   Clock, DollarSign, Calendar, ChevronDown, Code2,
@@ -241,8 +241,9 @@ const AI_CANDIDATE_MATCHES = [
 
 // ─── Star Rating helper ────────────────────────────────────────────────────
 function StarRating({ rating }) {
-  const full = Math.floor(rating);
-  const half = rating - full >= 0.5;
+  const numericRating = typeof rating === 'number' && !isNaN(rating) ? rating : 0;
+  const full = Math.floor(numericRating);
+  const half = numericRating - full >= 0.5;
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
@@ -251,7 +252,7 @@ function StarRating({ rating }) {
           className={`w-3 h-3 ${i < full ? 'text-amber-400 fill-amber-400' : half && i === full ? 'text-amber-400 fill-amber-400/50' : 'text-slate-700'}`}
         />
       ))}
-      <span className="ml-1 text-xs font-bold text-slate-500">{rating.toFixed(2)}</span>
+      <span className="ml-1 text-xs font-bold text-slate-500">{numericRating.toFixed(2)}</span>
     </div>
   );
 }
@@ -276,8 +277,9 @@ function MatchBadge({ match }) {
 }
 
 // ─── Main Component ────────────────────────────────────────────────────────
-export default function ProjectFeedWorkspace() {
+function ProjectFeedWorkspace() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState('feed'); // 'feed' | 'details'
   const [selectedProject, setSelectedProject] = useState(null);
 
@@ -375,6 +377,7 @@ export default function ProjectFeedWorkspace() {
         id: p.id,
         title: p.title,
         client: clientName,
+        clientId: p.clientId,
         postedAgo: timeAgo(p.createdAt),
         description: p.description,
         skills: sk,
@@ -391,6 +394,22 @@ export default function ProjectFeedWorkspace() {
       };
     });
   }, [dbProjects, sessionSubmitted]);
+
+  // Preselected project navigation support from notifications
+  useEffect(() => {
+    if (projects.length > 0) {
+      const searchParams = new URLSearchParams(location.search);
+      const preselectedId = location.state?.projectId || searchParams.get('projectId');
+      if (preselectedId) {
+        const found = projects.find(p => p.id === preselectedId);
+        if (found) {
+          // Clear state/query parameter so we don't re-trigger on subsequent updates
+          navigate(location.pathname, { replace: true, state: {} });
+          openDetails(found);
+        }
+      }
+    }
+  }, [projects, location.state, location.search]);
 
   // Computed filtered feed
   const filteredProjects = useMemo(() => {
@@ -604,6 +623,21 @@ export default function ProjectFeedWorkspace() {
       setIsAiMatching(false);
     }
   };
+
+  // Parse query params and auto-select project details on load
+  useEffect(() => {
+    if (isLoading || dbProjects.length === 0) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const projectId = params.get('projectId');
+    if (projectId) {
+      // Find matching project in our mapped list
+      const matched = projects.find(p => p.id === projectId);
+      if (matched) {
+        openDetails(matched);
+      }
+    }
+  }, [isLoading, dbProjects, projects]);
 
   const handleSubmitProposal = async (projectId) => {
     setSubmitting(projectId);
@@ -1000,7 +1034,20 @@ export default function ProjectFeedWorkspace() {
                               {project.title}
                             </h2>
                             <p className="text-sm font-medium text-slate-400 mt-0.5">
-                              Posted by <span className="text-cyan-300 font-semibold">{project.client}</span>
+                              Posted by{' '}
+                              {project.clientId ? (
+                                <span
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/client/${project.clientId}`);
+                                  }}
+                                  className="text-cyan-300 font-semibold hover:text-indigo-400 hover:underline cursor-pointer transition-all"
+                                >
+                                  {project.client}
+                                </span>
+                              ) : (
+                                <span className="text-cyan-300 font-semibold">{project.client}</span>
+                              )}
                             </p>
                           </div>
 
@@ -1125,7 +1172,17 @@ export default function ProjectFeedWorkspace() {
                 <MatchBadge match={selectedProject.match} />
               </div>
               <p className="text-sm font-medium text-slate-500">
-                Posted by <span className="text-indigo-600 font-bold">{selectedProject.client}</span>
+                Posted by{' '}
+                {selectedProject.clientId ? (
+                  <span
+                    onClick={() => navigate(`/client/${selectedProject.clientId}`)}
+                    className="text-indigo-650 hover:text-indigo-850 hover:underline cursor-pointer font-bold transition-all"
+                  >
+                    {selectedProject.client}
+                  </span>
+                ) : (
+                  <span className="text-indigo-600 font-bold">{selectedProject.client}</span>
+                )}
                 <span className="mx-2 text-slate-300">·</span>
                 <span className="text-slate-500">{selectedProject.postedAgo}</span>
               </p>
@@ -1520,5 +1577,50 @@ export default function ProjectFeedWorkspace() {
 
       </div>
     </div>
+  );
+}
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught an error", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 bg-slate-900 text-rose-455 border border-rose-900 rounded-2xl max-w-xl mx-auto my-10 space-y-4 relative z-50">
+          <h2 className="text-lg font-black uppercase tracking-wider text-rose-400">Application Error</h2>
+          <p className="text-sm font-semibold text-slate-300">{this.state.error?.toString()}</p>
+          <pre className="text-xs p-4 bg-slate-950 rounded-xl overflow-auto text-slate-400 max-h-60 whitespace-pre-wrap">
+            {this.state.error?.stack}
+          </pre>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-rose-900 hover:bg-rose-800 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors"
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+export default function ProjectFeedWorkspaceWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <ProjectFeedWorkspace />
+    </ErrorBoundary>
   );
 }

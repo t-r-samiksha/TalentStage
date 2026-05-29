@@ -17,3 +17,8 @@ export { default as projectService } from './services/projectService';
 export { default as dashboardService } from './services/dashboardService';
 export { default as aiService } from './services/aiService';
 export { default as skillTestService } from './services/skillTestService';
+export { default as notificationService } from './services/notificationService';
+export { followService } from './services/followService';
+export { savedService } from './services/savedService';
+export { contractService } from './services/messageService';
+

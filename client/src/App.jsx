@@ -10,6 +10,8 @@ import ProjectFeedWorkspace from './ProjectFeedWorkspace';
 import SkillMatchWorkspace from './SkillMatchWorkspace';
 import WorkspaceMessagesAndContracts from './WorkspaceMessagesAndContracts';
 import GlobalDemoController from './GlobalDemoController';
+import ClientProfilePage from './ClientProfilePage';
+import FreelancerProfilePage from './FreelancerProfilePage';
 import { authStorage } from './api';
 
 /**
@@ -65,6 +67,7 @@ function PublicOnlyRoute({ children }) {
  */
 function WorkspaceMessagesAndContractsWrapper() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = authStorage.getUser();
   
   const handleBack = () => {
@@ -74,6 +77,9 @@ function WorkspaceMessagesAndContractsWrapper() {
       navigate('/dashboard');
     }
   };
+
+  const contractId = location.state?.contractId || new URLSearchParams(location.search).get('contractId') || null;
+  const section = location.state?.section || new URLSearchParams(location.search).get('section') || 'messages';
 
   return (
     <div className="min-h-screen bg-slate-950 p-8 lg:p-10 select-none relative overflow-hidden flex flex-col text-slate-100">
@@ -92,7 +98,7 @@ function WorkspaceMessagesAndContractsWrapper() {
             &larr; Back to Dashboard
           </button>
         </div>
-        <WorkspaceMessagesAndContracts />
+        <WorkspaceMessagesAndContracts activeSection={section} preselectedContractId={contractId} />
       </div>
     </div>
   );
@@ -180,6 +186,16 @@ function AppRoutes() {
         <Route path="/workspace" element={
           <ProtectedRoute>
             <WorkspaceMessagesAndContractsWrapper />
+          </ProtectedRoute>
+        } />
+        <Route path="/client/:id" element={
+          <ProtectedRoute>
+            <ClientProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/freelancer/:id" element={
+          <ProtectedRoute>
+            <FreelancerProfilePage />
           </ProtectedRoute>
         } />
 

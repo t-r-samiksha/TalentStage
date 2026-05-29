@@ -60,7 +60,9 @@ export const hireFreelancerService = async ({ proposalId, clientId }) => {
 
     title: "Proposal Accepted",
 
-    message: "Client hired you for the project.",
+    message: `Your proposal for "${proposal.project.title}" has been accepted!`,
+    type: "PROPOSAL_ACCEPTED",
+    contractId: contract.id,
   });
 
   return contract;
@@ -96,6 +98,7 @@ export const getMyContractsService = async (userId) => {
         },
       },
       milestones: true,
+      review: true,
     },
 
     orderBy: {

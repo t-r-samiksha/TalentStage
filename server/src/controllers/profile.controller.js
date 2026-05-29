@@ -3,6 +3,8 @@ import {
   updateProfileService,
   updateFreelancerProfileService,
   addSkillService,
+  getClientProfileService,
+  getFreelancerProfileService,
 } from "../services/profile/profile.service.js";
 
 import {
@@ -133,4 +135,31 @@ async (req, res) => {
 
   }
 
+};
+
+// GET CLIENT PROFILE FOR REPUTATION
+export const getClientProfileController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentUserId = req.user?.userId;
+
+    const profile = await getClientProfileService(id, currentUserId);
+
+    return successResponse(res, profile, "Client profile fetched successfully", 200);
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
+};
+
+// GET FREELANCER PROFILE FOR REPUTATION
+export const getFreelancerProfileController = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const profile = await getFreelancerProfileService(id);
+
+    return successResponse(res, profile, "Freelancer profile fetched successfully", 200);
+  } catch (error) {
+    return errorResponse(res, error.message, 400);
+  }
 };

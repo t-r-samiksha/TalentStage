@@ -65,15 +65,30 @@ async ({
       },
     });
 
+  // Fetch client user profile to personalize name
+  let clientName = "A client";
+  try {
+    const clientUser = await prisma.user.findUnique({
+      where: { id: clientId },
+      include: { profile: true }
+    });
+    if (clientUser?.profile?.fullName) {
+      clientName = clientUser.profile.fullName;
+    } else if (clientUser?.email) {
+      clientName = clientUser.email.split('@')[0];
+    }
+  } catch (err) {
+    console.error(`[Invitation Notification Profile Error] ${err.message}`);
+  }
+
   // send realtime notification
   await createNotificationService({
-
     userId: freelancerId,
-
     title: "Project Invitation",
-
-    message:
-      "You were invited to apply for a project.",
+    message: `${clientName} invited you to apply for their project: "${project.title}".`,
+    type: "PROJECT_INVITATION",
+    projectId,
+    clientId
   });
 
   return invitation;

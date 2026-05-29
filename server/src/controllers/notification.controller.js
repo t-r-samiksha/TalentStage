@@ -1,6 +1,7 @@
 import {
   getMyNotificationsService,
   markNotificationReadService,
+  markAllNotificationsReadService,
 } from "../services/notification/notification.service.js";
 import { successResponse, errorResponse } from "../utils/apiResponse.js";
 
@@ -35,6 +36,26 @@ async (req, res) => {
       );
 
     return successResponse(res, notification, "Notification marked as read successfully", 200);
+
+  } catch (error) {
+
+    return errorResponse(res, error.message, 400);
+
+  }
+
+};
+
+export const markAllNotificationsReadController =
+async (req, res) => {
+
+  try {
+
+    const result =
+      await markAllNotificationsReadService(
+        req.user.userId
+      );
+
+    return successResponse(res, result, "All notifications marked as read successfully", 200);
 
   } catch (error) {
 
